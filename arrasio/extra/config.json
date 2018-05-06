@@ -55,5 +55,5 @@
   "MIN_SPEED": 0.001,
   "FOOD_AMOUNT": 1.5, 
   "SKILL_BOOST": 5,
-  "BOTS": 0
+  "BOTS": 2
 }
