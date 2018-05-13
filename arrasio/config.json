@@ -1,7 +1,7 @@
 {
-  "host": "0.0.0.0",
+  "host": "172.17.0.19",
   "servesStatic": true,
-  "port": 3000,
+  "port": 955,
   "logpath": "logger.php",
   "networkUpdateFactor": 24,
   "socketWarningLimit": 5,

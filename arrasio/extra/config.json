@@ -1,6 +1,6 @@
 {
   "host": "0.0.0.0",
-  "port": 3000,
+  "port": 955,
   "logpath": "logger.php",
   "networkUpdateFactor": 25,
   "networkFrontlog": 3,
