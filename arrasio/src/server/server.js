@@ -29,7 +29,7 @@ Array.prototype.remove = index => {
 
 // Define player keys
 var keys = [
-    'EFrostToken',
+    'k', 'l', 'testk', 'testl',
     // Focus Group
         'ZNr3GBQOhD2CDDYpZD3JZkZ6hmhoF4wGiTYTikZlSLr1Z66yWKuVMitRkpUbPy6s', // Mine
         'HKib09Ep3hIcwFXpiCj5iEkpLBN88HQ22hiFqg5alcxn4AYl6VcsPFTqMvllLt1D', // Parodia

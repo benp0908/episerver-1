@@ -52,7 +52,7 @@ module.exports = {
     gameHeight: 0,
     xoffset: -0,
     yoffset: -0,
-    gameStart: true,
+    gameStart: false,
     disconnected: false,
     died: false,
     kicked: false,
