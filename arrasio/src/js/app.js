@@ -4,8 +4,8 @@
 "use strict";
 
 // Fundamental requires <3
-var global = require('./lib/global');
-var util = require('./lib/util');
+var global = './lib/global'
+var util = './lib/util';
 
 // Get color
 var config = {
