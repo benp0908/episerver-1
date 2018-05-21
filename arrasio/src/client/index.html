@@ -14,7 +14,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
     <!-- CSS -->
     <link rel="stylesheet" href="css/main.css" />
-    <!-- Version Control -->
+    <!-- Version Control
     <script>
         var VERSION = localStorage.getItem('versionHash');
         (function versionControl() {
@@ -36,6 +36,7 @@
             }
         });
     </script>
+    -->
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="57x57" href="/favicons/apple-icon-57x57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="/favicons/apple-icon-60x60.png">
@@ -163,19 +164,6 @@
                 clicked=true;
                 $(this).html('<h3 class="nopadding">view options/help 🡲</h3>');
                 $(".slider").css({"top": 0});
-            }
-        });
-    </script>
-    <script>
-        $(document).ready( function() {
-            // This is because it acts weird in Chrome for whatever reason...
-            $("#twitterHolder").css({"height": "100%"});
-            // This is for updates
-            if (localStorage.getItem('updated') === 'datgudshit') {
-                localStorage.setItem('updated', false);
-                $('#patchNotesIFrame').load(function(){
-                    $("#patchNotesIFrame").contents().find('#patchNotes').prepend('<update>New update!</update> ');
-                });
             }
         });
     </script>
