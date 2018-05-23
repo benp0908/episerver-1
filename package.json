@@ -1,9 +1,9 @@
 {
-  "name": "efrost-arras",
+  "name": "arras",
   "version": "1.0.0",
-  "main": "arrasio/src/server/server.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server"
   },
   "dependencies": {
     "google-closure-library": "^20180506.0.0",
