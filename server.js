@@ -3013,11 +3013,14 @@ const sockets = (() => {
                 switch (m.shift()) {
                 case 'k': { // key verification
                     if (m.length > 1) { socket.kick('Ill-sized key request.'); return 1; }
+                    if (socket.status.verified) { socket.kick('Duplicate player spawn attempt.'); return 1; }
                     socket.talk('w', true)
                     if (m.length === 1) {
                         let key = m[0];
+                        socket.key = key;
                         util.log('[INFO] A socket was verified with the token: '); util.log(key);
                     }
+                    socket.verified = true;
                     util.log('Clients: ' + clients.length);
                     /*if (m.length !== 1) { socket.kick('Ill-sized key request.'); return 1; }
                     // Get data
@@ -3118,26 +3121,21 @@ const sockets = (() => {
                         commands = m[2];
                     // Verify data
                     if (typeof target.x !== 'number' || typeof target.y !== 'number' || typeof commands !== 'number') { socket.kick('Weird downlink.'); return 1; }
-                    if (commands > 255 || target.x !== Math.round(target.x) || target.y !== Math.round(target.y)) { socket.kick('Malformed command packet.'); return 1; }
+                    if (commands > 255) { socket.kick('Malformed command packet.'); return 1; }
                     // Put the new target in
-                    player.target = target;
+                    player.target = target
                     // Process the commands
-                    let val = [false, false, false, false, false, false, false, false];
-                    for (let i=7; i>=0; i--) {
-                        if (commands >= Math.pow(2, i)) {
-                            commands -= Math.pow(2, i);
-                            val[i] = true;
-                        }
+                    if (player.command != null && player.body != null) {
+                        player.command.up    = (commands &  1)
+                        player.command.down  = (commands &  2) >> 1
+                        player.command.left  = (commands &  4) >> 2
+                        player.command.right = (commands &  8) >> 3
+                        player.command.lmb   = (commands & 16) >> 4
+                        player.command.mmb   = (commands & 32) >> 5
+                        player.command.rmb   = (commands & 64) >> 6
                     }
-                    player.command.up = val[0];
-                    player.command.down = val[1];
-                    player.command.left = val[2];
-                    player.command.right = val[3];
-                    player.command.lmb = val[4];
-                    player.command.mmb = val[5];
-                    player.command.rmb = val[6];
                     // Update the thingy 
-                    socket.timeout.set(commands);
+                    socket.timeout.set(commands)
                 } break;
                 case 't': { // player toggle
                     if (m.length !== 1) { socket.kick('Ill-sized toggle.'); return 1; }
