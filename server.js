@@ -2957,11 +2957,7 @@ var http = require('http'),
 // Websocket behavior
 const sockets = (() => {
     const protocol = require('./lib/fasttalk');
-    let clients = [], players = [], bannedIPs = [], suspiciousIPs = [], connectedIPs = [],
-        bannedNames = [
-            'FREE_FOOD_LUCARIO',
-            'FREE FOOD'
-        ];
+    let clients = [], players = [];
     return {
         broadcast: message => {
             clients.forEach(socket => {
@@ -2996,27 +2992,9 @@ const sockets = (() => {
                 util.remove(clients, clients.indexOf(socket));        
                 util.log('[INFO] Socket closed. Views: ' + views.length + '. Clients: ' + clients.length + '.');
             }
-            // Banning
-            function ban(socket) {
-                if (bannedIPs.findIndex(ip => { return ip === socket.ip; }) === -1) {
-                    bannedIPs.push(socket.ip);
-                } // No need for duplicates
-                socket.terminate();
-                util.warn(socket.ip + ' banned!');
-            }
             // Being kicked 
             function kick(socket, reason = 'No reason given.') {
-                let n = suspiciousIPs.findIndex(n => { return n.ip === socket.ip; });
-                if (n === -1) {
-                    suspiciousIPs.push({ ip: socket.ip, warns: 1, });
-                    util.warn(reason + ' Kicking. 1 warning.');
-                } else {
-                    suspiciousIPs[n].warns++;
-                    util.warn(reason + ' Kicking. ' + suspiciousIPs[n].warns + ' warnings.');
-                    if (suspiciousIPs[n].warns >= c.socketWarningLimit) {
-                        ban(socket);
-                    }
-                }
+                util.warn(reason + ' Kicking.');
                 socket.lastWords('K');
             }
             // Handle incoming messages
@@ -3034,11 +3012,15 @@ const sockets = (() => {
                 // Handle the request
                 switch (m.shift()) {
                 case 'k': { // key verification
+                    if (m.length > 1) { socket.kick('Ill-sized key request.'); return 1; }
                     socket.talk('w', true)
+                    if (m.length === 1) {
+                        let key = m[0];
+                        util.log('[INFO] A socket was verified with the token: '); util.log(key);
+                    }
                     util.log('Clients: ' + clients.length);
                     /*if (m.length !== 1) { socket.kick('Ill-sized key request.'); return 1; }
                     // Get data
-                    let key = m[0];
                     // Verify it
                     if (typeof key !== 'string') { socket.kick('Weird key offered.'); return 1; }
                     if (key.length > 64) { socket.kick('Overly-long key offered.'); return 1; }
@@ -3217,7 +3199,7 @@ const sockets = (() => {
                 case 'L': { // level up cheat
                     if (m.length !== 0) { socket.kick('Ill-sized level-up request.'); return 1; }
                     // cheatingbois
-                    if (player.body != null) { if (player.body.skill.level < c.SKILL_CHEAT_CAP || ((socket.key === 'testk' || socket.key ==='testl') && player.body.skill.level < 45)) {
+                    if (player.body != null) { if (player.body.skill.level < c.SKILL_CHEAT_CAP || ((socket.key === process.env.SECRET) && player.body.skill.level < 45)) {
                         player.body.skill.score += player.body.skill.levelScore;
                         player.body.skill.maintain();
                         player.body.refreshBodyAttributes();
@@ -3226,7 +3208,7 @@ const sockets = (() => {
                 case '0': { // testbed cheat
                     if (m.length !== 0) { socket.kick('Ill-sized testbed request.'); return 1; }
                     // cheatingbois
-                    if (player.body != null) { if (socket.key === 'testk' || socket.key ==='testl') {
+                    if (player.body != null) { if (socket.key === process.env.SECRET) {
                         player.body.define(Class.testbed);
                     } }
                 } break;
@@ -3502,7 +3484,7 @@ const sockets = (() => {
                         body.name = name; // Define the name
                         // Dev hax
                         if (socket.key === 'testl' || socket.key === 'testk') {
-                            body.name = "\u0000";
+                            body.name = "\u200b" + body.name;
                             body.define({ CAN_BE_ON_LEADERBOARD: false, });
                         }                        
                         body.addController(new io_listenToPlayer(body, player)); // Make it listen
@@ -4106,7 +4088,7 @@ const sockets = (() => {
             // This function initalizes the socket upon connection
             return (socket, req) => {
                 // Get information about the new connection and verify it
-                util.log(socket.ip + ' is trying to connect...');
+                util.log('A client is trying to connect...');
                 // Set it up
                 socket.binaryType = 'arraybuffer';
                 socket.key = '';
@@ -4164,7 +4146,6 @@ const sockets = (() => {
                 socket.makeView = () => { socket.view = eyes(socket); };
                 socket.makeView();
                 // Put the fundamental functions in the socket
-                socket.ban = () => ban(socket);
                 socket.kick = reason => kick(socket, reason);
                 socket.talk = (...message) => {
                     if (socket.readyState === socket.OPEN) { 
@@ -4188,7 +4169,7 @@ const sockets = (() => {
                 };
                 // Log it
                 clients.push(socket);
-                util.log('[INFO] New socket opened with ', socket.ip);
+                util.log('[INFO] New socket opened');
             };
         })(),
     };
