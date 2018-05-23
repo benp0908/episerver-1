@@ -2972,17 +2972,6 @@ const sockets = (() => {
             // Define shared functions
             // Closing the socket
             function close(socket) {
-                // Free the IP
-                let n = connectedIPs.findIndex(w => { return w.ip === socket.ip; });
-                if (n !== -1) {
-                    util.log(socket.ip + " disconnected.");
-                    util.remove(connectedIPs, n);
-                }
-                // Free the token
-                if (socket.key != '') { 
-                    keys.push(socket.key);
-                    util.log("Token freed.");
-                }   
                 // Figure out who the player was
                 let player = socket.player,
                     index = players.indexOf(player);
@@ -3624,7 +3613,9 @@ const sockets = (() => {
                             // 13: health
                             Math.ceil(255 * data.health),
                             // 14: shield
-                            Math.round(255 * data.shield)
+                            Math.round(255 * data.shield),
+                            // 15: alpha
+                            Math.round(255 * 1),
                         );
                         if (data.type & 0x04) {
                             output.push(
@@ -4115,33 +4106,6 @@ const sockets = (() => {
             // This function initalizes the socket upon connection
             return (socket, req) => {
                 // Get information about the new connection and verify it
-                if (c.servesStatic || req.connection.remoteAddress === '::ffff:127.0.0.1' || req.connection.remoteAddress === '::1') {
-                    socket.ip = req.headers['x-forwarded-for'];
-                    // Make sure we're not banned...
-                    if (bannedIPs.findIndex(ip => { return ip === socket.ip; }) !== -1) {
-                        socket.terminate(); 
-                        return 1;
-                    }
-                    // Make sure we're not already connected...
-                    if (!c.servesStatic) { 
-                        let n = connectedIPs.findIndex(w => { return w.ip === socket.ip; });
-                        if (n !== -1) {
-                            // Don't allow more than 2
-                            if (connectedIPs[n].number > 1) {
-                                util.warn('Too many connections from the same IP. [' + socket.ip + ']');
-                                socket.terminate();
-                                return 1;
-                            } else connectedIPs[n].number++;
-                        } else connectedIPs.push({ ip: socket.ip, number: 1, });
-                    }
-                } else { 
-                    // Don't let banned IPs connect.
-                    util.warn(req.connection.remoteAddress);
-                    util.warn(req.headers['x-forwarded-for']);
-                    socket.terminate();
-                    util.warn('Inappropiate connection request: header spoofing. Socket terminated.');
-                    return 1;
-                }
                 util.log(socket.ip + ' is trying to connect...');
                 // Set it up
                 socket.binaryType = 'arraybuffer';
