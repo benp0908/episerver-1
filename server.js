@@ -3045,7 +3045,9 @@ const sockets = (() => {
                 // Handle the request
                 switch (m.shift()) {
                 case 'k': { // key verification
-                    if (m.length !== 1) { socket.kick('Ill-sized key request.'); return 1; }
+                    socket.talk('w', true)
+                    util.log('Clients: ' + clients.length);
+                    /*if (m.length !== 1) { socket.kick('Ill-sized key request.'); return 1; }
                     // Get data
                     let key = m[0];
                     // Verify it
@@ -3067,7 +3069,7 @@ const sockets = (() => {
                         // If not, kick 'em (nicely)
                         util.log('[INFO] Invalid player verification attempt.');
                         socket.lastWords('w', false);
-                    }
+                    }*/
                 } break;
                 case 's': { // spawn request
                     if (!socket.status.deceased) { socket.kick('Trying to spawn while already alive.'); return 1; }
