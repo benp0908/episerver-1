@@ -1,0 +1,12 @@
+dependencies:
+  google-closure-library: 20180506.0.0
+packages:
+  /google-closure-library/20180506.0.0:
+    dev: false
+    resolution:
+      integrity: sha1-LS2pLCfBDcADE//4ClFYtVTKmQg=
+registry: 'https://registry.npmjs.org/'
+shrinkwrapMinorVersion: 6
+shrinkwrapVersion: 3
+specifiers:
+  google-closure-library: ^20180506.0.0
