@@ -8,8 +8,8 @@
   "networkFrontlog": 1,
   "networkFallbackTime": 150,
   "visibleListInterval": 1000,
-  "gameSpeed": 1,
-  "runSpeed": 1.5,
+  "gameSpeed": 0.7,
+  "runSpeed": 1.2,
   "maxHeartbeatInterval": 30000,
   "sqlinfo":{
     "connectionLimit": 50,
@@ -66,8 +66,8 @@
   "SKILL_LEAK": 0,
   "STEALTH": 4,
   "MIN_SPEED": 0.001,
-  "FOOD_AMOUNT": 2, 
+  "FOOD_AMOUNT": 1, 
   "SKILL_BOOST": 5,
-  "BOTS": 1,
+  "BOTS": 0,
   "GLASS_HEALTH_FACTOR": 2
 }
