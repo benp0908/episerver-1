@@ -3,15 +3,13 @@
 /*global goog, Map, let */
 "use strict";
 
-console.log("HELLO")
-
 // General requires
 require('google-closure-library');
 goog.require('goog.structs.PriorityQueue');
 goog.require('goog.structs.QuadTree');
 
 // Import game settings.
-const c = require('arrasio/config.json');
+const c = require('./config.json');
 
 // Import utilities.
 const util = require('./lib/util');
@@ -2701,13 +2699,11 @@ var logs = (() => {
 })();
 
 // Essential server requires
-var express = require('express'),
-    http = require('http'),
+var http = require('http'),
     url = require('url'),
-    WebSocket = require('ws'),
-    app = express(),
+    WebSocket = require('uws'),
     fs = require('fs'),
-    exportDefintionsToClient = (() => { 
+    mockupJsonData = (() => { 
         function rounder(val) {
             if (Math.abs(val) < 0.00001) val = 0;
             return +val.toPrecision(6);
@@ -2955,54 +2951,8 @@ var express = require('express'),
         purgeEntities();
         // Build the function to return
         let writeData = JSON.stringify(mockupData);
-        return loc => {
-            util.log('Preparing definition export.');
-            fs.writeFileSync(loc, writeData, 'utf8', (err) => {
-                if (err) return util.error(err);
-            });
-            util.log('Mockups written to ' + loc + '!');
-        };
-    })(),
-    generateVersionControlHash = (() => {
-        let crypto = require('crypto');
-        let write = (() => {
-            let hash = [null, null];
-            return (loc, data, numb) => {
-                // The callback is executed on reading completion
-                hash[numb] = crypto.createHash('sha1').update(data).digest('hex');
-                if (hash[0] && hash[1]) {
-                    let finalHash = hash[0] + hash[1];
-                    util.log('Client hash generated. Hash is "' + finalHash + '".');
-                    // Write the hash to a place the client can read it.
-                    fs.writeFileSync(loc, finalHash, 'utf8', err => {
-                        if (err) return util.error(err);
-                    });
-                    util.log('Hash written to ' + loc + '!');
-                }
-            };
-        })();
-        return loc => {
-            let path1 = __dirname + '/../client/js/app.js';
-            let path2 = __dirname + '/lib/definitions.js';
-            util.log('Building client version hash, reading from ' + path1 + ' and ' + path2 + '...');
-            // Read the client application
-            fs.readFile(path1, 'utf8', (err, data) => {
-                if (err) return util.error(err);
-                util.log('app.js complete.');
-                write(loc, data, 0);
-            });
-            fs.readFile(path2, 'utf8', (err, data) => {
-                if (err) return util.error(err);
-                util.log('definitions.js complete.');
-                write(loc, data, 1);
-            });
-        };
+        return writeData;
     })();
-
-// Give the client upon request
-exportDefintionsToClient(__dirname + '/../client/json/mockups.json');
-generateVersionControlHash(__dirname + '/../client/api/vhash');
-if (c.servesStatic) app.use(express.static(__dirname + '/../client'));
 
 // Websocket behavior
 const sockets = (() => {
@@ -5112,20 +5062,37 @@ var speedcheckloop = (() => {
 
 /** BUILD THE SERVERS **/  
 // Turn the server on
-var server = http.createServer(app);
-var websockets = (() => {
+let server = http.createServer((req, res) => {
+  let { pathname } = url.parse(req.url)
+  switch (pathname) {
+    case '/':
+      res.writeHead(200)
+      res.end('<!DOCTYPE html><h3>Hello</h3>')
+    break
+    case '/mockups.json':
+      res.setHeader('Access-Control-Allow-Origin', '*')
+      res.writeHead(200)
+      res.end(mockupJsonData)
+    break
+    default:
+      res.writeHead(404)
+      res.end()
+  }
+}).listen(process.env.PORT || 8080)
+
+let websockets = (() => {
     // Configure the websocketserver
-    let config = { server: server };
-    if (c.servesStatic) {
-        server.listen(c.port, function httpListening() {
-            util.log((new Date()) + ". Joint HTTP+Websocket server turned on, listening on port "+server.address().port + ".");
-        });
+    let config = { server: server }
+        server.listen(8080, function httpListening() {
+            util.log((new Date()) + ". Joint HTTP+Websocket server turned on, listening on port "+server.address().port + ".")
+        })
+    /*if (c.servesStatic) {
     } else {
-        config.port = c.port; 
-        util.log((new Date()) + 'Websocket server turned on, listening on port ' + c.port + '.'); 
-    }
+        config.port = 8080; 
+        util.log((new Date()) + 'Websocket server turned on, listening on port ' + 8080 + '.'); 
+    }*/
     // Build it
-    return new WebSocket.Server(config);
+    return new WebSocket.Server(config)
 })().on('connection', sockets.connect); 
 
 // Bring it to life
