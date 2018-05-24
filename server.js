@@ -462,7 +462,7 @@ class io_nearestDifferentMaster extends IO {
         this.targetLock = undefined;
         this.tick = ran.irandom(30);
         this.lead = 0;
-        this.validTargets = this.buildList(body.fov);
+        this.validTargets = this.buildList(body.fov / 2);
         this.oldHealth = body.health.display();
     }
 
@@ -519,7 +519,7 @@ class io_nearestDifferentMaster extends IO {
         } 
         // Otherwise, consider how fast we can either move to ram it or shoot at a potiential target.
         let tracking = this.body.topSpeed,
-            range = this.body.fov;
+            range = this.body.fov / 2;
         // Use whether we have functional guns to decide
         for (let i=0; i<this.body.guns.length; i++) {
             if (this.body.guns[i].canShoot && !this.body.aiSettings.skynet) {
