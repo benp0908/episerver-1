@@ -5,7 +5,7 @@
 1. Click the top left where it says **arras-template**
 2. Remix the project
 3. Give your new project a name
-4. Your private server name will be at <http://arras.surge.sh/#private=new-name-here.glitch.me> (replace `ew-name-here` with it's new name)
+4. Your private server name will be at <http://arras.surge.sh/#private=new-name-here.glitch.me> (replace `new-name-here` with it's new name)
 
 ## More Information
 
