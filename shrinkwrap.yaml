@@ -14,7 +14,7 @@ packages:
     resolution:
       integrity: sha512-vWt+e8dOdwLM4neb1xIeZuQ7ZUN3l7n0qTKrOUtU1EZrV4BpmrSnsEL30d062/ocqRMGtLpwzVFsLKFgXomA9g==
 registry: 'https://registry.npmjs.org/'
-shrinkwrapMinorVersion: 6
+shrinkwrapMinorVersion: 7
 shrinkwrapVersion: 3
 specifiers:
   google-closure-library: ^20180506.0.0
