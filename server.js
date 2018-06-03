@@ -3429,7 +3429,7 @@ const sockets = (() => {
                             // 14: shield
                             Math.round(255 * data.shield),
                             // 15: alpha
-                            Math.round(255 * 1),
+                            255 // Math.round(255 * data.alpha),
                         );
                         if (data.type & 0x04) {
                             output.push(
@@ -4846,7 +4846,7 @@ let server = http.createServer((req, res) => {
   switch (pathname) {
     case '/':
       res.writeHead(200)
-      res.end('<!DOCTYPE html><h3>Hello</h3>')
+      res.end('<!DOCTYPE html><h3>Arras</h3>')
     break
     case '/mockups.json':
       res.setHeader('Access-Control-Allow-Origin', '*')
