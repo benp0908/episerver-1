@@ -17,3 +17,4 @@ SECRET=aSecretPasswordHere
 3. Open the private server with <http://arras.surge.sh/#private=new-name-here.glitch.me;aSecretPasswordHere> (replace `aSecretPasswordHere` with the password)
 4. The map/config data are in the `config.js` file
 5. The tank data are in the `lib/definitions.js` file
+6. Other stuff (score curve, stat amount) are in the `server.js` file
