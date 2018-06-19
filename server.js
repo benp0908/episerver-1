@@ -1271,7 +1271,7 @@ class Gun {
             ((this.negRecoil) ? -1 : 1) * this.settings.speed * c.runSpeed * sk.spd * (1 + ss) * Math.cos(this.angle + this.body.facing + sd),
             ((this.negRecoil) ? -1 : 1) * this.settings.speed * c.runSpeed * sk.spd * (1 + ss) * Math.sin(this.angle + this.body.facing + sd)
         );     
-        // Boost it if we should
+        // Boost it if we shouldw
         if (this.body.velocity.length) { 
             let extraBoost = 
                 Math.max(0, s.x * this.body.velocity.x + s.y * this.body.velocity.y) / this.body.velocity.length / s.length;
