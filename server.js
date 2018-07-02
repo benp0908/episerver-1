@@ -2895,7 +2895,7 @@ const sockets = (() => {
                     if (views.indexOf(socket.view) != -1) { util.remove(views, views.indexOf(socket.view)); socket.makeView(); }
                     socket.player = socket.spawn(name);     
                     // Give it the room state
-                    if (needsRoom) { 
+                    if (!needsRoom) { 
                         socket.talk(
                             'R',
                             room.width,
