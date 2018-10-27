@@ -4,4 +4,4 @@
 
 OpenShift, compared to Glitch, requires a lot more effort to setup. However, if your private server received a large amount of players, it may be worth it as OpenShift servers have considerably more resources than Glitch. 
 
-https://manage.openshift.com/accounts/auth/keycloak
+To get started, sign up for openshift at <https://manage.openshift.com/accounts/auth/keycloak>
