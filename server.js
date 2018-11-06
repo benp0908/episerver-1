@@ -3591,9 +3591,9 @@ const sockets = (() => {
             // and also kicks inactive sockets
             const broadcast = (() => {
                 // This is the public information we need for broadcasting
-                let readmap, readlb;
+                let readlb;
                 // Define fundamental functions
-                const getminimap = (() => {
+                /*const getminimap = (() => {
                     // Build a map cleaner
                     let cleanmapreader = (() => {
                         function flattener() {
@@ -3720,8 +3720,50 @@ const sockets = (() => {
                         // Clean the map and return the reader
                         return cleanmapreader();
                     };
+                })();*/
+                const getminimap = (() => {
+                  let all = {
+                    walls: [],
+                    players: {},
+                    minibosses: [],
+                  }
+                  let updateMaze = () => {
+                    let walls = all.walls = [0]
+                    entities.forEach(my => {
+                      if (my.type === 'wall') {
+                        walls[0]++
+                        walls.push(
+                          util.clamp(Math.floor(256 * my.x / room.width), 0, 255),
+                          util.clamp(Math.floor(256 * my.y / room.height), 0, 255),
+                          my.shape === 4 ? -2 : -1,
+                          Math.round(my.SIZE / 4))
+                      }
+                    })
+                  }
+                  setTimeout(updateMaze, 3e3)
+                  setInterval(updateMaze, 30e3)
+                  setInterval(() => {
+                    let minimaps = all.players = { [1]: [0], [2]: [0], [3]: [0], [4]: [0] }
+                    let minibosses = all.minibosses = [0]
+                    entities.forEach(my => {
+                      if (my.type === 'miniboss') {
+                        minibosses[0]++
+                        minibosses.push(
+                          util.clamp(Math.floor(256 * my.x / room.width), 0, 255),
+                          util.clamp(Math.floor(256 * my.y / room.height), 0, 255),
+                          my.color)
+                      } else if (my.type === 'tank' && -1 >= my.team && my.team >= -4) {
+                        minimaps[-my.team][0]++
+                        minimaps[-my.team].push(
+                          util.clamp(Math.floor(256 * my.x / room.width), 0, 255),
+                          util.clamp(Math.floor(256 * my.y / room.height), 0, 255),
+                          my.color)
+                      }
+                    })
+                  }, 1000)
+                  return all
                 })();
-                const getleaderboard = (() => {
+              const getleaderboard = (() => {
                     let lb = { full: [], updates: [], };
                     // We'll reuse these lists over and over again
                     let list = new goog.structs.PriorityQueue();
@@ -3887,7 +3929,6 @@ const sockets = (() => {
                 function slowloop() {
                     // Build the minimap
                     logs.minimap.set();
-                    readmap = getminimap();
                     // Build the leaderboard
                     readlb = getleaderboard();
                     logs.minimap.mark();
@@ -3904,14 +3945,20 @@ const sockets = (() => {
                 return socket => {
                     // Make sure it's spawned first
                     if (socket.status.hasSpawned) {
+                        let { walls, players, minibosses } = getminimap
+                        let lb = readlb(socket.status.needsFullLeaderboard)
+                        socket.status.needsFullLeaderboard = false
+                        socket.talk('b', ...walls, ...(players[socket.player.team] || [0]), ...minibosses, ...lb)
+                    }
+                    /*if (socket.status.hasSpawned) {
                         let m = [0], lb = [0, 0];
-                        m = readmap(socket.player.team, socket.status.needsFullMap);
+                        let  = readmap(socket.player.team, socket.status.needsFullMap);
                         socket.status.needsFullMap = false;
                         lb = readlb(socket.status.needsFullLeaderboard);
                         socket.status.needsFullLeaderboard = false;
                         // Don't broadcast if you don't need to
                         if (m !== [0] || lb !== [0, 0]) { socket.talk('b', ...m, ...lb); }
-                    }
+                    }*/
                 };
             })();
             // Build the returned function
