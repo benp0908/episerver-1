@@ -47,7 +47,7 @@ Replace it with
 update: (data) => [0, 0, 0],
 ```
 
-If you want teammates and bosses to still be shown, however, you can replace the entire `broadcast` function, which you can find by searching `const broadcast = \(\(\) => {`
+If you want teammates and bosses to still be shown, however, ~~you can replace the entire `broadcast` function, which you can find by searching `const broadcast = \(\(\) => {`~~ you'll need to wait a bit, and you can check back on this document within a few days.
 
 ## July 2nd, 2018
 
