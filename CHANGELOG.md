@@ -4,50 +4,7 @@
 
 If you've created a private server with this template before November 12th, 2018, the minimap and leaderboard will no longer work without this update!
 
-Showing all entities on the minimap have been permanently removed due to lag issues. If you want to disable the minimap completely, you can do this:
-
-Find the following in your server.js:
-```
-update: (data) => {
-    // Flag all old data as to be removed
-    for (let e of internalmap)
-      e[0] = -1
-    // Round all the old data
-    data = data.map(d => [
-      Math.round(255 * util.clamp(d[0] / room.width, 0, 1)),
-      Math.round(255 * util.clamp(d[1] / room.height, 0, 1)),
-      d[2]
-    ])
-    // Add new data and stabilze existing data, then emove old data
-    for (let d of data) {
-        // Find if it's already there
-        let i = internalmap.findIndex(e => {
-          return e[1] === d[0] &&
-            e[2] === d[1] &&
-            e[3] === d[2]
-        })
-        if (i === -1) { // if not add it
-            internalmap.push([1, ...d])
-        } else { // if so, flag it as stable
-            internalmap[i][0] = 0
-        }
-    }
-    // Export all new and old data
-    let ex = internalmap.filter(e => e[0] !== 0)
-    // Remove outdated data
-    internalmap = internalmap.filter(e => e[0] !== -1)
-    // Flatten the exports
-    return flatten(ex)
-    return [0]
-},
-```
-
-Replace it with
-```
-update: (data) => [-1],
-```
-
-If you want teammates and bosses to still be shown, however, you can replace the entire `broadcast` function, which you can find by searching `const broadcast = (() => {`.
+Showing all entities on the minimap have been permanently removed due to lag issues. If you only want teammates and bosses to still be shown, however, you can replace the entire `broadcast` function, which you can find by searching `const broadcast = (() => {` and replacing it with the one in the template.
 
 ## July 2nd, 2018
 
