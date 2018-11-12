@@ -3593,134 +3593,6 @@ const sockets = (() => {
                 // This is the public information we need for broadcasting
                 let readlb;
                 // Define fundamental functions
-                /*const getminimap = (() => {
-                    // Build a map cleaner
-                    let cleanmapreader = (() => {
-                        function flattener() {
-                            let internalmap = [];
-                            // Define the flattener
-                            function flatten(data) {
-                                // In case it's all filtered away, we'll still have something to work with
-                                if (data == null) data = [];
-                                let out = [data.length];
-                                // Push it flat
-                                data.forEach(d => out.push(...d));
-                                return out;
-                            }
-                            // Make a test function
-                            function challenge(value, challenger) {
-                                return value[1] === challenger[0] &&
-                                    value[2] === challenger[1] &&
-                                    value[3] === challenger[2];
-                            }
-                            // Return our functions
-                            return {
-                                update: (data) => {
-                                    // Flag all old data as to be removed
-                                    internalmap.forEach(e => e[0] = -1);
-                                    // Round all the old data
-                                    data = data.map(d => { 
-                                        return [
-                                            Math.round(255 * util.clamp(d[0] / room.width, 0, 1)), 
-                                            Math.round(255 * util.clamp(d[1] / room.height, 0, 1)), 
-                                            d[2]
-                                        ];
-                                    });
-                                    // Add new data and stabilze existing data, then emove old data
-                                    data.forEach(d => {
-                                        // Find if it's already there
-                                        let i = internalmap.findIndex(e => { return challenge(e, d); });
-                                        if (i === -1) { // if not add it
-                                            internalmap.push([1, ...d]);
-                                        } else { // if so, flag it as stable
-                                            internalmap[i][0] = 0;
-                                        }
-                                    });
-                                    // Export all new and old data
-                                    let ex = internalmap.filter(e => e[0] !== 0);
-                                    // Remove outdated data
-                                    internalmap = internalmap.filter(e => e[0] !== -1);
-                                    // Flatten the exports
-                                    let f = flatten(ex);
-                                    return f;
-                                },
-                                exportall: () => {
-                                    // Returns a flattened version of the map with blanket add requests
-                                    return flatten(internalmap.map(e => { return [1, e[1], e[2], e[3]]; }));
-                                },
-                            };
-                        }
-                        // Define the function
-                        return (room.gameMode === 'ffa') ? 
-                            // ffa function builder
-                            (() => {
-                                // Make flatteners
-                                let publicmap = flattener();
-                                // Return the function
-                                return () => {
-                                    // Updates
-                                    let clean = publicmap.update(minimap.map(function(entry) {
-                                        return [entry[1], entry[2], (entry[4] === 'miniboss') ? entry[3] : 17];
-                                    }));  
-                                    let full = publicmap.exportall();
-                                    // Reader
-                                    return (team, everything = false) => { return (everything) ? full : clean; };
-                                };
-                            })() : 
-                            // tdm function builder
-                            (() => {
-                                // Make flatteners
-                                let team1map = flattener();
-                                let team2map = flattener();
-                                let team3map = flattener();
-                                let team4map = flattener();
-                                // Return the function
-                                return () => {
-                                    let clean = [
-                                        team1map.update(minimap.map(function(entry) {
-                                            return [entry[1], entry[2], (entry[4] === 'miniboss' || (entry[4] === 'tank' && entry[5] === -1)) ? entry[3] : 17];
-                                        })),
-                                        team2map.update(minimap.map(function(entry) {
-                                            return [entry[1], entry[2], (entry[4] === 'miniboss' || (entry[4] === 'tank' && entry[5] === -2)) ? entry[3] : 17];
-                                        })),
-                                        team3map.update(minimap.map(function(entry) {
-                                            return [entry[1], entry[2], (entry[4] === 'miniboss' || (entry[4] === 'tank' && entry[5] === -3)) ? entry[3] : 17];
-                                        })),
-                                        team4map.update(minimap.map(function(entry) {
-                                            return [entry[1], entry[2], (entry[4] === 'miniboss' || (entry[4] === 'tank' && entry[5] === -4)) ? entry[3] : 17];
-                                        })),
-                                    ];
-                                    let full = [
-                                        team1map.exportall(),
-                                        team2map.exportall(),
-                                        team3map.exportall(),
-                                        team4map.exportall()
-                                    ];
-                                    // The reader
-                                    return (team, everything = false) => { return (everything) ? full[team-1] : clean[team-1]; };
-                                };                
-                            })();
-                    })();
-                    // Return the builder function. This itself returns 
-                    // a reader for the map (will change based on team)
-                    return () => {
-                        // Update the minimap
-                        entities.forEach((my) => {
-                            if (my.settings.drawShape && ran.dice(my.stealth * c.STEALTH)) {
-                                let i = minimap.findIndex((entry) => {
-                                        return entry[0] === my.id;
-                                    });
-                                if (i != -1) { // update position
-                                    minimap[i] = [my.id, my.x, my.y, my.color, my.type, my.team];
-                                } else { // add position
-                                    minimap.push([my.id, my.x, my.y, my.color, my.type, my.team]);
-                                }
-                            }
-                        });
-                        // Clean the map and return the reader
-                        return cleanmapreader();
-                    };
-                })();*/
                 const getminimap = (() => {
                   let all = {
                     walls: [],
@@ -3728,41 +3600,46 @@ const sockets = (() => {
                     minibosses: [],
                   }
                   let updateMaze = () => {
-                    let walls = all.walls = [0]
+                    let walls = all.walls = []
                     entities.forEach(my => {
                       if (my.type === 'wall') {
-                        walls[0]++
                         walls.push(
+                          my.shape === 4 ? 2 : 1,
+                          my.id,
                           util.clamp(Math.floor(256 * my.x / room.width), 0, 255),
                           util.clamp(Math.floor(256 * my.y / room.height), 0, 255),
-                          my.shape === 4 ? -2 : -1,
-                          Math.round(my.SIZE / 4))
+                          my.color,
+                          Math.round(my.SIZE))
                       }
                     })
                   }
-                  setTimeout(updateMaze, 3e3)
-                  setInterval(updateMaze, 30e3)
+                  setTimeout(updateMaze, 2500)
+                  setInterval(updateMaze, 25000)
                   setInterval(() => {
-                    let minimaps = all.players = { [1]: [0], [2]: [0], [3]: [0], [4]: [0] }
-                    let minibosses = all.minibosses = [0]
+                    let minimaps = all.players = { [1]: [], [2]: [], [3]: [], [4]: [] }
+                    let minibosses = all.minibosses = []
                     entities.forEach(my => {
                       if (my.type === 'miniboss') {
-                        minibosses[0]++
                         minibosses.push(
+                          0,
+                          my.id,
                           util.clamp(Math.floor(256 * my.x / room.width), 0, 255),
                           util.clamp(Math.floor(256 * my.y / room.height), 0, 255),
-                          my.color)
+                          my.color,
+                        )
                       } else if (my.type === 'tank' && -1 >= my.team && my.team >= -4) {
-                        minimaps[-my.team][0]++
                         minimaps[-my.team].push(
+                          0,
+                          my.id,
                           util.clamp(Math.floor(256 * my.x / room.width), 0, 255),
                           util.clamp(Math.floor(256 * my.y / room.height), 0, 255),
-                          my.color)
+                          my.color,
+                        )
                       }
                     })
-                  }, 1000)
+                  }, 250)
                   return all
-                })();
+                })()
               const getleaderboard = (() => {
                     let lb = { full: [], updates: [], };
                     // We'll reuse these lists over and over again
@@ -3948,17 +3825,8 @@ const sockets = (() => {
                         let { walls, players, minibosses } = getminimap
                         let lb = readlb(socket.status.needsFullLeaderboard)
                         socket.status.needsFullLeaderboard = false
-                        socket.talk('b', ...walls, ...(players[socket.player.team] || [0]), ...minibosses, ...lb)
+                        socket.talk('b', ...walls, ...(players[socket.player.team] || []), ...minibosses, -1, ...lb)
                     }
-                    /*if (socket.status.hasSpawned) {
-                        let m = [0], lb = [0, 0];
-                        let  = readmap(socket.player.team, socket.status.needsFullMap);
-                        socket.status.needsFullMap = false;
-                        lb = readlb(socket.status.needsFullLeaderboard);
-                        socket.status.needsFullLeaderboard = false;
-                        // Don't broadcast if you don't need to
-                        if (m !== [0] || lb !== [0, 0]) { socket.talk('b', ...m, ...lb); }
-                    }*/
                 };
             })();
             // Build the returned function

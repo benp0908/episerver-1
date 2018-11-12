@@ -1,8 +1,8 @@
 # Breaking Changes
 
-## November 6th, 2018
+## November 12th, 2018
 
-If you've created a private server with this template before November 6th, 2018, the minimap and leaderboard will no longer work without this update!
+If you've created a private server with this template before November 12th, 2018, the minimap and leaderboard will no longer work without this update!
 
 Showing all entities on the minimap have been permanently removed due to lag issues. If you want to disable the minimap completely, you can do this:
 
@@ -44,10 +44,10 @@ update: (data) => {
 
 Replace it with
 ```
-update: (data) => [0, 0, 0],
+update: (data) => [-1],
 ```
 
-If you want teammates and bosses to still be shown, however, ~~you can replace the entire `broadcast` function, which you can find by searching `const broadcast = \(\(\) => {`~~ you'll need to wait a bit, and you can check back on this document within a few days.
+If you want teammates and bosses to still be shown, however, you can replace the entire `broadcast` function, which you can find by searching `const broadcast = (() => {`.
 
 ## July 2nd, 2018
 
