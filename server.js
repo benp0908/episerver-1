@@ -2533,7 +2533,7 @@ var logs = (() => {
 // Essential server requires
 var http = require('http'),
     url = require('url'),
-    WebSocket = require('uws'),
+    WebSocket = require('ws'),
     fs = require('fs'),
     mockupJsonData = (() => { 
         function rounder(val) {
