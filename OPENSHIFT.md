@@ -4,4 +4,20 @@
 
 OpenShift, compared to Glitch, requires a lot more effort to setup. However, if your private server received a large amount of players, it may be worth it as OpenShift servers have considerably more resources than Glitch. 
 
-To get started, sign up for openshift at <https://manage.openshift.com/accounts/auth/keycloak>
+### Creating a free subscription
+
+To get started, sign up for openshift at <https://manage.openshift.com/accounts/auth/keycloak>. Fill in your information appropriately.
+
+...
+
+In the mean time, you can set up GitLab
+
+### Setting up GitLab
+
+https://api.glitch.com/arras-template/git
+
+You wait for a box to magically appear and click Open Web Console
+
+### 
+On the left, click the Node.js button
+
