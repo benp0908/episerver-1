@@ -30,7 +30,7 @@ On the left, click the Node.js box. Click Next. Pick some uncreative names like 
 
 After a bit, on the right sidebar, your project should pop up. Open it, ignore the build error (we'll fix that soon) or anything about metrics (don't always happen, not important), and go to Resource > Secrets > Create Secret.
 
-For username, put your GitLab username, and for password or token, put your access token. Don't touch any of the checkboxes, and just name and create your secret.
+For password or token, put your access token. Don't touch anything else, and just name and create your secret.
 
 Go to Builds > Builds and select your build. On the top right click Action > Edit. Click advanced options in the Source Configuration, and select your newly made secret where it says Source Secret. Scroll to the bottom and save.
 
