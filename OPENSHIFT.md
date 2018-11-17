@@ -18,11 +18,19 @@ Register for GitLab with https://gitlab.com/users/sign_in#register-pane
 
 After logging in, click the green New Project button on the top left, and select the Import project tab. Click Repo by URL, and paste in this link: <https://api.glitch.com/arras-template/git>, and create the repository.
 
-After that, find the link next to where it says HTTPS. It should end with .git, and after that, and after copying that you may proceed.
+After that, find the link next to where it says HTTPS, which should end with `.git`. Save the link in a text document somewhere.
+
+Go to your Profile settings, and find Access tokens. Choose a name and select the `api` scope, and click the Create personal access token button. Save the access token in a secured place like that text document.
 
 ### Creating an OpenShift project
 
 You wait for a box to magically appear and click Open Web Console
 
 On the left, click the Node.js box. Click Next. Pick some uncreative names like Arras, and paste the repo's HTTPS link. Click Create.
+
+After a bit, on the right sidebar, your project should pop up. Open it, and go to Resource > Secrets > Create Secret.
+
+For username, put your GitLab username, and for password or token, put your access token. Don't touch any of the checkboxes, and just name and create your secret.
+
+
 
