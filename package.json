@@ -11,5 +11,6 @@
   },
   "engines": {
     "node": "8.x"
-  }
+  },
+  "license": "GPL-3.0"
 }
