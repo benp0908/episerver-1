@@ -1700,7 +1700,8 @@ class Entity {
             this.type = set.TYPE; 
         }
         if (set.SHAPE != null) {
-            this.shape = set.SHAPE;
+            this.shape = set.SHAPE instanceof Array ? 0 : set.SHAPE;
+            this.shapeData = set.SHAPE;
         }
         if (set.COLOR != null) { 
             this.color = set.COLOR; 
@@ -2548,7 +2549,7 @@ var http = require('http'),
                 x: rounder(e.x),
                 y: rounder(e.y),
                 color: e.color,
-                shape: e.shape,
+                shape: e.shapeData,
                 size: rounder(e.size),
                 realSize: rounder(e.realSize),
                 facing: rounder(e.facing),

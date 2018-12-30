@@ -21,7 +21,7 @@ SECRET=aSecretPasswordHere
 
 ## Breaking Changes
 
-Breaking changes are important updates to the template that you should do on your server, as otherwise it may stop functioning. The last breaking change is on July 2nd, 2018. If you've made a private server before that day, it may no longer work without this update. See `CHANGELOG.md` for details.
+Breaking changes are important updates to the template that you should do on your server, as otherwise it may stop functioning. The last breaking change is on December 30th, 2018. If you've made a private server before that day, it may no longer work without this update. See `CHANGELOG.md` for details.
 
 ## OpenShift
 

@@ -1,5 +1,32 @@
 # Breaking Changes
 
+## December 30th, 2018
+
+If you've created a private server with this template before December 30th, 2018, it will not support custom body shapes without this update!
+
+Find the following in your server.js:
+```
+if (set.SHAPE != null) {
+    this.shape = set.SHAPE;
+}
+```
+Replace it with
+```
+if (set.SHAPE != null) {
+    this.shape = set.SHAPE instanceof Array ? 0 : set.SHAPE;
+    this.shapeData = set.SHAPE;
+}
+```
+Then find
+```
+shape: e.shape
+```
+Replace it with
+```
+shape: e.shapeData
+```
+And you should be able to create custom bodies by putting an array of coordinates as the coordinates of the custom body. You can see an example of this in the TESTBED tank in definitions.js.
+
 ## November 12th, 2018
 
 If you've created a private server with this template before November 12th, 2018, the minimap and leaderboard will no longer work without this update!
