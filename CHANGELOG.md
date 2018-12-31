@@ -13,7 +13,7 @@ if (set.SHAPE != null) {
 Replace it with
 ```
 if (set.SHAPE != null) {
-    this.shape = set.SHAPE instanceof Array ? 0 : set.SHAPE;
+    this.shape = typeof set.SHAPE === 'number' ? set.SHAPE : 0
     this.shapeData = set.SHAPE;
 }
 ```

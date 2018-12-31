@@ -1700,7 +1700,7 @@ class Entity {
             this.type = set.TYPE; 
         }
         if (set.SHAPE != null) {
-            this.shape = set.SHAPE instanceof Array ? 0 : set.SHAPE;
+            this.shape = typeof set.SHAPE === 'number' ? set.SHAPE : 0
             this.shapeData = set.SHAPE;
         }
         if (set.COLOR != null) { 
