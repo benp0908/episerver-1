@@ -25,7 +25,7 @@ Replace it with
 ```
 shape: e.shapeData
 ```
-And you should be able to create custom bodies by putting an array of coordinates as the coordinates of the custom body. You can see an example of this in the TESTBED tank in definitions.js.
+And you should be able to create custom bodies by putting an array of coordinates as the coordinates of the custom body. You can see an example of this in the TESTBED tank in definitions.js. It's also possible to put a SVG path data instead of simply an array, which can offer more customization.
 
 ## November 12th, 2018
 
