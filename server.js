@@ -4771,12 +4771,12 @@ let server = http.createServer((req, res) => {
       res.writeHead(404)
       res.end()
   }
-}).listen(process.env.PORT || 8080)
+})
 
 let websockets = (() => {
     // Configure the websocketserver
     let config = { server: server }
-        server.listen(8080, function httpListening() {
+        server.listen(process.env.PORT || 8080, function httpListening() {
             util.log((new Date()) + ". Joint HTTP+Websocket server turned on, listening on port "+server.address().port + ".")
         })
     /*if (c.servesStatic) {
