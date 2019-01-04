@@ -1453,6 +1453,12 @@ var bringToLife = (() => {
         if (my.settings.attentionCraver && !faucet.main && my.range) {
             my.range -= 1;
         }
+        // Invisibility
+        if (my.invisible[1]) {
+          my.alpha = Math.max(0, my.alpha - my.invisible[1])
+          if (!my.velocity.isShorterThan(0.1) || my.damageReceived)
+            my.alpha = Math.min(1, my.alpha + my.invisible[0])
+        }
         // So we start with my master's thoughts and then we filter them down through our control stack
         my.controllers.forEach(AI => {
             let a = AI.think(b);
