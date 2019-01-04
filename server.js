@@ -1626,6 +1626,8 @@ class Entity {
         this.damp = 0.05;
         this.collisionArray = [];
         this.invuln = false;
+        this.alpha = 1;
+        this.invisible = [0, 0];
         // Get a new unique id
         this.id = entitiesIdLog++;
         this.team = this.id;
@@ -1805,6 +1807,12 @@ class Entity {
         }
         if (set.AI != null) { 
             this.aiSettings = set.AI; 
+        }
+        if (set.ALPHA != null) { 
+            this.alpha = set.ALPHA;
+        }
+        if (set.INVISIBLE != null) { 
+            this.invisible = set.INVISIBLE;
         }
         if (set.DANGER != null) { 
             this.dangerValue = set.DANGER; 
@@ -2039,6 +2047,7 @@ class Entity {
             status: 1,
             health: this.health.display(),
             shield: this.shield.display(),
+            alpha: this.alpha,
             facing: this.facing,
             vfacing: this.vfacing,
             twiggle: this.facingType === 'autospin' || (this.facingType === 'locksFacing' && this.control.alt),
@@ -3428,7 +3437,7 @@ const sockets = (() => {
                             // 14: shield
                             Math.round(255 * data.shield),
                             // 15: alpha
-                            255 // Math.round(255 * data.alpha),
+                            Math.round(255 * data.alpha),
                         );
                         if (data.type & 0x04) {
                             output.push(
