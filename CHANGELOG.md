@@ -1,5 +1,11 @@
 # Breaking Changes
 
+## April 10th, 2019
+
+If you've created a private server with this template before April 10th, 2019, it will not support the new protocol which will be standardized in May, 2019!
+
+Open the lib/fasttalk.js in your server. Copy the code from the lib/fasttalk.js in this project onto your project. This will let your server use the new encoding, which will save bandwidth.
+
 ## December 30th, 2018
 
 If you've created a private server with this template before December 30th, 2018, it will not support custom body shapes without this update!
