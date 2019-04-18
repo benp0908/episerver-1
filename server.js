@@ -3439,7 +3439,7 @@ const sockets = (() => {
                             // 14: shield
                             Math.round(255 * data.shield),
                             // 15: alpha
-                            Math.round(255 * data.alpha),
+                            Math.round(255 * data.alpha)
                         );
                         if (data.type & 0x04) {
                             output.push(
