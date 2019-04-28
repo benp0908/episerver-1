@@ -4803,30 +4803,3 @@ let websockets = (() => {
 setInterval(gameloop, room.cycleSpeed);
 setInterval(maintainloop, 200);
 setInterval(speedcheckloop, 1000);
-
-// Graceful shutdown
-let shutdownWarning = false;
-if (process.platform === "win32") {
-    var rl = require("readline").createInterface({
-        input: process.stdin,
-        output: process.stdout
-    });  
-    rl.on("SIGINT", () => {
-        process.emit("SIGINT");
-    });
-}
-process.on("SIGINT", () => {
-    if (!shutdownWarning) {
-        shutdownWarning = true;
-        sockets.broadcast("The server is shutting down.");
-        util.log('Server going down! Warning broadcasted.');
-        setTimeout(() => {
-            sockets.broadcast("Arena closed.");
-            util.log('Final warning broadcasted.'); 
-            setTimeout(() => {
-                util.warn('Process ended.'); 
-                process.exit();
-            }, 3000);
-        }, 17000);
-    }
-});
