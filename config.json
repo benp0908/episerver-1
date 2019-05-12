@@ -2,7 +2,6 @@
   "host": "0.0.0.0",
   "servesStatic": true,
   "port": 3000,
-  "logpath": "logger.php",
   "networkUpdateFactor": 24,
   "socketWarningLimit": 5,
   "networkFrontlog": 1,
@@ -10,17 +9,8 @@
   "visibleListInterval": 1000,
   "gameSpeed": 1,
   "runSpeed": 1.5,
-  "maxHeartbeatInterval": 30000,
-  "sqlinfo":{
-    "connectionLimit": 50,
-    "host": "DEFAULT",
-    "user": "root",
-    "password": "DEFAULT",
-    "database": "DEFAULT",
-    "debug": false
-  },
+  "maxHeartbeatInterval": 300000,
   "verbose": true,
-
   "WIDTH": 1500,
   "HEIGHT": 1500,
   "MODE": "tdm",
