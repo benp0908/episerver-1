@@ -3054,11 +3054,6 @@ const sockets = (() => {
                         player.body.define(Class.testbed);
                     } }
                 } break;
-                case 'z': { // leaderboard desync report
-                    if (m.length !== 0) { socket.kick('Ill-sized level-up request.'); return 1; }
-                    // Flag it to get a refresh on the next cycle
-                    socket.status.needsFullLeaderboard = true;
-                } break;
                 default: socket.kick('Bad packet index.');
                 }
             }
@@ -3603,9 +3598,9 @@ const sockets = (() => {
             // and also kicks inactive sockets
             const broadcast = (() => {
                 // This is the public information we need for broadcasting
-                let readlb;
+                let readlb
                 // Define fundamental functions
-                const getminimap = (() => {
+                /*const getminimap = (() => {
                   let all = {
                     walls: [],
                     players: {},
@@ -3613,8 +3608,8 @@ const sockets = (() => {
                   }
                   let updateMaze = () => {
                     let walls = all.walls = []
-                    entities.forEach(my => {
-                      if (my.type === 'wall') {
+                    for (let my of entities)
+                      if (my.type === 'wall' && my.alpha > 0.2) {
                         walls.push(
                           my.shape === 4 ? 2 : 1,
                           my.id,
@@ -3623,15 +3618,14 @@ const sockets = (() => {
                           my.color,
                           Math.round(my.SIZE))
                       }
-                    })
                   }
                   setTimeout(updateMaze, 2500)
-                  setInterval(updateMaze, 25000)
+                  setInterval(updateMaze, 10000)
                   setInterval(() => {
                     let minimaps = all.players = { [1]: [], [2]: [], [3]: [], [4]: [] }
                     let minibosses = all.minibosses = []
-                    entities.forEach(my => {
-                      if (my.type === 'miniboss') {
+                    for (let my of entities)
+                      if (my.type === 'miniboss' || (my.type === 'tank' && my.lifetime)) {
                         minibosses.push(
                           0,
                           my.id,
@@ -3639,7 +3633,7 @@ const sockets = (() => {
                           util.clamp(Math.floor(256 * my.y / room.height), 0, 255),
                           my.color,
                         )
-                      } else if (my.type === 'tank' && -1 >= my.team && my.team >= -4) {
+                      } else if (my.type === 'tank' && -1 >= my.team && my.team >= -4 && my.master === my) {
                         minimaps[-my.team].push(
                           0,
                           my.id,
@@ -3648,74 +3642,72 @@ const sockets = (() => {
                           my.color,
                         )
                       }
-                    })
                   }, 250)
                   return all
                 })()
-              const getleaderboard = (() => {
-                    let lb = { full: [], updates: [], };
+                const getleaderboard = (() => {
+                    let lb = { full: [], updates: [], }
                     // We'll reuse these lists over and over again
-                    let list = new goog.structs.PriorityQueue();
+                    let list = []
                     // This puts things in the data structure
                     function listify(instance) {
                         if (
-                            instance.settings.leaderboardable && 
-                            instance.settings.drawShape && 
+                            instance.settings.leaderboardable &&
+                            instance.settings.drawShape &&
                             (
-                                instance.type === 'tank' || 
-                                instance.killCount.solo || 
+                                instance.type === 'tank' ||
+                                instance.killCount.solo ||
                                 instance.killCount.assists
                             )
-                        ) { 
-                            list.enqueue(1/(instance.skill.score + 1), instance); 
+                        ) {
+                            list.push(instance)
                         }
                     }
                     // Build a function to prepare for export
-                    let flatten = (() => { 
-                        let leaderboard = {};
+                    let flatten = (() => {
+                        let leaderboard = {}
                         // Define our index manager
                         let indices = (() => {
-                            let data = [], removed = [];
+                            let data = [], removed = []
                             // Provide the index manager methods
-                            return { 
+                            return {
                                 flag: () => {
-                                    data.forEach(index => {
-                                        index.status = -1;
-                                    }); 
-                                    if (data == null) { data = []; } 
+                                    for (let index of data)
+                                        index.status = -1
+                                    if (data == null) { data = []; }
                                 },
-                                cull: () => { 
-                                    removed = []; 
+                                cull: () => {
+                                    removed = [];
                                     data = data.filter(index => {
-                                        let doit = index.status === -1;
-                                        if (doit) removed.push(index.id);
-                                        return !doit;
-                                    });
-                                    return removed; 
+                                        let doit = index.status === -1
+                                        if (doit) removed.push(index.id)
+                                        return !doit
+                                    })
+                                    return removed;
                                 },
-                                add: id => { 
-                                    data.push({ id: id, status: 1, }); 
+                                add: id => {
+                                    data.push({ id: id, status: 1, });
                                 },
-                                stabilize: id => { 
-                                    data[data.findIndex(index => {
-                                        return index.id === id;
-                                    })].status = 0; 
+                                stabilize: id => {
+                                    data.find(index => {
+                                        return index.id === id
+                                    }).status = 0;
                                 },
-                            };
-                        })();
+                            }
+                        })()
                         // This processes it
                         let process = (() => {
                             // A helpful thing
                             function barcolor(entry) {
                                 switch (entry.team) {
-                                case -100: return entry.color;
-                                case -1: return 10;
-                                case -2: return 11;
-                                case -3: return 12;
-                                case -4: return 15;
+                                case -100: return entry.color
+                                case -1: return 10
+                                case -2: return 11
+                                case -3: return 12
+                                case -4: return 15
                                 default: {
-                                    if (room.gameMode === 'tdm') return entry.color;
-                                    return 11;
+                                    if (room.gameMode[0] === '2' || room.gameMode[0] === '3' || room.gameMode[0] === '4') return entry.color
+                                    return 11
                                 }
                                 }
                             }
@@ -3728,119 +3720,289 @@ const sockets = (() => {
                                     entry.name,
                                     entry.color,
                                     barcolor(entry),
-                                ];
+                                ]
                             }
                             return {
                                 normal: entry => {
                                     // Check if the entry is already there
                                     let id = entry.id,
-                                        score = Math.round(entry.skill.score);
-                                    let lb = leaderboard['_' + id];
+                                        score = Math.round(entry.skill.score)
+                                    let lb = leaderboard['_' + id]
                                     if (lb != null) {
                                         // Unflag it for removal
-                                        indices.stabilize(id);
+                                        indices.stabilize(id)
                                         // Figure out if we need to update anything
-                                        if (lb.score !== score || lb.index !== entry.index) { 
+                                        if (lb.score !== score || lb.index !== entry.index) {
                                             // If so, update our record first
-                                            lb.score = score;
-                                            lb.index = entry.index;
+                                            lb.score = score
+                                            lb.index = entry.index
                                             // Return it for broadcasting
                                             return [
-                                                id, 
-                                                score, 
+                                                id,
+                                                score,
                                                 entry.index,
-                                            ]; 
+                                            ];
                                         }
                                     } else {
                                         // Record it
-                                        indices.add(id);
+                                        indices.add(id)
                                         leaderboard['_' + id] = {
                                             score: score,
                                             name: entry.name,
                                             index: entry.index,
                                             color: entry.color,
                                             bar: barcolor(entry),
-                                        };
+                                        }
                                         // Return it for broadcasting
-                                        return getfull(entry);
+                                        return getfull(entry)
                                     }
                                 },
-                                full: entry => { return getfull(entry); },
-                            };
-                        })();
+                                full: entry => getfull(entry),
+                            }
+                        })()
                         // The flattening functions
                         return data => {
                             // Start
-                            indices.flag();
+                            indices.flag()
                             // Flatten the orders
-                            let orders = data.map(process.normal).filter(e => { return e; }),
-                                refresh = data.map(process.full).filter(e => { return e; }),
+                            let orders = data.map(process.normal).filter(e => e),
+                                refresh = data.map(process.full).filter(e => e),
                                 flatorders = [],
-                                flatrefresh = [];
-                            orders.forEach(e => flatorders.push(...e));
-                            refresh.forEach(e => flatrefresh.push(...e));
+                                flatrefresh = []
+                            for (let e of orders) flatorders.push(...e)
+                            for (let e of refresh) flatrefresh.push(...e)
                             // Find the stuff to remove
-                            let removed = indices.cull();
+                            let removed = indices.cull()
                             // Make sure we sync the leaderboard
-                            removed.forEach(id => { delete leaderboard['_' + id]; });
+                            for (let id of removed) { delete leaderboard['_' + id]; }
                             return {
                                 updates: [removed.length, ...removed, orders.length, ...flatorders],
                                 full: [-1, refresh.length, ...flatrefresh], // The -1 tells the client it'll be a full refresh
-                            };
-                        };
-                    })();
+                            }
+                        }
+                    })()
                     // The update function (returns a reader)
                     return () => {
-                        list.clear();       
+                        list = []
                         // Sort everything
-                        entities.forEach(listify);
+                        for (let e of entities) listify(e)
                         // Get the top ten
-                        let topTen = [];
-                        for (let i=0; i<10; i++) {
-                            // Only if there's anything in the list of course
-                            if (list.getCount()) {
-                                topTen.push(list.dequeue());   
-                            } else { 
-                                break; 
+                        let topTen = []
+                        for (let i = 0; i < 10 && list.length; i++) {
+                          let top, is = 0
+                          for (let j = 0; j < list.length; j++) {
+                            let val = list[j].skill.score
+                            if (val > is) {
+                              is = val
+                              top = j
                             }
-                        }       
-                        topTen = topTen.filter(e => { return e; });
-                        room.topPlayerID = (topTen.length) ? topTen[0].id : -1;
+                          }
+                          if (is === 0) break
+                          topTen.push(list[top])
+                          list.splice(top, 1)
+                        }
+                        room.topPlayerID = (topTen.length) ? topTen[0].id : -1
                         // Remove empty values and process it
-                        lb = flatten(topTen);
+                        lb = flatten(topTen)
                         // Return the reader
-                        return (full = false) => {
-                            return full ? lb.full : lb.updates;
-                        };
-                    };
-                })();
-                // Define a 1 Hz update loop
-                function slowloop() {
-                    // Build the minimap
-                    logs.minimap.set();
-                    // Build the leaderboard
-                    readlb = getleaderboard();
-                    logs.minimap.mark();
-                    // Check sockets
-                    let time = util.time();
-                    clients.forEach(socket => {
-                        if (socket.timeout.check(time)) socket.kick('Kicked for inactivity.');
-                        if (time - socket.statuslastHeartbeat > c.maxHeartbeatInterval) socket.kick('Lost heartbeat.'); 
-                    });
-                } 
-                // Start it
-                setInterval(slowloop, 1000);
-                // Give the broadcast method
-                return socket => {
-                    // Make sure it's spawned first
-                    if (socket.status.hasSpawned) {
-                        let { walls, players, minibosses } = getminimap
-                        let lb = readlb(socket.status.needsFullLeaderboard)
-                        socket.status.needsFullLeaderboard = false
-                        socket.talk('b', ...walls, ...(players[socket.player.team] || []), ...minibosses, -1, ...lb)
+                        return full => full ? lb.full : lb.updates
                     }
-                };
-            })();
+                })()*/
+                // Util
+                let getBarColor = entry => {
+                  switch (entry.team) {
+                    case -100: return entry.color
+                    case -1: return 10
+                    case -2: return 11
+                    case -3: return 12
+                    case -4: return 15
+                    default:
+                      if (room.gameMode[0] === '2' || room.gameMode[0] === '3' || room.gameMode[0] === '4') return entry.color
+                      return 11
+                  }
+                }
+                // Delta Calculator
+                const Delta = class {
+                  constructor(dataLength, finder) {
+                    this.dataLength = dataLength
+                    this.finder = finder
+                    this.now = finder()
+                  }
+                  update() {
+                    let old = this.now
+                    let now = this.finder()
+                    this.now = now
+
+                    let oldIndex = 0
+                    let nowIndex = 0
+                    let updates = []
+                    let updatesLength = 0
+                    let deletes = []
+                    let deletesLength = 0
+
+                    while (oldIndex < old.length && nowIndex < now.length) {
+                      let oldElement = old[oldIndex]
+                      let nowElement = now[nowIndex]
+
+                      if (oldElement.id === nowElement.id) { // update
+                        nowIndex++
+                        oldIndex++
+
+                        let updated = false
+                        for (let i = 0; i < this.dataLength; i++)
+                          if (oldElement.data[i] !== nowElement.data[i]) {
+                            updated = true
+                            break
+                          }
+
+                        if (updated) {
+                          updates.push(nowElement.id, ...nowElement.data)
+                          updatesLength++
+                        }
+                      } else if (oldElement.id < nowElement.id) { // delete
+                        deletes.push(oldElement.id)
+                        deletesLength++
+                        oldIndex++
+                      } else { // create
+                        updates.push(nowElement.id, ...nowElement.data)
+                        updatesLength++
+                        nowIndex++
+                      }
+                    }
+
+                    for (let i = oldIndex; i < old.length; i++) {
+                      deletes.push(old[i].id)
+                      deletesLength++
+                    }
+                    for (let i = nowIndex; i < now.length; i++) {
+                      updates.push(now[i].id, ...now[i].data)
+                      updatesLength++
+                    }
+
+                    let reset = [0, now.length]
+                    for (let element of now)
+                      reset.push(element.id, ...element.data)
+                    let update = [deletesLength, ...deletes, updatesLength, ...updates]
+                    return { reset, update }
+                  }
+                }
+                // Deltas
+                let minimapAll = new Delta(5, () => {
+                  let all = []
+                  for (let my of entities)
+                    if ((my.type === 'wall' && my.alpha > 0.2) ||
+                         my.type === 'miniboss' ||
+                        (my.type === 'tank' && my.lifetime))
+                      all.push({
+                        id: my.id,
+                        data: [
+                          my.type === 'wall' ? my.shape === 4 ? 2 : 1 : 0,
+                          util.clamp(Math.floor(256 * my.x / room.width), 0, 255),
+                          util.clamp(Math.floor(256 * my.y / room.height), 0, 255),
+                          my.color,
+                          Math.round(my.SIZE),
+                        ]
+                      })
+                  return all
+                })
+                let minimapTeams = [1, 2, 3, 4].map(team => new Delta(3, () => {
+                  let all = []
+                  for (let my of entities)
+                    if (my.type === 'tank' && my.team === -team && my.master === my && !my.lifetime)
+                      all.push({
+                        id: my.id,
+                        data: [
+                          util.clamp(Math.floor(256 * my.x / room.width), 0, 255),
+                          util.clamp(Math.floor(256 * my.y / room.height), 0, 255),
+                          my.color,
+                        ]
+                      })
+                  return all
+                }))
+                let leaderboard = new Delta(5, () => {
+                  let list = []
+                  for (let instance of entities)
+                    if (instance.settings.leaderboardable &&
+                        instance.settings.drawShape &&
+                       (instance.type === 'tank' || instance.killCount.solo || instance.killCount.assists)) {
+                      list.push(instance)
+                    }
+
+                  let topTen = []
+                  for (let i = 0; i < 10 && list.length; i++) {
+                    let top, is = 0
+                    for (let j = 0; j < list.length; j++) {
+                      let val = list[j].skill.score
+                      if (val > is) {
+                        is = val
+                        top = j
+                      }
+                    }
+                    if (is === 0) break
+                    let entry = list[top]
+                    topTen.push({
+                      id: entry.id,
+                      data: [
+                        Math.round(entry.skill.score),
+                        entry.index,
+                        entry.name,
+                        entry.color,
+                        getBarColor(entry),
+                      ]
+                    })
+                    list.splice(top, 1)
+                  }
+                  room.topPlayerID = topTen.length ? topTen[0].id : -1
+
+                  return topTen.sort((a, b) => a.id - b.id)
+                })
+
+                // Periodically give out updates
+                let subscribers = []
+                setInterval(() => {
+                  logs.minimap.set()
+                  let minimapUpdate = minimapAll.update()
+                  let minimapTeamUpdates = minimapTeams.map(r => r.update())
+                  let leaderboardUpdate = leaderboard.update()
+                  for (let socket of subscribers) {
+                    if (!socket.status.hasSpawned) continue
+                    let team = minimapTeamUpdates[socket.player.team - 1]
+                    if (socket.status.needsNewBroadcast) {
+                      socket.talk('b',
+                        ...minimapUpdate.reset,
+                        ...(team ? team.reset : [0, 0]),
+                        ...(socket.anon ? [0, 0] : leaderboardUpdate.reset))
+                      socket.status.needsNewBroadcast = false
+                    } else {
+                      socket.talk('b',
+                        ...minimapUpdate.update,
+                        ...(team ? team.update : [0, 0]),
+                        ...(socket.anon ? [0, 0] : leaderboardUpdate.update))
+                    }
+                  }
+
+                  logs.minimap.mark()
+
+                  let time = util.time()
+                  for (let socket of clients) {
+                    if (socket.timeout.check(time))
+                      socket.lastWords('K')
+                    if (time - socket.statuslastHeartbeat > c.maxHeartbeatInterval)
+                      socket.kick('Lost heartbeat.')
+                  }
+                }, 250)
+
+                return {
+                  subscribe(socket) {
+                    subscribers.push(socket)
+                  },
+                  unsubscribe(socket) {
+                    let i = subscribers.indexOf(socket)
+                    if (i !== -1)
+                      util.remove(subscribers, i)
+                  },
+                }
+            })()
             // Build the returned function
             // This function initalizes the socket upon connection
             return (socket, req) => {
@@ -3866,14 +4028,14 @@ const sockets = (() => {
                     requests: 0,
                     hasSpawned: false,
                     needsFullMap: true,
-                    needsFullLeaderboard: true, 
+                    needsNewBroadcast: true, 
                     lastHeartbeat: util.time(),
                 };  
                 // Set up loops
                 socket.loops = (() => {
                     let nextUpdateCall = null; // has to be started manually
                     let trafficMonitoring = setInterval(() => traffic(socket), 1500);
-                    let broadcastingGuiStuff = setInterval(() => broadcast(socket), 1000);
+                    broadcast.subscribe(socket)
                     // Return the loop methods
                     return {
                         setUpdate: timeout => {
@@ -3885,7 +4047,7 @@ const sockets = (() => {
                         terminate: () => {
                             clearTimeout(nextUpdateCall);
                             clearTimeout(trafficMonitoring);
-                            clearTimeout(broadcastingGuiStuff);
+                            broadcast.unsubscribe(socket)
                         },
                     };
                 })();
