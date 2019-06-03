@@ -30,7 +30,10 @@ Parts of the gamemode code must appear in the order below, all of which are opti
 - `f` for FFA, `2` for 2 Teams, `3` for 3 Teams, or `4` for 4 Teams
 - `d` for Domination or `m` for Mothership
 
-Note: Maze FFA and 2 Teams Mothership are replaced with just Maze and `Mothership`
+Note:
+- Maze FFA and 2 Teams Mothership are replaced with just Maze and Mothership
+- Team modes without domination or mothership are changed to TDM instead of Teams
+- Although Maze is before the team number in the gamemode code, they are moved to be after it in the displayed name (`m2` to 2TDM Maze)
  
 ## Breaking Changes
 
