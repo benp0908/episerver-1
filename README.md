@@ -22,7 +22,3 @@ SECRET=aSecretPasswordHere
 ## Breaking Changes
 
 Breaking changes are important updates to the template that you should do on your server, as otherwise it may stop functioning. The last breaking change is on April 10th, 2019. If you've made a private server before that day, it may no longer work without this update. See `CHANGELOG.md` for details.
-
-## OpenShift
-
-Glitch only allows for a very limited amount of CPU, RAM, and disk space. If your server have gotten lots of traffic, it may be worth it to switch to OpenShift. Although the process is free, it's quite complicated and will take a bit of time. See `OPENSHIFT.md` for details. (NOTICE: the tutorial is not yet complete)
