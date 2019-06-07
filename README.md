@@ -25,6 +25,7 @@ You can start the name with a gamemode code to specify its gamemode, such as `f-
 Parts of the gamemode code must appear in the order below, all of which are optional:
 - `p` for Private
 - `e` for customized event names, which is followed by the length of the event name and then the event name itself, such as `e5space`
+- `e` for customized event names with dashes, which is followed by the number of words and the length of each word and the word itself, such as `d21d3day`
 - `o` for Open
 - `m` for Maze
 - `f` for FFA, `2` for 2 Teams, `3` for 3 Teams, or `4` for 4 Teams
