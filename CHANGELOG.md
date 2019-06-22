@@ -18,7 +18,7 @@ Find `let broadcastingGuiStuff = setInterval(() => broadcast(socket), 250)` and 
 
 Find `clearTimeout(broadcastingGuiStuff)` and replace it with `broadcast.unsubscribe(socket)`
 
-You may remove this block of code in server.js
+You may also remove this block of code in server.js
 ```
 case 'z': { // leaderboard desync report
     if (m.length !== 0) { socket.kick('Ill-sized level-up request.'); return 1; }
