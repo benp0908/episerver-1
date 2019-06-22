@@ -1,5 +1,11 @@
 # Breaking Changes
 
+## June 22nd, 2019
+
+If you've created a private server with this template before April 10th, 2019, it will not support the new protocol which is now standardized!
+
+Open the lib/fasttalk.js in your server. Copy the code from the lib/fasttalk.js in this project onto your project. This will let your server use the new encoding, which will save bandwidth.
+
 ## May 25th, 2019
 
 If you've created a private server with this template before May 25th, 2019, the minimap and leaderboard will no longer work without this update!
@@ -23,7 +29,7 @@ case 'z': { // leaderboard desync report
 
 ## April 10th, 2019
 
-If you've created a private server with this template before April 10th, 2019, it will not support the new protocol which will be standardized in May, 2019!
+If you've created a private server with this template before April 10th, 2019, it will not support the new protocol which will be standardized in the future!
 
 Open the lib/fasttalk.js in your server. Copy the code from the lib/fasttalk.js in this project onto your project. This will let your server use the new encoding, which will save bandwidth.
 
