@@ -2237,12 +2237,8 @@ class Entity {
             break;
         }
         // Loop
-        while (this.facing < 0) {
-            this.facing += 2 * Math.PI;
-        }
-        while (this.facing > 2 * Math.PI) {
-            this.facing -= 2 * Math.PI;
-        }
+        const TAU = 2 * Math.PI
+        this.facing = (this.facing % TAU + TAU) % TAU;
         this.vfacing = util.angleDifference(oldFacing, this.facing) * roomSpeed;
     }
 
