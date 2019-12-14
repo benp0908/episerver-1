@@ -5205,18 +5205,18 @@ var maintainloop = (() => {
             let o = new Entity(position);
                 o.define(entityClass);
                 o.team = -101;
-                o.facing = ran.randomAngle();
+                o.facing = ran.randomRange();
                 o.protect();
                 o.life();
         }
         // Start placing them
         let roidcount = room.roid.length /** room.width * room.height / room.xgrid / room.ygrid / 50000 / 1.5*/;
-        let rockcount = room.rock.length * room.width * room.height / room.xgrid / room.ygrid / 250000 / 1.5*/;
+        /*let rockcount = room.rock.length * room.width * room.height / room.xgrid / room.ygrid / 250000 / 1.5;*/
         let count = 0;
         for (let i=Math.ceil(roidcount); i; i--) { count++; placeRoid('roid', Class.mazeObstacle); }
-        for (let i=Math.ceil(roidcount * 0.3); i; i--) { count++; placeRoid('roid', Class.mazeObstacle); }
-        for (let i=Math.ceil(rockcount * 0.8); i; i--) { count++; placeRoid('rock', Class.mazeObstacle); }
-        for (let i=Math.ceil(rockcount * 0.5); i; i--) { count++; placeRoid('rock', Class.mazeObstacle); }
+        /*for (let i=Math.ceil(roidcount * 0.3); i; i--) { count++; placeRoid('roid', Class.mazeObstacle); }*/
+        /*for (let i=Math.ceil(rockcount * 0.8); i; i--) { count++; placeRoid('rock', Class.mazeObstacle); }
+        for (let i=Math.ceil(rockcount * 0.5); i; i--) { count++; placeRoid('rock', Class.mazeObstacle); }*/
         util.log('Placing ' + count + ' obstacles!');
     }
     placeRoids();
