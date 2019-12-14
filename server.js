@@ -87,7 +87,6 @@ const room = {
             y: ran.irandom(0.5*room.height/room.ygrid) * ran.choose([-1, 1])  + selection.y,
         };
     };
-
     room.gauss = clustering => {
         let output;
         do {
@@ -5199,7 +5198,7 @@ var maintainloop = (() => {
         function placeRoid(type, entityClass) {
             let x = 0;
             let position;
-            do { position = room.isInRoom(type); 
+            do { position = room.randomType(type); 
                 x++;
                 if (x>200) { util.warn("Could not place some roids."); return 0; }
             } while (dirtyCheck(position/*, 10 + entityClass.SIZE*/));
