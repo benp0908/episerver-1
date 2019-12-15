@@ -4961,10 +4961,11 @@ var maintainloop = (() => {
     }
     placeRoids();
   
+    if (ran.chance(2));
         let placerandomWalls = () => {
-      let count = 0
-      if ran.chance(2);      
+      let count = 0     
       for (let loc of room['rwall']) {
+ 
         let o = new Entity(loc)
         o.define(Class.mazeObstacle)
         o.SIZE = (room.xgridWidth + room.ygridHeight) / 4
