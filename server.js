@@ -67,7 +67,8 @@ const room = {
     };
     room.findType('nest');
     room.findType('wall');
-    room.findType('bwall')
+    room.findType('bwall');
+    room.findType('twall');
     room.findType('norm');
     room.findType('bas1');
     room.findType('bas2');
@@ -4988,6 +4989,23 @@ var maintainloop = (() => {
       util.log('Placing ' + count + ' regular walls!')
     }
     placebigWalls()
+  
+
+  
+        let placethiccWalls = () => {
+      let count = 0
+      for (let loc of room['twall']) {
+        let o = new Entity(loc)
+        o.define(Class.thiccMazeObstacle)
+        o.SIZE = (room.xgridWidth + room.ygridHeight) / 4
+        o.team = -101
+        o.protect()
+        o.life()
+        count++;
+      }
+      util.log('Placing ' + count + ' regular walls!')
+    }
+    placethiccWalls()
     // Spawning functions
     let spawnBosses = (() => {
         let timer = 0;
