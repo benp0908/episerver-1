@@ -4569,7 +4569,7 @@ var gameloop = (() => {
                 dist = util.getDistance(item1, item2); 
             }
         }
-        function reflectcollide(wall, bounce) {
+/*        function reflectcollide(wall, bounce) {
             let delt = new Vector(wall.x - bounce.x, wall.y - bounce.y);
             let dist = delt.length;
             let diff = wall.size + bounce.size - dist;
@@ -4580,7 +4580,7 @@ var gameloop = (() => {
             }
             return 0;
         }
-        function advancedcollide(my, n, doDamage, doInelastic, nIsFirmCollide = false) {
+        function advancedcollide(my, n, doDamage, doInelastic, nIsFirmCollide = false) {*/
             // Prepare to check
             let tock = Math.min(my.stepRemaining, n.stepRemaining),
                 combinedRadius = n.size + my.size,
