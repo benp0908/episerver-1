@@ -66,6 +66,7 @@ const room = {
         room[type] = output;
     };
     room.findType('nest');
+    room.findType('wall')
     room.findType('norm');
     room.findType('bas1');
     room.findType('bas2');
@@ -4563,6 +4564,21 @@ var maintainloop = (() => {
         util.log('Placing ' + count + ' obstacles!');
     }
     placeRoids();
+  
+    let placeWalls = () => {
+      let count = 0
+      for (let loc of room['wall']) {
+        let o = new Entity(loc)
+        o.define(Class.obstacle)
+        o.SIZE = (room.xgridWidth + room.ygridHeight) / 4
+        o.team = -101
+        o.protect()
+        o.life()
+        count++;
+      }
+      util.log('Placing ' + count + ' regular walls!')
+    }
+    placeWalls()
     // Spawning functions
     let spawnBosses = (() => {
         let timer = 0;
