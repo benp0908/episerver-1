@@ -3,7 +3,7 @@
 /*global goog, Map, let */
 "use strict";
 
-// General requires
+// General requiresdddw
 require('google-closure-library');
 goog.require('goog.structs.PriorityQueue');
 goog.require('goog.structs.QuadTree');
@@ -162,6 +162,10 @@ class Vector {
         this.dir = this.direction;
     }
 
+    isShorterThan(d) {
+        return this.x * this.x + this.y * this.y <= d * d
+    }
+  
     get length() {
         return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
     }
@@ -217,8 +221,8 @@ function timeOfImpact(p, v, s) {
 }
 class IO {
     constructor(body) {
-        this.body = body;
-        this.acceptsFromTop = true;
+        this.body = body
+        this.acceptsFromTop = true
     }
 
     think() {
@@ -229,13 +233,14 @@ class IO {
             main: null,
             alt: null,
             power: null,
-        };
+        }
     }
 }
-class io_doNothing extends IO {
+let ioTypes = {}
+ioTypes.doNothing = class extends IO {
     constructor(body) {
-        super(body);
-        this.acceptsFromTop = false;
+        super(body)
+        this.acceptsFromTop = false
     }
 
     think() {
@@ -247,198 +252,292 @@ class io_doNothing extends IO {
             main: false,
             alt: false,
             fire: false,
-        };
+        }
     }
 }
-class io_moveInCircles extends IO {
+ioTypes.moveInCircles = class extends IO {
     constructor(body) {
-        super(body);
-        this.acceptsFromTop = false;
-        this.timer = ran.irandom(10) + 3;
+        super(body)
+        this.acceptsFromTop = false
+        this.timer = ran.irandom(10) + 3
         this.goal = {
             x: this.body.x + 10*Math.cos(-this.body.facing),
             y: this.body.y + 10*Math.sin(-this.body.facing),
-        };
+        }
     }
 
     think() {
         if (!(this.timer--)) {
-            this.timer = 10;
+            this.timer = 10
             this.goal = {
                 x: this.body.x + 10*Math.cos(-this.body.facing),
                 y: this.body.y + 10*Math.sin(-this.body.facing),
-            };
+            }
         }
-        return { goal: this.goal };
+        return { goal: this.goal }
     }
 }
-class io_listenToPlayer extends IO {
+ioTypes.listenToPlayer = class extends IO {
     constructor(b, p) {
-        super(b);
-        this.player = p;
-        this.acceptsFromTop = false;
+        super(b)
+        this.player = p
+        this.acceptsFromTop = false
     }
 
     // THE PLAYER MUST HAVE A VALID COMMAND AND TARGET OBJECT
-    
+
     think() {
         let targ = {
             x: this.player.target.x,
             y: this.player.target.y,
-        };
+        }
+        if (c.RADIAL) {
+            let angle = Math.atan2(this.body.x - room.width / 2, room.height / 2 - this.body.y)
+            let cos = Math.cos(angle)
+            let sin = Math.sin(angle)
+            let { x, y } = targ
+            targ.x = cos * x - sin * y
+            targ.y = sin * x + cos * y
+        }
         if (this.player.command.autospin) {
-            let kk = Math.atan2(this.body.control.target.y, this.body.control.target.x) + 0.02;
+            let kk = Math.atan2(this.body.control.target.y, this.body.control.target.x) + 0.02
             targ = {
                 x: 100 * Math.cos(kk),
                 y: 100 * Math.sin(kk),
-            };
+            }
+        } else if (this.player.command.reverseTank) {
+            targ.x = -targ.x
+            targ.y = -targ.y
         }
         if (this.body.invuln) {
             if (this.player.command.right || this.player.command.left || this.player.command.up || this.player.command.down || this.player.command.lmb) {
-                this.body.invuln = false;
+                this.body.invuln = false
             }
         }
-        this.body.autoOverride = this.player.command.override;
-        return {         
+        this.body.autoOverride = this.player.command.override
+        let left = this.player.command.lmb
+        let right = this.player.command.rmb
+        if (this.player.command.reverseMouse) {
+            let temp = right
+            right = left
+            left = temp
+        }
+        left = this.player.command.autofire || left
+        let goalX = this.player.command.right - this.player.command.left
+        let goalY = this.player.command.down - this.player.command.up
+        if (c.RADIAL) {
+            let angle = Math.atan2(this.body.x - room.width / 2, room.height / 2 - this.body.y)
+            let cos = Math.cos(angle)
+            let sin = Math.sin(angle)
+            let newX = cos * goalX - sin * goalY
+            let newY = sin * goalX + cos * goalY
+            goalX = newX
+            goalY = newY
+        }
+        return {
             target: targ,
             goal: {
-                x: this.body.x + this.player.command.right - this.player.command.left,
-                y: this.body.y + this.player.command.down - this.player.command.up,
+                x: this.body.x + goalX,
+                y: this.body.y + goalY,
             },
-            fire: this.player.command.lmb || this.player.command.autofire,
-            main: this.player.command.lmb || this.player.command.autospin || this.player.command.autofire,
-            alt: this.player.command.rmb,
-        };
+            fire: left,
+            main: left || this.player.command.autospin,
+            alt: right,
+            reverseTank: this.player.command.reverseTank,
+        }
     }
 }
-class io_mapTargetToGoal extends IO {
+ioTypes.reactionControl = class extends IO {
     constructor(b) {
-        super(b);
+        super(b)
+        this.acceptsFromTop = false
+        this.direction = 0
+        this.stabilizeWait = 50
+    }
+
+    // THE PLAYER MUST HAVE A VALID COMMAND AND TARGET OBJECT
+
+    think() {
+        let offset = 0
+        if (this.body.bond != null) {
+            offset = this.body.bound.angle
+        }
+        let player = this.body.master.master.player
+        let moving = player && (player.command.right || player.command.left || player.command.down || player.command.up)
+        let fire = moving
+        let override = this.body.master.autoOverride
+        if (moving) {
+          /*let x = this.body.master.control.goal.x - this.body.x // +player.command.right - +player.command.left
+          let y = this.body.master.control.goal.y - this.body.y // +player.command.down - +player.command.up
+          this.direction = Math.atan2(y, x)*/
+          let x = +player.command.right - +player.command.left
+          let y = +player.command.down - +player.command.up
+          this.direction = [
+            -3, -2, -1,
+             4,  0,  0,
+             3,  2,  1,
+          ][y * 3 + x + 4] / 4 * Math.PI
+          if (c.RADIAL) {
+            this.direction += Math.atan2(this.body.x - room.width / 2, room.height / 2 - this.body.y)
+          }
+        } else if (!override) {
+          if (!this.body.master.velocity.isShorterThan(0.1)) {
+            this.direction = this.body.master.velocity.direction + Math.PI
+            if (!this.body.master.velocity.isShorterThan(1.5) || this.stabilizeWait <= 0) {
+              fire = true
+            }
+          }
+        }
+        if (fire && !(this.stabilizeWait <= 0 && this.stabilizeWait > 3)) {
+          this.stabilizeWait = 50
+        } else if (this.stabilizeWait > 0) {
+          this.stabilizeWait--
+        }
+        return {
+            target: {
+                x: Math.cos(offset + this.direction),
+                y: Math.sin(offset + this.direction),
+            },
+            main: true,
+            fire,
+        }
+    }
+}
+ioTypes.mapTargetToGoal = class extends IO {
+    constructor(body) {
+        super(body)
     }
 
     think(input) {
         if (input.main || input.alt) {
-            return {         
+            return {
                 goal: {
                     x: input.target.x + this.body.x,
                     y: input.target.y + this.body.y,
                 },
                 power: 1,
-            };
+            }
         }
     }
 }
-class io_boomerang extends IO {
-    constructor(b) {
-        super(b);
-        this.r = 0;
-        this.b = b;
-        this.m = b.master;
-        this.turnover = false;
-        let len = 10 * util.getDistance({x: 0, y:0}, b.master.control.target);
+ioTypes.boomerang = class extends IO {
+    constructor(body) {
+        super(body)
+        this.range = 0
+        this.master = body.master
+        this.turnover = false
         this.myGoal = {
-            x: 3 * b.master.control.target.x + b.master.x,
-            y: 3 * b.master.control.target.y + b.master.y,
-        };
+            x: 3 * body.master.control.target.x + body.master.x,
+            y: 3 * body.master.control.target.y + body.master.y,
+        }
     }
     think(input) {
-        if (this.b.range > this.r) this.r = this.b.range;
-        let t = 1; //1 - Math.sin(2 * Math.PI * this.b.range / this.r) || 1;
-        if (!this.turnover) {
-            if (this.r && this.b.range < this.r * 0.5) { this.turnover = true; }
-            return {
-                goal: this.myGoal,
-                power: t,
-            };
-        } else {
+        if (this.body.range > this.range) this.range = this.body.range
+        if (this.turnover) {
             return {
                 goal: {
-                    x: this.m.x,
-                    y: this.m.y,
+                    x: this.master.x,
+                    y: this.master.y,
                 },
-                power: t,
-            };
+            }
+        } else {
+            if (this.range && this.body.range < this.range * 0.5) this.turnover = true
+            return {
+                goal: this.myGoal,
+            }
         }
     }
 }
-class io_goToMasterTarget extends IO {
+ioTypes.goToMasterTarget = class extends IO {
     constructor(body) {
-        super(body);
+        super(body)
         this.myGoal = {
             x: body.master.control.target.x + body.master.x,
             y: body.master.control.target.y + body.master.y,
-        };
-        this.countdown = 5;
+        }
+        this.countdown = 200
     }
 
     think() {
-        if (this.countdown) {
-            if (util.getDistance(this.body, this.myGoal) < 1) { this.countdown--; }
-            return {
-                goal: {
-                    x: this.myGoal.x,
-                    y: this.myGoal.y,
-                },
-            };
+        if (this.countdown <= 0) return
+
+        // projectedDistance = velocity / this.body.damp * roomSpeed
+        let deltaX = (this.myGoal.x - this.body.x) * this.body.damp - this.body.velocity.x
+        let deltaY = (this.myGoal.y - this.body.y) * this.body.damp - this.body.velocity.y
+        let power = Math.sqrt(deltaX * deltaX + deltaY * deltaY) / this.body.acceleration / roomSpeed
+        if (power < 0.001)
+          this.countdown -= 20
+        else
+          this.countdown--
+
+        return {
+            goal: {
+                x: this.body.x + deltaX,
+                y: this.body.y + deltaY,
+            },
+            power: Math.min(1, power),
         }
     }
 }
-class io_canRepel extends IO {
-    constructor(b) {
-        super(b);
+ioTypes.canRepel = class extends IO {
+    constructor(body) {
+        super(body)
     }
-    
+
     think(input) {
         if (input.alt && input.target) {
-            return {                
-                target: {
-                    x: -input.target.x,
-                    y: -input.target.y,
-                },  
-                main: true,
-            };
+            let x = this.body.master.master.x - this.body.x
+            let y = this.body.master.master.y - this.body.y
+            // if (x * x + y * y < 2250000) // (50 * 30) ^ 2
+            return {
+              target: {
+                x: -input.target.x,
+                y: -input.target.y,
+              },
+              main: true,
+            }
         }
     }
 }
-class io_alwaysFire extends IO {
+ioTypes.alwaysFire = class extends IO {
     constructor(body) {
-        super(body);
+        super(body)
     }
 
     think() {
         return {
             fire: true,
-        };
+        }
     }
 }
-class io_targetSelf extends IO {
+ioTypes.targetSelf = class extends IO {
     constructor(body) {
-        super(body);
+        super(body)
     }
 
     think() {
         return {
             main: true,
             target: { x: 0, y: 0, },
-        };
+        }
     }
 }
-class io_mapAltToFire extends IO {
+ioTypes.mapAltToFire = class extends IO {
     constructor(body) {
-        super(body);
+        super(body)
     }
 
     think(input) {
         if (input.alt) {
             return {
                 fire: true,
-            };
+            }
         }
     }
 }
-class io_onlyAcceptInArc extends IO {
+ioTypes.onlyAcceptInArc = class extends IO {
     constructor(body) {
-        super(body);
+        super(body)
     }
 
     think(input) {
@@ -448,125 +547,135 @@ class io_onlyAcceptInArc extends IO {
                     fire: false,
                     alt: false,
                     main: false,
-                };
+                }
             }
         }
     }
 }
-class io_nearestDifferentMaster extends IO {
+ioTypes.nearestDifferentMaster = class extends IO {
     constructor(body) {
-        super(body);
-        this.targetLock = undefined;
-        this.tick = ran.irandom(30);
-        this.lead = 0;
-        this.validTargets = this.buildList(body.fov / 2);
-        this.oldHealth = body.health.display();
+        super(body)
+        this.targetLock = undefined
+        this.tick = ran.irandom(30)
+        this.lead = 0
+        this.validTargets = this.buildList(body.fov)
     }
-
     buildList(range) {
         // Establish whom we judge in reference to
         let m = { x: this.body.x, y: this.body.y, },
             mm = { x: this.body.master.master.x, y: this.body.master.master.y, },
             mostDangerous = 0,
             sqrRange = range * range,
-            keepTarget = false;
+            sqrRangeMaster = range * range * 4/3,
+            keepTarget = false
         // Filter through everybody...
-        let out = entities.map(e => {
-            // Only look at those within our view, and our parent's view, not dead, not our kind, not a bullet/trap/block etc
-            if (e.health.amount > 0) {
-            if (!e.invuln) {
-            if (e.master.master.team !== this.body.master.master.team) {
-            if (e.master.master.team !== -101) {
-            if (e.type === 'tank' || e.type === 'crasher' || (!this.body.aiSettings.shapefriend && e.type === 'food')) {
-            if (Math.abs(e.x - m.x) < range && Math.abs(e.y - m.y) < range) {
-            if (!this.body.aiSettings.blind || (Math.abs(e.x - mm.x) < range && Math.abs(e.y - mm.y) < range)) return e;
-            } } } } } }
-        }).filter((e) => { return e; });
-        
-        if (!out.length) return [];
-
-        out = out.map((e) => {
+        let out = entities.filter(e => {
+          // Only look at those within our view, and our parent's view, not dead, not invisible, not our kind, not a bullet/trap/block etc
+          return (e.health.amount > 0) &&
+                 (!e.invuln) &&
+                 (e.master.master.team !== this.body.master.master.team) &&
+                 (e.master.master.team !== -101) &&
+                 (e.master.master.alpha > 0.5) &&
+                 (e.type === 'tank' || e.type === 'crasher' || (!this.body.aiSettings.fixedFriend && e.type === 'fixed') || (!this.body.aiSettings.shapeFriend && e.type === 'food')) &&
+                 (this.body.aiSettings.parentView  || ((e.x -  m.x) * (e.x -  m.x) < sqrRange && (e.y -  m.y) * (e.y -  m.y) < sqrRange)) &&
+                 (this.body.aiSettings.skynet      || ((e.x - mm.x) * (e.x - mm.x) < sqrRangeMaster && (e.y - mm.y) * (e.y - mm.y) < sqrRangeMaster)) &&
+                 (!this.body.aiSettings.ignoreBase || room.isNotInBase(e))
+        }).filter((e) => {
             // Only look at those within range and arc (more expensive, so we only do it on the few)
-            let yaboi = false;
-            if (Math.pow(this.body.x - e.x, 2) + Math.pow(this.body.y - e.y, 2) < sqrRange) {
-                if (this.body.firingArc == null || this.body.aiSettings.view360) {
-                    yaboi = true;
-                } else if (Math.abs(util.angleDifference(util.getDirection(this.body, e), this.body.firingArc[0])) < this.body.firingArc[1]) yaboi = true;
-            }
-            if (yaboi) {                
-                mostDangerous = Math.max(e.dangerValue, mostDangerous);
-                return e;
-            }
-        }).filter((e) => { 
-            // Only return the highest tier of danger
-            if (e != null) { if (this.body.aiSettings.farm || e.dangerValue === mostDangerous) { 
-                if (this.targetLock) { if (e.id === this.targetLock.id) keepTarget = true; }
-                return e; 
-            } } 
-        }); 
+          if (this.body.firingArc == null || this.body.aiSettings.view360 ||
+            Math.abs(util.angleDifference(util.getDirection(this.body, e), this.body.firingArc[0])) < this.body.firingArc[1]) {
+            mostDangerous = Math.max(e.dangerValue, mostDangerous)
+            return true
+          }
+          return false
+        }).filter((e) => {
+          // Only return the highest tier of danger
+          if (this.body.aiSettings.farm || e.dangerValue === mostDangerous) {
+            if (this.targetLock && e.id === this.targetLock.id) keepTarget = true
+            return true
+          }
+          return false
+        });
         // Reset target if it's not in there
-        if (!keepTarget) this.targetLock = undefined;
-        return out;
+        if (!keepTarget) this.targetLock = undefined
+        return out
     }
 
     think(input) {
+        if (this.body.alpha < 0.5) return {}
         // Override target lock upon other commands
         if (input.main || input.alt || this.body.master.autoOverride) {
-            this.targetLock = undefined; return {};
-        } 
+            this.targetLock = undefined; return {}
+        }
         // Otherwise, consider how fast we can either move to ram it or shoot at a potiential target.
         let tracking = this.body.topSpeed,
-            range = this.body.fov / 2;
+            range = this.body.fov
         // Use whether we have functional guns to decide
         for (let i=0; i<this.body.guns.length; i++) {
-            if (this.body.guns[i].canShoot && !this.body.aiSettings.skynet) {
-                let v = this.body.guns[i].getTracking();
-                tracking = v.speed;
-                range = Math.min(range, v.speed * v.range);
-                break;
+            if (this.body.guns[i].canShoot) {
+                let v = this.body.guns[i].getTracking()
+                tracking = v.speed
+                range = Math.min(range, v.speed * v.range)
+                break
             }
         }
         // Check if my target's alive
-        if (this.targetLock) { if (this.targetLock.health.amount <= 0) {
-            this.targetLock = undefined;
-            this.tick = 100;
-        } }
+        if (this.targetLock) {
+          let m = { x: this.body.x, y: this.body.y, },
+              mm = { x: this.body.master.master.x, y: this.body.master.master.y, },
+              sqrRange = range * range,
+              sqrRangeMaster = range * range * 4/3,
+              e = this.targetLock
+          if ((e.health.amount > 0) &&
+             (!e.invuln) &&
+             (e.master.master.team !== this.body.master.master.team) &&
+             (e.master.master.team !== -101) &&
+             (e.alpha > 0.5) &&
+             (e.type === 'tank' || e.type === 'crasher' || (!this.body.aiSettings.fixedFriend && e.type === 'fixed') || (!this.body.aiSettings.shapeFriend && e.type === 'food')) &&
+             (this.body.aiSettings.parentView  || ((e.x -  m.x) * (e.x -  m.x) < sqrRange && (e.y -  m.y) * (e.y -  m.y) < sqrRange)) &&
+             (this.body.aiSettings.skynet      || ((e.x - mm.x) * (e.x - mm.x) < sqrRangeMaster && (e.y - mm.y) * (e.y - mm.y) < sqrRangeMaster)) &&
+             (!this.body.aiSettings.ignoreBase || room.isNotInBase(e))) {
+          } else {
+            this.targetLock = undefined
+            this.tick = 100
+          }
+        }
         // Think damn hard
         if (this.tick++ > 15 * roomSpeed) {
-            this.tick = 0;
-            this.validTargets = this.buildList(range);
+            this.tick = 0
+            this.validTargets = this.buildList(range)
             // Ditch our old target if it's invalid
             if (this.targetLock && this.validTargets.indexOf(this.targetLock) === -1) {
-                this.targetLock = undefined;
+                this.targetLock = undefined
             }
             // Lock new target if we still don't have one.
             if (this.targetLock == null && this.validTargets.length) {
-                this.targetLock = (this.validTargets.length === 1) ? this.validTargets[0] : nearest(this.validTargets, { x: this.body.x, y: this.body.y });
-                this.tick = -90;
+                this.targetLock = (this.validTargets.length === 1) ? this.validTargets[0] : nearest(this.validTargets, { x: this.body.x, y: this.body.y })
+                this.tick = -90
             }
         }
         // Lock onto whoever's shooting me.
-        // let damageRef = (this.body.bond == null) ? this.body : this.body.bond;
+        // let damageRef = (this.body.bond == null) ? this.body : this.body.bond
         // if (damageRef.collisionArray.length && damageRef.health.display() < this.oldHealth) {
-        //     this.oldHealth = damageRef.health.display();
+        //     this.oldHealth = damageRef.health.display()
         //     if (this.validTargets.indexOf(damageRef.collisionArray[0]) === -1) {
-        //         this.targetLock = (damageRef.collisionArray[0].master.id === -1) ? damageRef.collisionArray[0].source : damageRef.collisionArray[0].master;
+        //         this.targetLock = (damageRef.collisionArray[0].master.id === -1) ? damageRef.collisionArray[0].source : damageRef.collisionArray[0].master
         //     }
         // }
         // Consider how fast it's moving and shoot at it
         if (this.targetLock != null) {
-            let radial = this.targetLock.velocity;
+            let radial = this.targetLock.velocity
             let diff = {
                 x: this.targetLock.x - this.body.x,
                 y: this.targetLock.y - this.body.y,
-            };
-            /// Refresh lead time
+            }
+            // Refresh lead time
             if (this.tick % 4 === 0) {
-                this.lead = 0;
+                this.lead = 0
                 // Find lead time (or don't)
                 if (!this.body.aiSettings.chase) {
-                    let toi = timeOfImpact(diff, radial, tracking);
-                    this.lead = toi;
+                    let toi = timeOfImpact(diff, radial, tracking)
+                    this.lead = toi
                 }
             }
             // And return our aim
@@ -577,122 +686,123 @@ class io_nearestDifferentMaster extends IO {
                 },
                 fire: true,
                 main: true,
-            }; 
+            }
         }
-        return {};
+        return {}
     }
 }
-class io_avoid extends IO {
+ioTypes.avoid = class extends IO {
     constructor(body) {
-        super(body);
+        super(body)
     }
 
     think(input) {
-        let masterId = this.body.master.id;
-        let range = this.body.size * this.body.size * 100 ;
-        this.avoid = nearest( 
-            entities, 
+        let masterId = this.body.master.id
+        let range = this.body.size * this.body.size * 100
+        this.avoid = nearest(
+            entities,
             { x: this.body.x, y: this.body.y },
-            function(test, sqrdst) { 
+            function(test, sqrdst) {
                 return (
-                    test.master.id !== masterId && 
+                    test.master.id !== masterId &&
                     (test.type === 'bullet' || test.type === 'drone' || test.type === 'swarm' || test.type === 'trap' || test.type === 'block') &&
                     sqrdst < range
                 ); }
-        );
+        )
         // Aim at that target
-        if (this.avoid != null) { 
+        if (this.avoid != null) {
             // Consider how fast it's moving.
-            let delt = new Vector(this.body.velocity.x - this.avoid.velocity.x, this.body.velocity.y - this.avoid.velocity.y);
-            let diff = new Vector(this.avoid.x - this.body.x, this.avoid.y - this.body.y);            
-            let comp = (delt.x * diff. x + delt.y * diff.y) / delt.length / diff.length;
-            let goal = {};
+            let delt = new Vector(this.body.velocity.x - this.avoid.velocity.x, this.body.velocity.y - this.avoid.velocity.y)
+            let diff = new Vector(this.avoid.x - this.body.x, this.avoid.y - this.body.y);
+            let comp = (delt.x * diff. x + delt.y * diff.y) / delt.length / diff.length
+            let goal = {}
             if (comp > 0) {
                 if (input.goal) {
-                    let goalDist = Math.sqrt(range / (input.goal.x * input.goal.x + input.goal.y * input.goal.y));
+                    let goalDist = Math.sqrt(range / (input.goal.x * input.goal.x + input.goal.y * input.goal.y))
                     goal = {
                         x: input.goal.x * goalDist - diff.x * comp,
                         y: input.goal.y * goalDist - diff.y * comp,
-                    };
+                    }
                 } else {
                     goal = {
                         x: -diff.x * comp,
                         y: -diff.y * comp,
-                    };
+                    }
                 }
-                return goal;
+                return goal
             }
         }
     }
 }
-class io_minion extends IO {
+ioTypes.minion = class extends IO {
     constructor(body) {
-        super(body);
-        this.turnwise = 1;
+        super(body)
+        this.turnwise = 1
     }
 
     think(input) {
         if (this.body.aiSettings.reverseDirection && ran.chance(0.005)) { this.turnwise = -1 * this.turnwise; }
         if (input.target != null && (input.alt || input.main)) {
-            let sizeFactor = Math.sqrt(this.body.master.size / this.body.master.SIZE);
-            let leash = 60 * sizeFactor;
-            let orbit = 120 * sizeFactor;
-            let repel = 135 * sizeFactor;
-            let goal;
-            let power = 1;
-            let target = new Vector(input.target.x, input.target.y);
+            let sizeFactor = Math.sqrt(this.body.master.size / this.body.master.SIZE)
+            let leash = 82 * sizeFactor
+            let orbit = 140 * sizeFactor
+            let repel = 142 * sizeFactor
+            let goal
+            let power = 1
+            let target = new Vector(input.target.x, input.target.y)
             if (input.alt) {
                 // Leash
                 if (target.length < leash) {
                     goal = {
                         x: this.body.x + target.x,
                         y: this.body.y + target.y,
-                    };
+                    }
                 // Spiral repel
                 } else if (target.length < repel) {
-                    let dir = -this.turnwise * target.direction + Math.PI / 5;
+                    let dir = -this.turnwise * target.direction + Math.PI / 5
                     goal = {
                         x: this.body.x + Math.cos(dir),
                         y: this.body.y + Math.sin(dir),
-                    };
+                    }
                 // Free repel
                 } else {
                     goal = {
                         x: this.body.x - target.x,
                         y: this.body.y - target.y,
-                    };
+                    }
                 }
             } else if (input.main) {
                 // Orbit point
-                let dir = this.turnwise * target.direction + 0.01;
+                let dir = this.turnwise * target.direction + 0.01
                 goal = {
                     x: this.body.x + target.x - orbit * Math.cos(dir),
-                    y: this.body.y + target.y - orbit * Math.sin(dir), 
-                };
+                    y: this.body.y + target.y - orbit * Math.sin(dir),
+                }
                 if (Math.abs(target.length - orbit) < this.body.size * 2) {
-                    power = 0.7;
+                    power = 0.7
                 }
             }
-            return { 
+            return {
                 goal: goal,
                 power: power,
-            };
+            }
         }
     }
 }
-class io_hangOutNearMaster extends IO {
+ioTypes.hangOutNearMaster = class extends IO {
     constructor(body) {
-        super(body);
-        this.acceptsFromTop = false;
-        this.orbit = 30;
-        this.currentGoal = { x: this.body.source.x, y: this.body.source.y, };
-        this.timer = 0;
+        super(body)
+        this.acceptsFromTop = false
+        this.orbit = 30
+        this.currentGoal = { x: this.body.source.x, y: this.body.source.y, }
+        this.timer = 0
     }
     think(input) {
-        if (this.body.source != this.body) {
-            let bound1 = this.orbit * 0.8 + this.body.source.size + this.body.size;
-            let bound2 = this.orbit * 1.5 + this.body.source.size + this.body.size;
-            let dist = util.getDistance(this.body, this.body.source) + Math.PI / 8; 
+        if (this.body.invisible[1]) return {}
+        if (this.body.source !== this.body) {
+            let bound1 = this.orbit * 0.8 + this.body.source.size + this.body.size
+            let bound2 = this.orbit * 1.5 + this.body.source.size + this.body.size
+            let dist = util.getDistance(this.body, this.body.source) + Math.PI / 8;
             let output = {
                 target: {
                     x: this.body.velocity.x,
@@ -700,112 +810,218 @@ class io_hangOutNearMaster extends IO {
                 },
                 goal: this.currentGoal,
                 power: undefined,
-            };        
+            };
             // Set a goal
             if (dist > bound2 || this.timer > 30) {
-                this.timer = 0;
+                this.timer = 0
 
-                let dir = util.getDirection(this.body, this.body.source) + Math.PI * ran.random(0.5); 
-                let len = ran.randomRange(bound1, bound2);
-                let x = this.body.source.x - len * Math.cos(dir);
-                let y = this.body.source.y - len * Math.sin(dir);
+                let dir = util.getDirection(this.body, this.body.source) + Math.PI * ran.random(0.5);
+                let len = ran.randomRange(bound1, bound2)
+                let x = this.body.source.x - len * Math.cos(dir)
+                let y = this.body.source.y - len * Math.sin(dir)
                 this.currentGoal = {
                     x: x,
                     y: y,
-                };        
+                };
             }
             if (dist < bound2) {
-                output.power = 0.15;
+                output.power = 0.15
                 if (ran.chance(0.3)) { this.timer++; }
             }
-            return output;
+            return output
         }
     }
 }
-class io_spin extends IO {
-    constructor(b) {
-        super(b);
-        this.a = 0;
+ioTypes.spinWhenIdle = class extends IO {
+    constructor(body) {
+        super(body)
+        this.a = 0
     }
-    
+
     think(input) {
-        this.a += 0.05;
-        let offset = 0;
-        if (this.body.bond != null) {
-            offset = this.body.bound.angle;
+        if (input.target) {
+          this.a = Math.atan2(input.target.y, input.target.x)
+          return input
         }
-        return {                
+        this.a += 0.02
+        return {
+          target: {
+            x: Math.cos(this.a),
+            y: Math.sin(this.a),
+          },
+          main: true
+        }
+    }
+}
+ioTypes.slowspin = class extends IO {
+    constructor(body) {
+        super(body)
+        this.a = 0
+    }
+
+    think(input) {
+        this.a += 0.02
+        let offset = 0
+        if (this.body.bond != null) {
+            offset = this.body.bound.angle
+        }
+        return {
             target: {
                 x: Math.cos(this.a + offset),
                 y: Math.sin(this.a + offset),
-            },  
+            },
             main: true,
-        };        
+        };
     }
 }
-class io_fastspin extends IO {
-    constructor(b) {
-        super(b);
-        this.a = 0;
+ioTypes.spin = class extends IO {
+    constructor(body) {
+        super(body)
+        this.a = 0
     }
-    
+
     think(input) {
-        this.a += 0.072;
-        let offset = 0;
+        this.a += 0.04
+        let offset = 0
         if (this.body.bond != null) {
-            offset = this.body.bound.angle;
+            offset = this.body.bound.angle
         }
-        return {                
+        return {
             target: {
                 x: Math.cos(this.a + offset),
                 y: Math.sin(this.a + offset),
-            },  
+            },
             main: true,
-        };        
+        };
     }
 }
-class io_reversespin extends IO {
-    constructor(b) {
-        super(b);
-        this.a = 0;
+ioTypes.fastspin = class extends IO {
+    constructor(body) {
+        super(body)
+        this.a = 0
     }
-    
+
     think(input) {
-        this.a -= 0.05;
-        let offset = 0;
+        this.a += 0.08
+        let offset = 0
         if (this.body.bond != null) {
-            offset = this.body.bound.angle;
+            offset = this.body.bound.angle
         }
-        return {                
+        return {
             target: {
                 x: Math.cos(this.a + offset),
                 y: Math.sin(this.a + offset),
-            },  
+            },
             main: true,
-        };        
+        };
     }
 }
-class io_dontTurn extends IO {
-    constructor(b) {
-        super(b);
+ioTypes.counterslowspin = class extends IO {
+    constructor(body) {
+        super(body)
+        this.a = 0
     }
-    
+
+    think(input) {
+        this.a -= 0.02
+        let offset = 0
+        if (this.body.bond != null) {
+            offset = this.body.bound.angle
+        }
+        return {
+            target: {
+                x: Math.cos(this.a + offset),
+                y: Math.sin(this.a + offset),
+            },
+            main: true,
+        };
+    }
+}
+ioTypes.lmg = class extends IO {
+    constructor(body) {
+        super(body)
+        this.a = 0
+    }
+
+    think(input) {
+        if (!input.main) {
+          this.a = 0
+          return {}
+        }
+        this.a++
+        let offset = Math.atan2(this.body.master.y, this.body.master.x)
+        return {
+            target: {
+                x: Math.cos(offset - this.a * 0.12),
+                y: Math.sin(offset - this.a * 0.12),
+            },
+            main: true,
+        };
+    }
+}
+ioTypes.teaming = class extends IO { // AFT
+    constructor(body) {
+        super(body)
+        this.a = 0
+    }
+
+    think(input) {
+        this.a += 0.4
+        let offset = 0
+        if (this.body.bond != null) {
+            offset = this.body.bound.angle
+        }
+        return {
+            target: {
+                x: Math.cos(this.a + offset),
+                y: Math.sin(this.a + offset),
+            },
+            main: true,
+        };
+    }
+}
+ioTypes.reversespin = class extends IO {
+    constructor(body) {
+        super(body)
+        this.a = 0
+    }
+
+    think(input) {
+        this.a -= 0.05
+        let offset = 0
+        if (this.body.bond != null) {
+            offset = this.body.bound.angle
+        }
+        return {
+            target: {
+                x: Math.cos(this.a + offset),
+                y: Math.sin(this.a + offset),
+            },
+            main: true,
+        };
+    }
+}
+ioTypes.dontTurn = class extends IO {
+    constructor(body) {
+        super(body)
+    }
+
     think(input) {
         return {
             target: {
-                x: 1,
-                y: 0,
-            },  
+                x: 0,
+                y: 1,
+            },
             main: true,
-        };        
+        };
     }
 }
-class io_fleeAtLowHealth extends IO {
-    constructor(b) {
-        super(b);
-        this.fear = util.clamp(ran.gauss(0.7, 0.15), 0.1, 0.9);
+ioTypes.fleeAtLowHealth = class extends IO {
+    constructor(body) {
+        super(body)
+        this.fear = util.clamp(ran.gauss(0.7, 0.15), 0.1, 0.9)
     }
-    
+
     think(input) {
         if (input.fire && input.target != null && this.body.health.amount < this.body.health.max * this.fear) {
             return {
@@ -813,11 +1029,11 @@ class io_fleeAtLowHealth extends IO {
                     x: this.body.x - input.target.x,
                     y: this.body.y - input.target.y,
                 },
-            };
+            }
         }
     }
-
 }
+
 
 /***** ENTITIES *****/
 // Define skills
@@ -835,11 +1051,21 @@ const skcnv = {
     mob: 9,
 };
 const levelers = [
-    1,  2,  3,  4,  5,  6,  7,  8,  9,  10,
-    11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-    21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-    31, 32, 33, 34, 35, 36, 38, 40, 42, 44,
-];
+         1,  2,  3,  4,  5,  6,  7,  8,  9,
+    10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+    20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+    30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
+        41,     43,     45,
+]
+let curve = (() => {
+    let make = x => Math.log(4*x + 1) / Math.log(5)
+    let a = []
+    for (let i = 0; i < c.MAX_SKILL * 2; i++)
+      a.push(make(i/c.MAX_SKILL))
+    return x => a[x * c.MAX_SKILL]
+})()
+let apply = (f, x) => x < 0 ? 1 / (1 - x * f) : f * x + 1
+
 class Skill {
     constructor(inital = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]) { // Just skill stuff. 
         this.raw = inital;
@@ -889,46 +1115,51 @@ class Skill {
     }
 
     update() {
-        let curve = (() => {
-            function make(x) { return Math.log(4*x + 1) / Math.log(5); }
-            let a = [];
-            for (let i=0; i<c.MAX_SKILL*2; i++) { a.push(make(i/c.MAX_SKILL)); }
-            // The actual lookup function
-            return x => { return a[x * c.MAX_SKILL]; };
-        })();
-        function apply(f, x) { return (x<0) ? 1 / (1 - x * f) : f * x + 1; }
         for (let i=0; i<10; i++) {
             if (this.raw[i] > this.caps[i]) {
-                this.points += this.raw[i] - this.caps[i];
-                this.raw[i] = this.caps[i];
+                this.points += this.raw[i] - this.caps[i]
+                this.raw[i] = this.caps[i]
             }
         }
-        let attrib = [];
+        let attrib = []
         for (let i=0; i<5; i++) { for (let j=0; j<2; j+=1) {
             attrib[i + 5*j] = curve(
                 (
-                    this.raw[i + 5*j] + 
+                    this.raw[i + 5*j] +
                     this.bleed(i, j)
-                ) / c.MAX_SKILL);
+                ) / c.MAX_SKILL)
         } }
-        this.rld = Math.pow(0.5, attrib[skcnv.rld]);
-        this.pen = apply(2.5, attrib[skcnv.pen]);
-        this.str = apply(2, attrib[skcnv.str]);
-        this.dam = apply(3, attrib[skcnv.dam]);
-        this.spd = 0.5 + apply(1.5, attrib[skcnv.spd]);
 
-        this.acl = apply(0.5, attrib[skcnv.rld]);
-        
-        this.rst = 0.5 * attrib[skcnv.str] + 2.5 * attrib[skcnv.pen];
-        this.ghost = attrib[skcnv.pen];
-        
-        this.shi = c.GLASS_HEALTH_FACTOR * apply(3 / c.GLASS_HEALTH_FACTOR - 1, attrib[skcnv.shi]);
-        this.atk = apply(1, attrib[skcnv.atk]);
-        this.hlt = c.GLASS_HEALTH_FACTOR * apply(2 / c.GLASS_HEALTH_FACTOR - 1, attrib[skcnv.hlt]);
-        this.mob = apply(0.8, attrib[skcnv.mob]); 
-        this.rgn = apply(25, attrib[skcnv.rgn]);
+        this.rld = Math.pow(0.5, attrib[skcnv.rld])
+        this.rcs = Math.pow(0.55, attrib[skcnv.mob])
 
-        this.brst = 0.3 * (0.5 * attrib[skcnv.atk] + 0.5 * attrib[skcnv.hlt] + attrib[skcnv.rgn]);
+        this.pen = apply(2.7, attrib[skcnv.pen])
+        this.str = apply(2.2, attrib[skcnv.str])
+        this.dam = apply(3.2, attrib[skcnv.dam])
+        this.spd = 0.5 + apply(1.5, attrib[skcnv.spd])
+
+        this.acl = apply(0.8, attrib[skcnv.rld])
+
+        this.rst = 0.5 * attrib[skcnv.str] + 2.5 * attrib[skcnv.pen]
+        this.ghost = attrib[skcnv.pen]
+
+        this.shi = apply(0.3, attrib[skcnv.shi])
+        this.atk = apply(0.085, attrib[skcnv.atk])
+        this.hlt = apply(0.3, attrib[skcnv.hlt])
+        this.mob = apply(0.8, attrib[skcnv.mob])
+        this.rgn = apply(10, attrib[skcnv.rgn])
+
+        this.brst = 0.3 * (0.5 * attrib[skcnv.atk] + 0.5 * attrib[skcnv.hlt] + attrib[skcnv.rgn])
+
+        /*
+        this.shi = apply(3, attrib[skcnv.shi])
+        this.atk = apply(0.1, attrib[skcnv.atk])
+        this.hlt = apply(0.2, attrib[skcnv.hlt])
+        this.mob = apply(0.8, attrib[skcnv.mob])
+        this.rgn = apply(15, attrib[skcnv.rgn])
+
+        this.brst = 0.25 * (apply(4.5, attrib[skcnv.atk]) + apply(4.5, attrib[skcnv.hlt]) + apply(9, attrib[skcnv.rgn]))
+        */
     }
 
     set(thing) {
@@ -1714,7 +1945,7 @@ class Entity {
         if (set.CONTROLLERS != null) { 
             let toAdd = [];
             set.CONTROLLERS.forEach((ioName) => {
-                toAdd.push(eval('new io_' + ioName + '(this)'));
+                toAdd.push(new ioTypes[ioName](this))
             });
             this.addController(toAdd);
         }
@@ -3038,19 +3269,218 @@ const sockets = (() => {
                 case 'L': { // level up cheat
                     if (m.length !== 0) { socket.kick('Ill-sized level-up request.'); return 1; }
                     // cheatingbois
-                    if (player.body != null) { if (player.body.skill.level < c.SKILL_CHEAT_CAP || ((socket.key === process.env.SECRET) && player.body.skill.level < 45)) {
+                    if (player.body != null) { if (player.body.skill.level < c.SKILL_CHEAT_CAP || player.body.skill.level < 45) {
                         player.body.skill.score += player.body.skill.levelScore;
                         player.body.skill.maintain();
                         player.body.refreshBodyAttributes();
                     } }
                 } break;
-                case '0': { // testbed cheat
-                    if (m.length !== 0) { socket.kick('Ill-sized testbed request.'); return 1; }
+                case '0': { // developer cheat
+                    if (m.length > 1) { socket.kick('Ill-sized developer request.'); return 1; }
                     // cheatingbois
-                    if (player.body != null) { if (socket.key === process.env.SECRET) {
-                        player.body.define(Class.testbed);
-                    } }
-                } break;
+                    if (!player.body || socket.key !== process.env.SECRET) break
+                    if (m.length === 0) break
+
+                    switch (m[0] || 49) {
+                      case 112:
+                        for (let line of `Help menu:
+                          -  [1] Default
+                          -  [G]olden name
+                          -  [x]tronger
+                          -  [I]nvisible
+                          -  [C]op
+                          - I[N]finite level up
+                          -  [T]eleport
+                          -  [K]ill
+                          -  [m]hirlpool
+                          -  [Q] Drag
+                          -  [+] Zoom-out
+                          -  [-] Zoom-in
+                          -  [0] Clear zoom
+                        `.trim().split('\n').reverse())
+                          socket.talk('m', line.trim())
+                        break
+
+                      case 49: // [1] Default
+                        for (let instance of entities)
+                          if (instance.settings.clearOnMasterUpgrade && instance.master.id === player.body.id)
+                            instance.kill()
+
+                        socket.talk('m', 'Friendly reminder: Please do not repeatedly kill others with an overpowered tank.')
+                        if (socket.privilege > 2) {
+                          player.body.define(Class.developer)
+                        } else {
+                          player.body.define(Class.betaTester)
+                          socket.talk('m', 'Here are the beta tanks')
+                        }
+
+                        if (c.IS_BETA !== 2)
+                          player.body.define({ CAN_BE_ON_LEADERBOARD: false })
+                        player.body.identity = socket.identity
+                        break
+
+                      case 71: // [G]old name
+                        if (player.body.name.startsWith('\u200B')) {
+                          player.body.name = player.body.name.slice(1)
+                          socket.talk('m', 'Disabled gold name!')
+                        } else {
+                          player.body.name = '\u200B' + player.body.name
+                          socket.talk('m', 'Enabled gold name!')
+                        }
+                        break
+
+                      case 83: // [S]tronger
+                        player.body.define({
+                          SKILL: [15, 15, 15, 15, 15, 15, 15, 15, 15, 15],
+                          SKILL_CAP: [15, 15, 15, 15, 15, 15, 15, 15, 15, 15],
+                          BODY: {
+                            HEALTH: 100,
+                            FOV: 2,
+                          },
+                          CAN_GO_OUTSIDE_ROOM: true,
+                        })
+                        socket.talk('m', 'Maxed all stats!')
+                        break
+
+                      case 73: // [I]nvisible
+                        let [a, b] = player.body.invisible
+                        player.body.hiddenFromMinimap = true
+                        player.body.define(a === 0 && b === 0.1 ? {
+                          INVISIBLE: [0.06, 0.01],
+                          INTANGIBLE: false,
+                          BODY: {
+                            DAMAGE: player.body.DAMAGE < 1e-32 ? player.body.DAMAGE * 1e64 : player.body.DAMAGE,
+                          },
+                        } : a === 0.06 && b === 0.01 ? {
+                          ALPHA: 1,
+                          INVISIBLE: [0, 0],
+                        } : {
+                          ALPHA: 0,
+                          INVISIBLE: [0, 0.1],
+                          INTANGIBLE: true,
+                          BODY: {
+                            DAMAGE: player.body.DAMAGE < 1e-32 ? player.body.DAMAGE : player.body.DAMAGE * 1e-64,
+                          },
+                        })
+                        break
+
+                      case 67: // [C]op
+                        player.body.define(Class.boosterUndercover)
+                        for (let e of entities)
+                          if ((e.x - player.body.x) * (e.x - player.body.x) + (e.y - player.body.y) * (e.y - player.body.y) < 4000000)
+                            e.sendMessage('WOOP WOOP! That\'s the sound of da police!')
+                        break
+
+                      case 78: // I[N]finite level up
+                        player.body.skill.score += player.body.skill.levelScore
+                        player.body.skill.maintain()
+                        break
+
+                      case 84: // [T]eleport
+                        player.body.hiddenFromMinimap = true
+                        player.body.x += player.target.x
+                        player.body.y += player.target.y
+                        break
+
+                      case 75: // [K]ill
+                        {
+                          let tx = player.body.x + player.target.x
+                          let ty = player.body.y + player.target.y
+                          let count = 0
+                          for (let e of entities)
+                            if ((e.x - tx) * (e.x - tx) + (e.y - ty) * (e.y - ty) < e.size * e.size) {
+                              e.invuln = false
+                              e.kill()
+                              count++
+                            }
+                          if (count === 0) {
+                            socket.talk('m', 'No entity killed!')
+                          } else if (count === 1) {
+                            socket.talk('m', 'Killed 1 entity!')
+                          } else {
+                            socket.talk('m', 'Killed ' + count + ' entities!')
+                          }
+                        }
+                        break
+
+                      case 87: // [W]hirlpool
+                        {
+                          let tx = player.body.x + player.target.x
+                          let ty = player.body.y + player.target.y
+                          let nearest = null
+                          let nearestDist2 = Infinity
+                          for (let e of entities) {
+                            let dist2 = (e.x - tx) * (e.x - tx) + (e.y - ty) * (e.y - ty)
+                            if (dist2 < nearestDist2) {
+                              nearest = e
+                              nearestDist2 = dist2
+                            }
+                          }
+                          if (nearest) {
+                            nearest.x = tx
+                            nearest.y = ty
+                          }
+                        }
+                      case 81: // [Q] Drag
+                        if (!player.pickedUpInterval) {
+                          let tx = player.body.x + player.target.x
+                          let ty = player.body.y + player.target.y
+                          let pickedUp = []
+                          for (let e of entities)
+                            if ((e.x - tx) * (e.x - tx) + (e.y - ty) * (e.y - ty) < e.size * e.size) {
+                              pickedUp.push({ e, dx: e.x - tx, dy: e.y - ty })
+                            }
+                          if (pickedUp.length === 0) {
+                            socket.talk('m', 'No entity picked up!')
+                          } else {
+                            player.pickedUpInterval = setInterval(() => {
+                              if (!player.body) {
+                                clearInterval(player.pickedUpInterval)
+                                player.pickedUpInterval = null
+                                return
+                              }
+                              let tx = player.body.x + player.target.x
+                              let ty = player.body.y + player.target.y
+                              for (let { e, dx, dy } of pickedUp)
+                                if (!e.isGhost) {
+                                  e.x = dx + tx
+                                  e.y = dy + ty
+                                }
+                            }, 25)
+                          }
+                        }
+                        break
+                      case -87:
+                      case -81:
+                        clearInterval(player.pickedUpInterval)
+                        player.pickedUpInterval = null
+                        break
+
+                      case 61: // [+] Zoom-out
+                        player.body.FOV /= 1.3
+                        break
+
+                      case 173: // [-] Zoom-in
+                        player.body.FOV *= 1.3
+                        break
+
+                      case 48: // [0] Clear zoom
+                        player.body.FOV = 1
+                        break
+                    }
+
+                    player.body.skill.update()
+                    player.body.refreshBodyAttributes()
+                    break
+                } break
+                case 'K': { // suicide cheat
+                    if (m.length !== 0) { socket.kick('Ill-sized suicide request.'); return 1; }
+                    // cheatingbois
+                    if (player.body != null && socket.key === process.env.SECRET) {
+                      player.body.invuln = false
+                      player.body.kill()
+                    }
+                } break
                 default: socket.kick('Bad packet index.');
                 }
             }
@@ -3321,7 +3751,7 @@ const sockets = (() => {
                             body.name = "\u200b" + body.name;
                             body.define({ CAN_BE_ON_LEADERBOARD: false, });
                         }                        
-                        body.addController(new io_listenToPlayer(body, player)); // Make it listen
+                        body.addController(new ioTypes.listenToPlayer(body, player)); // Make it listen
                         body.sendMessage = content => messenger(socket, content); // Make it speak
                         body.invuln = true; // Make it safe
                     player.body = body;
@@ -3806,43 +4236,6 @@ const sockets = (() => {
                     }
                 })()*/
                 // Util
-
-/*
-let r = document.getElementById('run')
-let s = document.getElementById('status')
-let c = document.getElementById('canvas')
-let maze = new MazeGenerator(11)
-let runCode = () => {
-  try {
-    let minimal = maze.placeMinimal()
-    s.style.color = '#006600'
-    s.textContent = `Success (${ maze.isClosed() ? 'closed' : 'open' })`
-  
-    let pixelSize = 10
-    c.width = pixelSize * 32
-    c.height = pixelSize * 32
-    let ctx = c.getContext('2d')
-    ctx.scale(pixelSize, pixelSize)
-    ctx.fillStyle = '#fff'
-    ctx.fillRect(0, 0, 32, 32)
-    ctx.fillStyle = '#000'
-    for (let { x, y, size } of minimal)
-      ctx.fillRect(x, y, size - 0.1, size - 0.1)
-  } catch(e) {
-    console.error(e)
-    s.style.color = '#ee0000'
-    s.textContent = `Error! ` + e.message
-  }
-}
-r.onclick = () => {
-  runCode()
-}*/
-
-
-//document.body.appendChild()
-
-
-                
                 let getBarColor = entry => {
                   switch (entry.team) {
                     case -100: return entry.color
@@ -4545,27 +4938,27 @@ var maintainloop = (() => {
             do { position = room.randomType(type); 
                 x++;
                 if (x>200) { util.warn("Could not place some roids."); return 0; }
-            } while (dirtyCheck(position/*, 10 + entityClass.SIZE*/));
+            } while (dirtyCheck(position, 10 + entityClass.SIZE));
             let o = new Entity(position);
                 o.define(entityClass);
                 o.team = -101;
-                /*o.facing = ran.randomRange();*/
+                o.facing = ran.randomAngle();
                 o.protect();
                 o.life();
         }
         // Start placing them
-        let roidcount = room.roid.length /** room.width * room.height / room.xgrid / room.ygrid / 50000 / 1.5*/;
-        /*let rockcount = room.rock.length * room.width * room.height / room.xgrid / room.ygrid / 250000 / 1.5;*/
+        let roidcount = room.roid.length * room.width * room.height / room.xgrid / room.ygrid / 50000 / 1.5;
+        let rockcount = room.rock.length * room.width * room.height / room.xgrid / room.ygrid / 250000 / 1.5;
         let count = 0;
-        for (let i=Math.ceil(roidcount); i; i--) { count++; placeRoid('roid', Class.mazeObstacle); }
-        /*for (let i=Math.ceil(roidcount * 0.3); i; i--) { count++; placeRoid('roid', Class.mazeObstacle); }*/
-        /*for (let i=Math.ceil(rockcount * 0.8); i; i--) { count++; placeRoid('rock', Class.mazeObstacle); }
-        for (let i=Math.ceil(rockcount * 0.5); i; i--) { count++; placeRoid('rock', Class.mazeObstacle); }*/
+        for (let i=Math.ceil(roidcount); i; i--) { count++; placeRoid('roid', Class.obstacle); }
+        for (let i=Math.ceil(roidcount * 0.3); i; i--) { count++; placeRoid('roid', Class.babyObstacle); }
+        for (let i=Math.ceil(rockcount * 0.8); i; i--) { count++; placeRoid('rock', Class.obstacle); }
+        for (let i=Math.ceil(rockcount * 0.5); i; i--) { count++; placeRoid('rock', Class.babyObstacle); }
         util.log('Placing ' + count + ' obstacles!');
     }
     placeRoids();
   
-    let placeWalls = () => {
+      let placeWalls = () => {
       let count = 0
       for (let loc of room['wall']) {
         let o = new Entity(loc)
@@ -4648,16 +5041,7 @@ var maintainloop = (() => {
             } else if (!census.miniboss) timer++;
         };
     })();
-    let spawnCrasher = census => {
-        if (ran.chance(1 -  0.5 * census.crasher / room.maxFood / room.nestFoodAmount)) {
-            let spot, i = 30;
-            do { spot = room.randomType('nest'); i--; if (!i) return 0; } while (dirtyCheck(spot, 100));
-            let type = (ran.dice(80)) ? ran.choose([Class.sentryGun, Class.sentrySwarm, Class.sentryTrap]) : Class.crasher;
-            let o = new Entity(spot);
-                o.define(type);
-                o.team = -100;
-        }
-    };
+
     // The NPC function
     let makenpcs = (() => {
         // Make base protectors if needed.
@@ -4685,7 +5069,7 @@ var maintainloop = (() => {
                 }
             }).filter(e => { return e; });    
             // Spawning
-            spawnCrasher(census);
+
             spawnBosses(census);
             /*/ Bots
                 if (bots.length < c.BOTS) {
