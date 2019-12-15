@@ -66,6 +66,7 @@ const room = {
         room[type] = output;
     };
     room.findType('nest');
+    room.findType('rwall');
     room.findType('wall');
     room.findType('bwall');
     room.findType('twall');
@@ -4959,6 +4960,21 @@ var maintainloop = (() => {
         util.log('Placing ' + count + ' obstacles!');
     }
     placeRoids();
+  
+        let placerandomWalls = () => {
+      let count = 0
+      for (let loc of room['rwall']) {
+        let o = new Entity(loc)
+        o.define(Class.mazeObstacle)
+        o.SIZE = (room.xgridWidth + room.ygridHeight) / 4
+        o.team = -101
+        o.protect()
+        o.life()
+        count++;
+      }
+      util.log('Placing ' + count + ' regular walls!')
+    }
+    placerandomWalls()
   
       let placeWalls = () => {
       let count = 0
