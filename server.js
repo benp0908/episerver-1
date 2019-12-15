@@ -4960,38 +4960,28 @@ var maintainloop = (() => {
         util.log('Placing ' + count + ' obstacles!');
     }
     placeRoids();
-
-        let placerandomWalls = () => {
-      let count = 0             
-                  let choice = [];
-                switch (ran.chooseChance(100, 50)) {
-                    case 0: 
-                        choice = [[Class.mazeObstacle]];
-                    for (let loc of room['rwall']) {
-                    let o = new Entity(loc)
-                    o.define(Class.mazeObstacle)
-                    o.SIZE = (room.xgridWidth + room.ygridHeight) / 4
-                    o.team = -101
-                    o.protect()
-                    o.life()
-                    count++;
-            }                       
-                        break;
-                    case 1: 
-                        choice = [[Class.palisade], 1, 'castle', 'norm']; 
-                        break;
-                }
+  
+  
+    let placerandomWalls = () => {
+      let count = 0
+      for (let loc of room['rwall']) {
+        let o = new Entity(loc)
+        o.define(Class.mazeObstacle)
+        o.SIZE = (room.xgridWidth + room.ygridHeight) / 4
+        o.team = -101
+        o.protect()
+        o.life()
+        count++;
+      }
       util.log('Placing ' + count + ' regular walls!')
     }
     placerandomWalls()
-
-
 
     let placeWalls = () => {
       let count = 0
       for (let loc of room['wall']) {
         let o = new Entity(loc)
-        o.define(Class.obstacle)
+        o.define(Class.mazeObstacle)
         o.SIZE = (room.xgridWidth + room.ygridHeight) / 4
         o.team = -101
         o.protect()
