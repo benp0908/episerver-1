@@ -4579,8 +4579,8 @@ var gameloop = (() => {
                 return 1;
             }
             return 0;
-        }
-        function advancedcollide(my, n, doDamage, doInelastic, nIsFirmCollide = false) {*/
+        }*/
+        function advancedcollide(my, n, doDamage, doInelastic, nIsFirmCollide = false) {
             // Prepare to check
             let tock = Math.min(my.stepRemaining, n.stepRemaining),
                 combinedRadius = n.size + my.size,
@@ -4834,13 +4834,13 @@ var gameloop = (() => {
             }
             if (!instance.activation.check() && !other.activation.check()) { util.warn('Tried to collide with an inactive instance.'); return 0; }
             // Handle walls
-            if (instance.type === 'wall' || other.type === 'wall') {
+/*            if (instance.type === 'wall' || other.type === 'wall') {
                 let a = (instance.type === 'bullet' || other.type === 'bullet') ? 
                     1 + 10 / (Math.max(instance.velocity.length, other.velocity.length) + 10) : 
                     1;
                 if (instance.type === 'wall') advancedcollide(instance, other, false, false, a);
                 else advancedcollide(other, instance, false, false, a);
-            } else
+            } else*/
             // If they can firm collide, do that
             if ((instance.type === 'crasher' && other.type === 'food') || (other.type === 'crasher' && instance.type === 'food')) {
                 firmcollide(instance, other);
