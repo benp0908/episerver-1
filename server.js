@@ -4977,11 +4977,11 @@ var maintainloop = (() => {
       util.log('Placing ' + count + ' regular walls!')
     }
         
-      this.mazeRand = Math.random()    
+
     placerandomWalls()
-       if (this.mazeRand < 0.5);
-      let placeWalls = () => {
-    
+      var d = Math.random(); 
+      if (d < 0.5);
+      let placeWalls = () => {    
       let count = 0
       for (let loc of room['wall']) {
         let o = new Entity(loc)
@@ -4991,10 +4991,10 @@ var maintainloop = (() => {
         o.protect()
         o.life()
         count++;
-      }
-
+      } 
+      
       util.log('Placing ' + count + ' regular walls!')
-    }
+    } 
     placeWalls()
   
         let placebigWalls = () => {
