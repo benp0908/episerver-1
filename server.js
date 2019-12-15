@@ -4961,11 +4961,11 @@ var maintainloop = (() => {
     }
     placeRoids();
   
-    if (ran.chance(2));
+
         let placerandomWalls = () => {
       let count = 0     
       for (let loc of room['rwall']) {
- 
+    //if (ran.chance(2));
         let o = new Entity(loc)
         o.define(Class.mazeObstacle)
         o.SIZE = (room.xgridWidth + room.ygridHeight) / 4
@@ -4976,10 +4976,12 @@ var maintainloop = (() => {
       }
       util.log('Placing ' + count + ' regular walls!')
     }
-
+        
+      this.mazeRand = Math.random()    
     placerandomWalls()
-  
+       if (this.mazeRand < 0.5);
       let placeWalls = () => {
+    
       let count = 0
       for (let loc of room['wall']) {
         let o = new Entity(loc)
@@ -4990,6 +4992,7 @@ var maintainloop = (() => {
         o.life()
         count++;
       }
+
       util.log('Placing ' + count + ' regular walls!')
     }
     placeWalls()
