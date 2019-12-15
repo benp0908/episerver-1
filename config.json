@@ -17,7 +17,7 @@
   "RANDOM_COLORS": false,
   "BANNED_CHARACTER_REGEX": "/[\uFDFD\u200E\u0000]/gi", 
   "ROOM_SETUP": [
-    [ "norm", "norm", "norm", "norm", "norm", "norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm" ],
+    [ "rwall", "norm", "norm", "norm", "norm", "norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm" ],
     [ "norm", "wall", "wall", "wall", "norm", "wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","norm","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","norm","wall","wall","wall","norm" ],
     [ "norm", "wall", "wall", "wall", "norm", "norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","wall","wall","wall","norm" ],
     [ "norm", "wall", "wall", "wall", "norm", "wall","wall","wall","wall","wall","norm","norm","norm","norm","norm","wall","norm","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","norm","wall","wall","wall","norm" ],

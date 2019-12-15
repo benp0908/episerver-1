@@ -4963,6 +4963,7 @@ var maintainloop = (() => {
   
         let placerandomWalls = () => {
       let count = 0
+      if ran.chance(2);      
       for (let loc of room['rwall']) {
         let o = new Entity(loc)
         o.define(Class.mazeObstacle)
@@ -4974,6 +4975,7 @@ var maintainloop = (() => {
       }
       util.log('Placing ' + count + ' regular walls!')
     }
+
     placerandomWalls()
   
       let placeWalls = () => {
