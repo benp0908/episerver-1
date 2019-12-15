@@ -17,7 +17,7 @@
   "RANDOM_COLORS": false,
   "BANNED_CHARACTER_REGEX": "/[\uFDFD\u200E\u0000]/gi", 
   "ROOM_SETUP": [
-    [ "norm", "roid", "roid", "norm", "roid", "roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid" ],
+    [ "norm", "norm", "norm", "norm", "norm", "norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","roid" ],
     [ "norm", "roid", "roid", "norm", "roid", "roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid" ],
     [ "norm", "roid", "roid", "norm", "roid", "roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid" ],
     [ "norm", "roid", "roid", "norm", "roid", "roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid" ],
@@ -51,6 +51,7 @@
     [ "norm", "roid", "roid", "norm", "roid", "roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid" ],
     [ "norm", "roid", "roid", "norm", "roid", "roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid" ],
     [ "norm", "roid", "roid", "norm", "roid", "roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid","roid" ]
+    ],
   "X_GRID": 33,
   "Y_GRID": 33,
   "DAMAGE_CONSTANT": 0.6,
