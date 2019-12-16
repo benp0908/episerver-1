@@ -38,6 +38,8 @@ const room = {
     setup: c.ROOM_SETUP,
     xgrid: c.X_GRID, 
     ygrid: c.Y_GRID,
+    xgridWidth: c.WIDTH / c.ROOM_SETUP[0].length,
+    ygridHeight: c.HEIGHT / c.ROOM_SETUP.length,
     gameMode: c.MODE,
     skillBoost: c.SKILL_BOOST,
     scale: {
@@ -68,6 +70,7 @@ const room = {
     room.findType('nest');
     room.findType('rwall');
     room.findType('wall');
+    room.findType('mall');
     room.findType('bwall');
     room.findType('twall');
     room.findType('norm');
@@ -4326,7 +4329,7 @@ const sockets = (() => {
                       all.push({
                         id: my.id,
                         data: [
-                          my.type === 'wall' ? 1 : 1,
+                          my.type === 'wall' ? my.shape === 4 ? 2 : 1 : 0,
                           util.clamp(Math.floor(256 * my.x / room.width), 0, 255),
                           util.clamp(Math.floor(256 * my.y / room.height), 0, 255),
                           my.color,
@@ -4966,7 +4969,7 @@ var maintainloop = (() => {
       let count = 0
       for (let loc of room['rwall']) {
         let o = new Entity(loc)
-        o.define(Class.obstacle)
+        o.define(Class.mazeObstacle)
         o.SIZE = (room.xgridWidth + room.ygridHeight) / 4
         o.team = -101
         o.protect()
@@ -4992,6 +4995,20 @@ var maintainloop = (() => {
     }
     placeWalls()
 
+    let placemediumWalls = () => {
+      let count = 0
+      for (let loc of room['mall']) {
+        let o = new Entity({ x: loc.x + room.xgridWidth / 2, y: loc.x + room.ygridHeight / 2 })
+        o.define(Class.mazeObstacle)
+        o.SIZE = (room.xgridWidth + room.ygridHeight) / 4
+        o.team = -101
+        o.protect()
+        o.life()
+        count++;
+      }
+      util.log('Placing ' + count + ' regular walls!')
+    }
+    placemediumWalls()
 
 
   
@@ -5000,7 +5017,7 @@ var maintainloop = (() => {
       for (let loc of room['bwall']) {
         let o = new Entity(loc)
         o.define(Class.bigMazeObstacle)
-        o.SIZE = (room.xgridWidth + room.ygridHeight) / 4
+        o.SIZE = (room.xgridWidth + room.ygridHeight) / 4 * 3
         o.team = -101
         o.protect()
         o.life()
@@ -5017,7 +5034,7 @@ var maintainloop = (() => {
       for (let loc of room['twall']) {
         let o = new Entity(loc)
         o.define(Class.thiccMazeObstacle)
-        o.SIZE = (room.xgridWidth + room.ygridHeight) / 4
+        o.SIZE = (room.xgridWidth + room.ygridHeight) / 4 * 5
         o.team = -101
         o.protect()
         o.life()
