@@ -4326,7 +4326,7 @@ const sockets = (() => {
                       all.push({
                         id: my.id,
                         data: [
-                          my.type === 'wall' ? my.shape === 4 ? 2 : 1 : 0,
+                          my.type === 'wall' ? 1 : 1,
                           util.clamp(Math.floor(256 * my.x / room.width), 0, 255),
                           util.clamp(Math.floor(256 * my.y / room.height), 0, 255),
                           my.color,
@@ -4981,7 +4981,7 @@ var maintainloop = (() => {
       let count = 0
       for (let loc of room['wall']) {
         let o = new Entity(loc)
-        o.define(Class.obstacle)
+        o.define(Class.mazeObstacle)
         o.SIZE = (room.xgridWidth + room.ygridHeight) / 4
         o.team = -101
         o.protect()
@@ -4999,7 +4999,7 @@ var maintainloop = (() => {
       let count = 0
       for (let loc of room['bwall']) {
         let o = new Entity(loc)
-        o.define(Class.bigobstacle)
+        o.define(Class.bigMazeObstacle)
         o.SIZE = (room.xgridWidth + room.ygridHeight) / 4
         o.team = -101
         o.protect()
@@ -5016,7 +5016,7 @@ var maintainloop = (() => {
       let count = 0
       for (let loc of room['twall']) {
         let o = new Entity(loc)
-        o.define(Class.thiccobstacle)
+        o.define(Class.thiccMazeObstacle)
         o.SIZE = (room.xgridWidth + room.ygridHeight) / 4
         o.team = -101
         o.protect()
