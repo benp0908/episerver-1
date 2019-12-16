@@ -4966,7 +4966,7 @@ var maintainloop = (() => {
       let count = 0
       for (let loc of room['rwall']) {
         let o = new Entity(loc)
-        o.define(Class.mazeObstacle)
+        o.define(Class.obstacle)
         o.SIZE = (room.xgridWidth + room.ygridHeight) / 4
         o.team = -101
         o.protect()
@@ -4981,7 +4981,7 @@ var maintainloop = (() => {
       let count = 0
       for (let loc of room['wall']) {
         let o = new Entity(loc)
-        o.define(Class.mazeObstacle)
+        o.define(Class.obstacle)
         o.SIZE = (room.xgridWidth + room.ygridHeight) / 4
         o.team = -101
         o.protect()
@@ -4999,7 +4999,7 @@ var maintainloop = (() => {
       let count = 0
       for (let loc of room['bwall']) {
         let o = new Entity(loc)
-        o.define(Class.bigMazeObstacle)
+        o.define(Class.bigobstacle)
         o.SIZE = (room.xgridWidth + room.ygridHeight) / 4
         o.team = -101
         o.protect()
@@ -5016,7 +5016,7 @@ var maintainloop = (() => {
       let count = 0
       for (let loc of room['twall']) {
         let o = new Entity(loc)
-        o.define(Class.thiccMazeObstacle)
+        o.define(Class.thiccobstacle)
         o.SIZE = (room.xgridWidth + room.ygridHeight) / 4
         o.team = -101
         o.protect()
