@@ -4999,8 +4999,8 @@ var maintainloop = (() => {
       let count = 0
       for (let loc of room['mall']) {
         let o = new Entity({ x: loc.x + room.xgridWidth / 2, y: loc.x + room.ygridHeight / 2 })
-        o.define(Class.mazeObstacle)
-        o.SIZE = (room.xgridWidth + room.ygridHeight) / 4
+        o.define(Class.mediumMazeObstacle)
+        o.SIZE = (room.xgridWidth + room.ygridHeight) / 4 * 2
         o.team = -101
         o.protect()
         o.life()
