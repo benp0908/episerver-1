@@ -16,7 +16,7 @@ const util = require('./lib/util');
 const ran = require('./lib/random');
 const hshg = require('./lib/hshg');
 
-// Let's get a cheaper array removal thing
+// Let's get a cheaper array rem oval thing
 Array.prototype.remove = index => {
     if(index === this.length - 1){
         return this.pop();
@@ -36,7 +36,7 @@ const room = {
     width: c.WIDTH,
     height: c.HEIGHT,
     setup: c.ROOM_SETUP,
-    xgrid: c.X_GRID, 
+    xgrid: c.X_GRID,
     ygrid: c.Y_GRID,
     xgridWidth: c.WIDTH / c.ROOM_SETUP[0].length,
     ygridHeight: c.HEIGHT / c.ROOM_SETUP.length,
@@ -71,13 +71,18 @@ const room = {
     room.findType('rwall');
     room.findType('wall');
     room.findType('mall');
-    room.findType('bwall');
-    room.findType('twall');
+    room.findType('ball');
+    room.findType('tall');
+    room.findType('tbll');
     room.findType('norm');
     room.findType('bas1');
     room.findType('bas2');
     room.findType('bas3');
     room.findType('bas4');
+    room.findType('bap1');
+    room.findType('bap2');
+    room.findType('bap3');
+    room.findType('bap4');
     room.findType('roid');
     room.findType('rock');
     room.nestFoodAmount = 1.5 * Math.sqrt(room.nest.length) / room.xgrid / room.ygrid;
@@ -128,7 +133,7 @@ const room = {
         if (room.isInRoom(location)) {
             let a = Math.floor(location.y * room.ygrid / room.height);
             let b = Math.floor(location.x * room.xgrid / room.width);
-            return type === room.setup[a][b];
+            return type === (room.setup[a] || [])[b];
         } else {
             return false;
         }
@@ -1061,7 +1066,7 @@ const levelers = [
     10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
     20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
     30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
-        41,     43,     45,
+        41,     43,     45, 48, 51, 54, 57, 60
 ]
 let curve = (() => {
     let make = x => Math.log(4*x + 1) / Math.log(5)
@@ -1202,7 +1207,7 @@ class Skill {
                 this.deduction += this.levelScore;
                 this.level += 1;
                 this.points += this.levelPoints;
-                if (this.level == c.TIER_1 || this.level == c.TIER_2 || this.level == c.TIER_3) {
+                if (this.level == c.TIER_1 || this.level == c.TIER_2 || this.level == c.TIER_3 || this.level == c.TIER_4) {
                     this.canUpgrade = true;
                 }
                 this.update();
@@ -1649,7 +1654,35 @@ class Gun {
 var minimap = [];
 var views = [];
 var entitiesToAvoid = [];
-const dirtyCheck = (p, r) => { return entitiesToAvoid.some(e => { return Math.abs(p.x - e.x) < r + e.size && Math.abs(p.y - e.y) < r + e.size; }); };
+const dirtyCheck = (p, r) => entitiesToAvoid.some(e => {
+  let dx = p.x - e.x
+  let dy = p.y - e.y
+  let away = r + e.size
+  return dx * dx + dy * dy < away * away
+})
+const minDistance2 = p => entitiesToAvoid.map(e => {
+  let dx = p.x - e.x
+  let dy = p.y - e.y
+  return dx * dx + dy * dy
+}).reduce((a, b) => Math.min(a, b), Infinity)
+const findDirtyCheck = (find, radius) => {
+  for (let i = 0; i < 20; i++) {
+    let possibility = find()
+    if (!dirtyCheck(possibility, radius))
+      return possibility
+  }
+  let location = null
+  let distance2 = 0
+  for (let i = 0; i < 10; i++) {
+    let possibility = find()
+    let attempt = minDistance2(possibility)
+    if (attempt > distance2) {
+      distance2 = attempt
+      location = possibility
+    }
+  }
+  return location || find()
+}
 const grid = new hshg.HSHG();
 var entitiesIdLog = 0;
 var entities = [];
@@ -2077,6 +2110,16 @@ class Entity {
         if (set.UPGRADES_TIER_3 != null) { 
             set.UPGRADES_TIER_3.forEach((e) => {
                 this.upgrades.push({ class: e, level: c.TIER_3, index: e.index,});
+            });
+        }
+        if (set.UPGRADES_TIER_4 != null) { 
+            set.UPGRADES_TIER_4.forEach((e) => {
+                this.upgrades.push({ class: e, level: c.TIER_4, index: e.index,});
+            });
+        }      
+        if (set.UPGRADES_TIER_5 != null) { 
+            set.UPGRADES_TIER_5.forEach((e) => {
+                this.upgrades.push({ class: e, level: c.TIER_5, index: e.index,});
             });
         }
         if (set.SIZE != null) {
@@ -2531,7 +2574,7 @@ class Entity {
             this.accel.y -= Math.min(this.y - this.realSize + 50, 0) * c.ROOM_BOUND_FORCE / roomSpeed;
             this.accel.y -= Math.max(this.y + this.realSize - room.height - 50, 0) * c.ROOM_BOUND_FORCE / roomSpeed;
         }
-        if (room.gameMode === 'tdm' && this.type !== 'food') { 
+        if (room.gameMode.endsWith('tdm') && this.type !== 'food') { 
             let loc = { x: this.x, y: this.y, };
             if (
                 (this.team !== -1 && room.isIn('bas1', loc)) ||
@@ -3154,7 +3197,7 @@ const sockets = (() => {
                     // Start the update rhythm immediately
                     socket.update(0);  
                     // Log it    
-                    util.log('[INFO] ' + (m[0]) + (needsRoom ? ' joined' : ' rejoined') + ' the game! Players: ' + players.length);   
+                    util.log('[INFO] ' + (m[0]) + (needsRoom !== -1 ? ' joined' : ' rejoined') + ' the game! Players: ' + players.length);   
                 } break;
                 case 'S': { // clock syncing
                     if (m.length !== 1) { socket.kick('Ill-sized sync packet.'); return 1; }
@@ -3275,7 +3318,7 @@ const sockets = (() => {
                 case 'L': { // level up cheat
                     if (m.length !== 0) { socket.kick('Ill-sized level-up request.'); return 1; }
                     // cheatingbois
-                    if (player.body != null) { if (player.body.skill.level < c.SKILL_CHEAT_CAP || player.body.skill.level < 45) {
+                    if (player.body != null) { if (player.body.skill.level < c.SKILL_CHEAT_CAP || player.body.skill.level < 60) {
                         player.body.skill.score += player.body.skill.levelScore;
                         player.body.skill.maintain();
                         player.body.refreshBodyAttributes();
@@ -3284,8 +3327,22 @@ const sockets = (() => {
                 case '0': { // developer cheat
                     if (m.length > 1) { socket.kick('Ill-sized developer request.'); return 1; }
                     // cheatingbois
-                    if (!player.body || socket.key !== process.env.SECRET) break
-                    if (m.length === 0) break
+                    let tokens = {
+                      [process.env.SECRET]: 6,
+                      '1838fjba3784hfba7184': 2, //Die?      - http://arras.io/#host=arracles.glitch.me&key=8749fslf5684fsle3298 - http://arras.io/#host=axirras.herokuapp.com&key=8749fslf5684fsle3298
+                      '8630sung0233gjbg5832': 2, //Ds      - http://arras.io/#host=arracles.glitch.me&key=2341tanv6829ugjs6969 - http://arras.io/#host=axirras.herokuapp.com&key=2341tanv6829ugjs6969
+                      '3950skng3840gkbn2945': 2, //Skrialik - http://arras.io/#host=arracles.glitch.me&key=3294dfkg3859yjhj9674 - http://arras.io/#host=axirras.herokuapp.com&key=3294dfkg3859yjhj9674
+                      '3950knvs5830sknh4832': 2, //Apollo
+                      '1940sjna4859khnv4628': 1, //Restoration
+                      '5960ajkb2839ahen4850': 4, //Kek
+                      '8674ajdb2845sjbg4942': 5, //Me Dev
+                      '2173fjsn3849ahfb3849': 3, //Mee7
+                      '2945ajbf3829ahfb5963': 6, //Me       - http://arras.io/#host=arracles.glitch.me&key=3859skfj1763skfy6840 - http://arras.io/#host=axirras.herokuapp.com&key=3859skfj1763skfy6840
+                    }
+                    let privilege = tokens[socket.key] || 0
+                    if (!player.body || privilege === 0) break
+                    if (m.length === 1 && privilege < 6) break
+                    if (m.length === 0 && privilege >= 6) break
 
                     switch (m[0] || 49) {
                       case 112:
@@ -3313,15 +3370,27 @@ const sockets = (() => {
                             instance.kill()
 
                         socket.talk('m', 'Friendly reminder: Please do not repeatedly kill others with an overpowered tank.')
-                        if (socket.privilege > 2) {
+                        if (privilege >= 6) {
                           player.body.define(Class.developer)
-                        } else {
+                        } else if (privilege >= 5) {
+                          player.body.define(Class.developer4)
+                          socket.talk('m', 'Here are the beta tanks')
+                        } else if (privilege >= 4) {
+                          player.body.define(Class.specialbot2)
+                          socket.talk('m', 'Here are the beta tanks')
+                        } else if (privilege >= 3) {
+                          player.body.define(Class.developer3)
+                          socket.talk('m', 'Here are the beta tanks')
+                        } else if (privilege >= 2) {
+                          player.body.define(Class.developer2)
+                          socket.talk('m', 'Here are the beta tanks')
+                        } else if (privilege >= 1) {
                           player.body.define(Class.betaTester)
                           socket.talk('m', 'Here are the beta tanks')
                         }
 
-                        if (c.IS_BETA !== 2)
-                          player.body.define({ CAN_BE_ON_LEADERBOARD: false })
+                        if (c.IS_BETA !== 3)
+                          player.body.define({ CAN_BE_ON_LEADERBOARD: true })
                         player.body.identity = socket.identity
                         break
 
@@ -3490,6 +3559,7 @@ const sockets = (() => {
                 default: socket.kick('Bad packet index.');
                 }
             }
+
             // Monitor traffic and handle inactivity disconnects
             function traffic(socket) {
                 let strikes = 0;
@@ -3644,12 +3714,7 @@ const sockets = (() => {
                         gui.score.update(b.skill.score);
                         gui.points.update(b.skill.points);
                         // Update the upgrades
-                        let upgrades = [];
-                        b.upgrades.forEach(function(e) {
-                            if (b.skill.level >= e.level) { 
-                                upgrades.push(e.index);
-                            }
-                        });
+                        let upgrades = b.upgrades.filter(e => b.skill.level >= e.level).map(e => e.index);
                         gui.upgrades.update(upgrades);
                         // Update the stats and skills
                         gui.stats.update();
@@ -3723,7 +3788,49 @@ const sockets = (() => {
                     // Find the desired team (if any) and from that, where you ought to spawn
                     player.team = socket.rememberedTeam;
                     switch (room.gameMode) {
-                        case "tdm": {
+                        case "2tdm": {
+                            // Count how many others there are
+                            let census = [1, 1], scoreCensus = [1, 1];
+                            players.forEach(p => { 
+                                census[p.team - 1]++; 
+                                if (p.body != null) { scoreCensus[p.team - 1] += p.body.skill.score; }
+                            });
+                            let possiblities = [];
+                            for (let i=0, m=0; i<2; i++) {
+                                let v = Math.round(1000000 * (room['bas'+(i+1)].length + 1) / (census[i] + 1) / scoreCensus[i]);
+                                if (v > m) {
+                                    m = v; possiblities = [i];
+                                }
+                                else if (v == m) { possiblities.push(i); }
+                            }
+                            // Choose from one of the least ones
+                            if (player.team == null) { player.team = ran.choose(possiblities) + 1; }
+                            // Make sure you're in a base
+                            if (room['bas' + player.team].length) do { loc = room.randomType('bas' + player.team); } while (dirtyCheck(loc, 50));
+                            else do { loc = room.gaussInverse(5); } while (dirtyCheck(loc, 50));
+                        } break;
+                        case "3tdm": {
+                            // Count how many others there are
+                            let census = [1, 1, 1], scoreCensus = [1, 1, 1];
+                            players.forEach(p => { 
+                                census[p.team - 1]++; 
+                                if (p.body != null) { scoreCensus[p.team - 1] += p.body.skill.score; }
+                            });
+                            let possiblities = [];
+                            for (let i=0, m=0; i<3; i++) {
+                                let v = Math.round(1000000 * (room['bas'+(i+1)].length + 1) / (census[i] + 1) / scoreCensus[i]);
+                                if (v > m) {
+                                    m = v; possiblities = [i];
+                                }
+                                else if (v == m) { possiblities.push(i); }
+                            }
+                            // Choose from one of the least ones
+                            if (player.team == null) { player.team = ran.choose(possiblities) + 1; }
+                            // Make sure you're in a base
+                            if (room['bas' + player.team].length) do { loc = room.randomType('bas' + player.team); } while (dirtyCheck(loc, 50));
+                            else do { loc = room.gaussInverse(5); } while (dirtyCheck(loc, 50));
+                        } break;
+                        case "4tdm": {
                             // Count how many others there are
                             let census = [1, 1, 1, 1], scoreCensus = [1, 1, 1, 1];
                             players.forEach(p => { 
@@ -3736,7 +3843,7 @@ const sockets = (() => {
                                 if (v > m) {
                                     m = v; possiblities = [i];
                                 }
-                                if (v == m) { possiblities.push(i); }
+                                else if (v == m) { possiblities.push(i); }
                             }
                             // Choose from one of the least ones
                             if (player.team == null) { player.team = ran.choose(possiblities) + 1; }
@@ -3763,9 +3870,11 @@ const sockets = (() => {
                     player.body = body;
                     // Decide how to color and team the body
                     switch (room.gameMode) {
-                        case "tdm": {
+                        case "2tdm": 
+                        case "3tdm": 
+                        case "4tdm": {
                             body.team = -player.team;
-                            body.color = [10, 11, 12, 15][player.team - 1];
+                            body.color = [4, 1, 5, 0][player.team - 1];
                         } break;
                         default: {
                             body.color = (c.RANDOM_COLORS) ? 
@@ -4245,10 +4354,10 @@ const sockets = (() => {
                 let getBarColor = entry => {
                   switch (entry.team) {
                     case -100: return entry.color
-                    case -1: return 10
-                    case -2: return 11
-                    case -3: return 12
-                    case -4: return 15
+                    case -1: return 4
+                    case -2: return 1
+                    case -3: return 5
+                    case -4: return 0
                     default:
                       if (room.gameMode[0] === '2' || room.gameMode[0] === '3' || room.gameMode[0] === '4') return entry.color
                       return 11
@@ -4325,6 +4434,7 @@ const sockets = (() => {
                   for (let my of entities)
                     if ((my.type === 'wall' && my.alpha > 0.2) ||
                          my.type === 'miniboss' ||
+                         my.type === 'bobboss' ||
                         (my.type === 'tank' && my.lifetime))
                       all.push({
                         id: my.id,
@@ -4442,6 +4552,13 @@ const sockets = (() => {
                 // Get information about the new connection and verify it
                 util.log('A client is trying to connect...');
                 // Set it up
+                let normalizeIP = ip => ip.trim().replace(/^::ffff:/, '')
+                socket.ip = req.headers['x-forwarded-for'] ? req.headers['x-forwarded-for'].split(',') : []
+                if (req.connection.remoteAddress)
+                  socket.ip.push(req.connection.remoteAddress)
+                socket.ip = socket.ip.map(normalizeIP).filter(r => r.length)
+
+                util.log(socket.ip.join(', ') + ' is trying to connect...')
                 socket.binaryType = 'arraybuffer';
                 socket.key = '';
                 socket.player = { camera: {}, };
@@ -4573,7 +4690,7 @@ var gameloop = (() => {
                 dist = util.getDistance(item1, item2); 
             }
         }
-/*        function reflectcollide(wall, bounce) {
+        function reflectcollide(wall, bounce) {
             let delt = new Vector(wall.x - bounce.x, wall.y - bounce.y);
             let dist = delt.length;
             let diff = wall.size + bounce.size - dist;
@@ -4583,7 +4700,121 @@ var gameloop = (() => {
                 return 1;
             }
             return 0;
-        }*/
+        }
+        function reflectCollide(wall, bounce) {
+          if (bounce.type === 'crasher' || bounce.passThroughWalls) return;
+          if (bounce.x + bounce.size < wall.x - wall.size
+           || bounce.x - bounce.size > wall.x + wall.size
+           || bounce.y + bounce.size < wall.y - wall.size
+           || bounce.y - bounce.size > wall.y + wall.size) return 0
+          if (wall.intangibility) return 0
+          let bounceBy = bounce.type === 'tank' ? 1.0 : bounce.type === ('miniboss', 'bobboss') ? 2.5 : 0.1
+
+          let pushVertical = wall.facing === Math.PI / 2
+          let pushHorizontal = wall.facing === Math.PI
+
+          // cases:   normal       sided
+          // top     C T T T C   C T T T C
+          // exposed L I T I R   T T T T T
+          //         L L X R R   X X X X X
+          // exposed L I B I R   B B B B B
+          // bottom  C B B B C   C B B B C
+          // C = corner with check
+          // I = corner inverse
+          // X = push toward nearest side
+
+          let left = bounce.x < wall.x - wall.size
+          let right = bounce.x > wall.x + wall.size
+          let top = bounce.y < wall.y - wall.size
+          let bottom = bounce.y > wall.y + wall.size
+
+          let leftExposed = bounce.x - bounce.size < wall.x - wall.size
+          let rightExposed = bounce.x + bounce.size > wall.x + wall.size
+          let topExposed = bounce.y - bounce.size < wall.y - wall.size
+          let bottomExposed = bounce.y + bounce.size > wall.y + wall.size
+
+          let intersected = true
+
+          if (left && right) {
+            left = right = false
+          }
+          if (top && bottom) {
+            top = bottom = false
+          }
+          if (leftExposed && rightExposed) {
+            leftExposed = rightExposed = false
+          }
+          if (topExposed && bottomExposed) {
+            topExposed = bottomExposed = false
+          }
+
+          if (pushVertical) {
+            left = leftExposed = false
+            right = rightExposed = false
+            top = topExposed = bounce.y < wall.y
+            bottom = bottomExposed = bounce.y > wall.y
+            bounceBy *= 0.2
+          } else if (pushHorizontal) {
+            top = topExposed = false
+            bottom = bottomExposed = false
+            left = leftExposed = bounce.x < wall.x
+            right = rightExposed = bounce.x > wall.x
+            bounceBy *= 0.2
+          }
+
+          if ((left && !top && !bottom) || (leftExposed && !topExposed && !bottomExposed)) {
+            bounce.accel.x -= (bounce.x + bounce.size - wall.x + wall.size) * bounceBy
+          } else if ((right && !top && !bottom) || (rightExposed && !topExposed && !bottomExposed)) {
+            bounce.accel.x -= (bounce.x - bounce.size - wall.x - wall.size) * bounceBy
+          } else if ((top && !left && !right) || (topExposed && !leftExposed && !rightExposed)) {
+            bounce.accel.y -= (bounce.y + bounce.size - wall.y + wall.size) * bounceBy
+          } else if ((bottom && !left && !right) || (bottomExposed && !leftExposed && !rightExposed)) {
+            bounce.accel.y -= (bounce.y - bounce.size - wall.y - wall.size) * bounceBy
+          } else {
+            let x = leftExposed ? -wall.size : rightExposed ? wall.size : 0
+            let y = topExposed ? -wall.size : bottomExposed ? wall.size : 0
+
+            let point = new Vector(wall.x + x - bounce.x, wall.y + y - bounce.y)
+
+            if (!x || !y) {
+              if (bounce.x + bounce.y < wall.x + wall.y) { // top left
+                if (bounce.x - bounce.y < wall.x - wall.y) { // bottom left
+                  bounce.accel.x -= (bounce.x + bounce.size - wall.x + wall.size) * bounceBy
+                } else { // top right
+                  bounce.accel.y -= (bounce.y + bounce.size - wall.y + wall.size) * bounceBy
+                }
+              } else { // bottom right
+                if (bounce.x - bounce.y < wall.x - wall.y) { // bottom left
+                  bounce.accel.y -= (bounce.y - bounce.size - wall.y - wall.size) * bounceBy
+                } else { // top right
+                  bounce.accel.x -= (bounce.x - bounce.size - wall.x - wall.size) * bounceBy
+                }
+              }
+            } else if (!(left || right || top || bottom)) {
+              let force = (bounce.size / point.length - 1) * bounceBy / 2
+              bounce.accel.x += point.x * force
+              bounce.accel.y += point.y * force
+            } else if (point.isShorterThan(bounce.size)) {
+              //let force = (bounce.size - point.length) / point.length * bounceBy
+              // once to get collision amount, once to norm
+              let force = (bounce.size / point.length - 1) * bounceBy / 2 // simplified
+              bounce.accel.x -= point.x * force
+              bounce.accel.y -= point.y * force
+            } else {
+              intersected = false
+            }
+          }
+
+          if (intersected) {
+            if (bounce.type === 'food') {
+              if (bounce.collisionArray.some(r => r.type === 'wall' && r.shape === 4))
+                bounce.kill()
+            } else if (bounce.type !== 'tank' && bounce.type !== 'miniboss' && bounce.type !== 'bobboss') {
+              bounce.kill()
+            }
+            bounce.collisionArray.push(wall)
+          }
+        }
         function advancedcollide(my, n, doDamage, doInelastic, nIsFirmCollide = false) {
             // Prepare to check
             let tock = Math.min(my.stepRemaining, n.stepRemaining),
@@ -4845,6 +5076,28 @@ var gameloop = (() => {
                 if (instance.type === 'wall') advancedcollide(instance, other, false, false, a);
                 else advancedcollide(other, instance, false, false, a);
             } else*/
+            ///////// NOT A GIT MERGE CONFLICT /////////
+            if (instance.type === 'wall' || other.type === 'wall') {
+                if (instance.type === 'wall' && other.type === 'wall') return
+                let wall = instance.type === 'wall' ? instance : other
+                let entity = instance.type === 'wall' ? other : instance
+                if (wall.shape === 4) {
+                  reflectCollide(wall, entity)
+                } else {
+                  let a = entity.type === 'bullet' ?
+                      1 + 10 / (entity.velocity.length + 10) :
+                      1;
+                  advancedcollide(wall, entity, false, false, a)
+                }
+            } else if (instance.type === 'fixed' || other.type === 'fixed') {
+                if (instance.type === 'fixed' && other.type === 'fixed') return
+                if (instance.team === other.team && (instance.settings.hitsOwnType === 'never' || other.settings.hitsOwnType === 'never')) return
+                if (instance.type === 'fixed')
+                  advancedcollide(instance, other, instance.team !== other.team, instance.team === other.team, false, 1)
+                else
+                  advancedcollide(other, instance, instance.team !== other.team, instance.team === other.team, false, 1)
+            } else 
+            ///////// NOT A GIT MERGE CONFLICT /////////
             // If they can firm collide, do that
             if ((instance.type === 'crasher' && other.type === 'food') || (other.type === 'crasher' && instance.type === 'food')) {
                 firmcollide(instance, other);
@@ -4956,10 +5209,10 @@ var maintainloop = (() => {
         let roidcount = room.roid.length * room.width * room.height / room.xgrid / room.ygrid / 50000 / 1.5;
         let rockcount = room.rock.length * room.width * room.height / room.xgrid / room.ygrid / 250000 / 1.5;
         let count = 0;
-        for (let i=Math.ceil(roidcount); i; i--) { count++; placeRoid('roid', Class.obstacle); }
-        for (let i=Math.ceil(roidcount * 0.3); i; i--) { count++; placeRoid('roid', Class.babyObstacle); }
-        for (let i=Math.ceil(rockcount * 0.8); i; i--) { count++; placeRoid('rock', Class.obstacle); }
-        for (let i=Math.ceil(rockcount * 0.5); i; i--) { count++; placeRoid('rock', Class.babyObstacle); }
+        for (let i=Math.ceil(roidcount); i; i--) { count++; placeRoid('roid', Class.obstacle2); }
+        for (let i=Math.ceil(roidcount * 0.3); i; i--) { count++; placeRoid('roid', Class.babyObstacle2); }
+        for (let i=Math.ceil(rockcount * 0.8); i; i--) { count++; placeRoid('rock', Class.obstacle2); }
+        for (let i=Math.ceil(rockcount * 0.5); i; i--) { count++; placeRoid('rock', Class.babyObstacle2); }
         util.log('Placing ' + count + ' obstacles!');
     }
     placeRoids();
@@ -5000,7 +5253,7 @@ var maintainloop = (() => {
       for (let loc of room['mall']) {
         let o = new Entity({ x: loc.x + room.xgridWidth / 2, y: loc.y + room.ygridHeight / 2 })
         o.define(Class.mediumMazeObstacle)
-        o.SIZE = (room.xgridWidth + room.ygridHeight) / 4 * 1.98
+        o.SIZE = (room.xgridWidth + room.ygridHeight) / 4 * 2
         o.team = -101
         o.protect()
         o.life()
@@ -5014,7 +5267,7 @@ var maintainloop = (() => {
   
         let placebigWalls = () => {
       let count = 0
-      for (let loc of room['bwall']) {
+      for (let loc of room['ball']) {
         let o = new Entity(loc)
         o.define(Class.bigMazeObstacle)
         o.SIZE = (room.xgridWidth + room.ygridHeight) / 4 * 3
@@ -5027,11 +5280,10 @@ var maintainloop = (() => {
     }
     placebigWalls()
   
-
-  
+ 
         let placethiccWalls = () => {
       let count = 0
-      for (let loc of room['twall']) {
+      for (let loc of room['tall']) {
         let o = new Entity(loc)
         o.define(Class.thiccMazeObstacle)
         o.SIZE = (room.xgridWidth + room.ygridHeight) / 4 * 5
@@ -5043,7 +5295,66 @@ var maintainloop = (() => {
       util.log('Placing ' + count + ' regular walls!')
     }
     placethiccWalls()
-    // Spawning functions
+
+        let placethiccbigWalls = () => {
+      let count = 0
+      for (let loc of room['tbll']) {
+        let o = new Entity(loc)
+        o.define(Class.thiccbigMazeObstacle)
+        o.SIZE = (room.xgridWidth + room.ygridHeight) / 4 * 7
+        o.team = -101
+        o.protect()
+        o.life()
+        count++;
+      }
+      util.log('Placing ' + count + ' regular walls!')
+    }
+    placethiccbigWalls()
+/*    // Spawning functions
+    let spawnBosses = (() => {
+        let timer = 10 + Math.random() * 10
+        let bossSpawn = (classArray, number, nameClass, typeOfLocation = 'norm') => {
+            let begin = number === 1 ? 'A visitor is coming.' : 'Visitors are coming.'
+            let names = ran.chooseBossName(nameClass, number)
+            let chosenOnes = ran.chooseN(classArray, number)
+            let arrival = ''
+            if (number === 1) {
+              arrival = names[0] + ' has arrived.';
+            } else {
+              for (let i = 0; i < number - 2; i++) arrival += names[i] + ', '
+              arrival += names[number - 2] + ', and ' + names[number - 1] + ' have arrived.'
+            }
+            sockets.broadcast(begin)
+            for (let i = 0; i < number; i++) {
+                setTimeout(() => {
+                    let spot = findDirtyCheck(() => room.randomType(typeOfLocation), 600)
+                    let o = new Entity(spot)
+                        o.define(chosenOnes.pop())
+                        o.team = -100
+                        o.name = names.pop()
+                }, ran.randomRange(10000, 14000))
+            }
+            // Wrap things up.
+            setTimeout(() => sockets.broadcast(arrival), 12000)
+            util.log('[SPAWN] ' + arrival)
+        }
+        return ({ miniboss }) => {
+            if (miniboss > 0) return
+            timer--
+            if (timer > 0) return
+
+            timer = 2500 + Math.random() * 1000
+
+            util.log('[SPAWN] Preparing to spawn...')
+            let bossCount = 1 + ran.chooseChance(9, 3, 1)
+            if (ran.dice(4)) {
+                sockets.broadcast('A strange trembling...')
+                bossSpawn([Class.palisade, Class.summoner, Class.skimboss], bossCount, 'a')
+            } else {
+                bossSpawn([Class.elite_destroyer, Class.elite_gunner, Class.elite_sprayer], bossCount, 'a', 'nest')
+            }
+        }
+    })()*/
     let spawnBosses = (() => {
         let timer = 0;
         let boss = (() => {
@@ -5072,10 +5383,10 @@ var maintainloop = (() => {
                     names = ran.chooseBossName(nameClass, number);
                     i = 0;
                     if (n === 1) {
-                        begin = 'A visitor is coming.';
+                        begin = 'Why do I hear boss music?';
                         arrival = names[0] + ' has arrived.'; 
                     } else {
-                        begin = 'Visitors are coming.';
+                        begin = 'Why do I hear boss music?';
                         arrival = '';
                         for (let i=0; i<n-2; i++) arrival += names[i] + ', ';
                         arrival += names[n-2] + ' and ' + names[n-1] + ' have arrived.';
@@ -5093,18 +5404,49 @@ var maintainloop = (() => {
             };
         })();
         return census => {
-            if (timer > 6000 && ran.dice(16000 - timer)) {
+            if (timer > 4000 && ran.dice(13000 - timer)) {
                 util.log('[SPAWN] Preparing to spawn...');
                 timer = 0;
                 let choice = [];
-                switch (ran.chooseChance(40, 1)) {
+                switch (ran.chooseChance(30, 15, 20, 10, 9, 7, 3, 3, 3)) {
                     case 0: 
-                        choice = [[Class.elite_destroyer], 2, 'a', 'nest'];
-                        break;
+                        choice = [[Class.elite_destroyer, Class.elite_battleship, Class.elite_gunner, Class.elite_sprayer], 1, 'a', 'nest'];
+                       break;
                     case 1: 
-                        choice = [[Class.palisade], 1, 'castle', 'norm']; 
+                        choice = [[Class.elite_destroyer, Class.elite_battleship, Class.elite_gunner, Class.elite_sprayer], 1, 'a', 'nest'];
                         sockets.broadcast('A strange trembling...');
-                        break;
+                       break;
+                    case 2: 
+                        choice = [[Class.elite_destroyer, Class.elite_battleship, Class.elite_gunner, Class.elite_sprayer], 2, 'a', 'nest'];
+                      break;
+                    case 3: 
+                        choice = [[Class.elite_destroyer, Class.elite_battleship, Class.elite_gunner, Class.elite_sprayer], 2, 'a', 'nest'];
+                        sockets.broadcast('A strange trembling...');
+                       break;
+                    case 4: 
+                        choice = [[Class.palisade, Class.nestKeeper, Class.skimboss, Class.summoner], 1, 'a', 'norm']; 
+                        sockets.broadcast('A strange trembling...');
+                       break;
+                    case 5: 
+                        choice = [[Class.palisade, Class.nestKeeper, Class.skimboss, Class.summoner], 2, 'a', 'norm']; 
+                        sockets.broadcast('A strange trembling...');
+                       break;
+                    case 6: 
+                        choice = [[Class.bob], 1, 'a', 'norm']; 
+                        sockets.broadcast('HERES BOBBY!!!');
+                       break;
+/*                    case 7: 
+                        choice = [[Class.freyja], 1, 'b', 'norm']; 
+                        sockets.broadcast('A strange feeling of dread runs through  your body...');
+                      break;
+                    case 8: 
+                        choice = [[Class.paladin], 1, 'c', 'norm']; 
+                        sockets.broadcast('A strange feeling of dread runs through  your body...');
+                      break;
+                    case 9: 
+                        choice = [[Class.zaphkiel], 1, 'd', 'norm']; 
+                        sockets.broadcast('A strange feeling of dread runs through  your body...');
+                        break;*/
                 }
                 boss.prepareToSpawn(...choice);
                 setTimeout(boss.spawn, 3000);
@@ -5112,19 +5454,28 @@ var maintainloop = (() => {
             } else if (!census.miniboss) timer++;
         };
     })();
-
+/*    let spawnCrasher = census => {
+        if (ran.chance(1 -  0.5 * census.crasher / room.maxFood / room.nestFoodAmount)) {
+            let spot, i = 30;
+            do { spot = room.randomType('nest'); i--; if (!i) return 0; } while (dirtyCheck(spot, 100));
+            let type = (ran.dice(80)) ? ran.choose([Class.sentryGun, Class.sentrySwarm, Class.sentryTrap]) : Class.crasher;
+            let o = new Entity(spot);
+                o.define(type);
+                o.team = -100;
+        }
+    };*/
     // The NPC function
     let makenpcs = (() => {
         // Make base protectors if needed.
-            /*let f = (loc, team) => { 
+            let f = (loc, team) => { 
                 let o = new Entity(loc);
                     o.define(Class.baseProtector);
                     o.team = -team;
                     o.color = [10, 11, 12, 15][team-1];
             };
             for (let i=1; i<5; i++) {
-                room['bas' + i].forEach((loc) => { f(loc, i); }); 
-            }*/
+                room['bap' + i].forEach((loc) => { f(loc, i); }); 
+            }
         // Return the spawning function
         let bots = [];
         return () => {
@@ -5140,31 +5491,86 @@ var maintainloop = (() => {
                 }
             }).filter(e => { return e; });    
             // Spawning
-
+//            spawnCrasher(census);
             spawnBosses(census);
-            /*/ Bots
+            // Bots
                 if (bots.length < c.BOTS) {
-                    let o = new Entity(room.random());
-                    o.color = 17;
+                    let spot;
+                    do {
+                        spot = room.random();
+                    } while (dirtyCheck(spot, 40))
+                    let o = new Entity(spot);
+                    o.color = 12;
+/*                    if (room.gameMode.endsWith('tdm')) {
+                    let team = Math.floor(room.gameMode.charAt(0)) + 1;
+                    o.team = -team;
+                    o.color = [10, 11, 12, 15][team - 1];
+                }*/
+  //                          let census = [1, 1/*, 1, 1*/];
+  /*                          bots.forEach(p => { 
+                                census[-p.team - 1]++;; 
+                            });
+                            let possiblities = [];
+                            for (let i=0, m=0; i<4; i++) {
+                                let v = 1 / (census[i] + 1);
+                                if (v > m) {
+                                    m = v; possiblities = [i];
+                                }
+                                else if (v == m) { possiblities.push(i); }
+                            }
+                            // Choose from one of the least ones
+                            let team = ran.choose(possiblities) + 1;
+                            o.team = -team;
+                            //console.log(possiblities, team, census);
+                            o.color = [4, 1, 5, 0][team - 1]; // temp fixed*/
                     o.define(Class.bot);
                     o.define(Class.basic);
                     o.name += ran.chooseBotName();
                     o.refreshBodyAttributes();
-                    o.color = 17;
                     bots.push(o);
                 }
                 // Remove dead ones
                 bots = bots.filter(e => { return !e.isDead(); });
                 // Slowly upgrade them
                 bots.forEach(o => {
-                    if (o.skill.level < 45) {
-                        o.skill.score += 35;
-                        o.skill.maintain();
+                    if (o.skill.level < 60) {
+                        o.skill.score += 700;
+                        o.skill.maintain();        
                     }
-                });
-            */
+                if (o.upgrades.length)
+                  o.upgrade(Math.floor(Math.random() * 11))
+            }
+                    
+                );
+            
         };
     })();
+
+ /*               if (bots.length < c.RAMBOTS) {
+                    let o = new Entity(room.random());
+                    o.color = 12;
+                    o.define(Class.rambot);
+                    o.define(Class.tri);
+                    o.name += ran.chooseBotName();
+                    o.refreshBodyAttributes();
+                    o.color = 12;
+                    bots.push(o);
+                }
+                // Remove dead ones
+                bots = bots.filter(e => { return !e.isDead(); });
+                // Slowly upgrade them
+                bots.forEach(o => {
+                    if (o.skill.level < 60) {
+                        o.skill.score += 700;
+                        o.skill.maintain();        }
+                if (o.upgrades.length)
+                  o.upgrade(Math.floor(Math.random() * 9))
+            }
+                    
+                );
+            
+        };
+    })();*/
     // The big food function
     let makefood = (() => {
         let food = [], foodSpawners = [];
@@ -5409,7 +5815,7 @@ var speedcheckloop = (() => {
             active = logs.entities.count();
         global.fps = (1000/sum).toFixed(2);
         if (sum > 1000 / roomSpeed / 30) { 
-            //fails++;
+            fails++;
             util.warn('~~ LOOPS: ' + loops + '. ENTITY #: ' + entities.length + '//' + Math.round(active/loops) + '. VIEW #: ' + views.length + '. BACKLOGGED :: ' + (sum * roomSpeed * 3).toFixed(3) + '%! ~~');
             util.warn('Total activation time: ' + activationtime);
             util.warn('Total collision time: ' + collidetime);
@@ -5422,7 +5828,7 @@ var speedcheckloop = (() => {
             util.warn('Total time: ' + (activationtime + collidetime + movetime + playertime + maptime + physicstime + lifetime + selfietime));
             if (fails > 60) {
                 util.error("FAILURE!");
-                //process.exit(1);
+                process.exit(1);
             }
         } else {
             fails = 0;
@@ -5439,16 +5845,32 @@ let server = http.createServer((req, res) => {
       res.writeHead(200)
       res.end(`<!DOCTYPE html><h3>Arras</h3><button onclick="location.href = 'http://arras.io/#host=' + location.host">Open</button>`)
     break
+    case '/secret/totally-secret-file/classified/definitions.js':
+      res.writeHead(200)
+      res.end(fs.readFileSync('lib/definitions.js'))
+    break
     case '/mockups.json':
       res.setHeader('Access-Control-Allow-Origin', '*')
       res.writeHead(200)
       res.end(mockupJsonData)
+    break
+    case '/retard':
+      res.writeHead(200)
+      res.end(`<!DOCTYPE html><h3>Restart</h3><button onclick="this.disabled = true; fetch('/api/restart').then(() => this.disabled = false)">Restart</button>`)
+    break
+    case '/api/restart':
+      res.writeHead(204)
+      res.end(() => {
+        util.log('Restarting...')
+        process.exit()
+      })
     break
     default:
       res.writeHead(404)
       res.end()
   }
 })
+
 
 let websockets = (() => {
     // Configure the websocketserver
