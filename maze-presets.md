@@ -1,21 +1,49 @@
-{
-  "host": "0.0.0.0",
-  "servesStatic": true,
-  "port": 3000,
-  "networkUpdateFactor": 24,
-  "socketWarningLimit": 5,
-  "networkFrontlog": 1,
-  "networkFallbackTime": 150,
-  "visibleListInterval": 1000,
-  "gameSpeed": 1,
-  "runSpeed": 1.5,
-  "maxHeartbeatInterval": 300000,
-  "verbose": true,
-  "WIDTH": 7200,
-  "HEIGHT": 6000,
-  "MODE": "ffa",
-  "RANDOM_COLORS": false,
-  "BANNED_CHARACTER_REGEX": "/[\uFDFD\u200E\u0000]/gi", 
+# Maze Preset 1:
+
+```
+  "ROOM_SETUP": [
+    ["wall","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","wall","wall","norm","norm","norm","norm"],
+    ["norm","wall","norm","wall","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","wall","wall","wall","norm","norm","norm","norm"],
+    ["norm","wall","norm","wall","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","wall","norm","wall","norm","norm","norm","norm"],
+    ["norm","wall","norm","wall","norm","norm","norm","norm","norm","norm","norm","wall","wall","wall","wall","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","wall","norm","wall","norm","norm","norm","norm"],
+    ["norm","wall","norm","wall","wall","wall","wall","norm","wall","norm","norm","wall","norm","nest","wall","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","wall","norm","norm","norm","norm"],
+    ["norm","wall","norm","wall","norm","norm","wall","norm","wall","norm","norm","wall","norm","wall","wall","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","wall","norm","norm","norm","norm"],
+    ["norm","wall","norm","wall","norm","norm","wall","norm","wall","norm","norm","wall","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","wall","wall","wall","wall","norm"],
+    ["norm","wall","norm","wall","norm","norm","wall","wall","wall","norm","norm","wall","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","wall","wall","wall","norm","norm","norm","norm","wall","norm"],
+    ["norm","wall","norm","wall","norm","norm","norm","norm","norm","norm","norm","wall","wall","wall","wall","wall","wall","wall","wall","wall","norm","norm","norm","wall","norm","wall","norm","norm","norm","norm","wall","norm"],
+    ["norm","wall","norm","wall","wall","wall","norm","norm","norm","wall","norm","wall","nest","nest","nest","nest","nest","nest","nest","wall","nest","norm","norm","wall","norm","wall","norm","norm","norm","norm","wall","norm"],
+    ["norm","wall","norm","nest","norm","wall","norm","norm","wall","wall","norm","wall","nest","norm","norm","norm","norm","norm","norm","wall","nest","norm","norm","wall","norm","wall","norm","norm","norm","norm","wall","norm"],
+    ["norm","wall","norm","norm","nest","wall","norm","norm","norm","wall","norm","wall","nest","norm","nest","nest","nest","nest","nest","wall","nest","norm","norm","wall","norm","wall","norm","norm","wall","norm","wall","norm"],
+    ["norm","wall","wall","wall","wall","wall","norm","norm","wall","wall","norm","wall","nest","norm","nest","norm","norm","norm","nest","wall","nest","norm","norm","wall","norm","wall","norm","norm","wall","wall","wall","norm"],
+    ["norm","norm","norm","norm","norm","wall","norm","norm","wall","norm","norm","wall","nest","norm","nest","norm","norm","norm","nest","wall","wall","wall","wall","wall","norm","wall","norm","norm","wall","norm","wall","norm"],
+    ["norm","norm","norm","norm","norm","wall","norm","norm","wall","norm","norm","wall","nest","norm","nest","norm","nest","norm","nest","wall","nest","norm","norm","norm","norm","wall","norm","norm","wall","norm","wall","norm"],
+    ["norm","norm","norm","wall","wall","wall","norm","norm","wall","norm","norm","wall","nest","norm","nest","nest","nest","nest","nest","wall","nest","norm","wall","norm","norm","wall","norm","norm","wall","norm","wall","norm"],
+    ["norm","norm","norm","wall","norm","norm","norm","norm","wall","norm","wall","wall","nest","norm","nest","norm","nest","norm","nest","wall","nest","norm","wall","norm","norm","wall","norm","wall","wall","norm","wall","norm"],
+    ["norm","norm","norm","wall","norm","norm","norm","norm","wall","norm","norm","norm","nest","norm","nest","norm","norm","norm","nest","norm","nest","norm","wall","norm","norm","wall","norm","wall","norm","norm","norm","norm"],
+    ["norm","norm","norm","wall","norm","norm","norm","norm","wall","wall","wall","wall","nest","norm","nest","norm","norm","norm","nest","wall","nest","norm","wall","norm","norm","norm","norm","wall","norm","norm","norm","norm"],
+    ["norm","norm","norm","wall","norm","wall","wall","wall","norm","wall","norm","wall","nest","norm","nest","norm","norm","norm","nest","wall","nest","norm","wall","norm","norm","norm","norm","wall","norm","norm","norm","norm"],
+    ["norm","norm","norm","wall","norm","wall","norm","wall","norm","wall","norm","wall","nest","norm","nest","nest","nest","nest","nest","wall","nest","norm","wall","norm","wall","norm","wall","wall","norm","norm","norm","norm"],
+    ["norm","norm","norm","wall","norm","wall","norm","wall","norm","wall","norm","wall","nest","norm","norm","norm","norm","norm","norm","wall","nest","norm","norm","norm","norm","norm","norm","wall","norm","norm","norm","norm"],
+    ["norm","norm","norm","wall","norm","wall","norm","wall","norm","wall","norm","wall","nest","nest","nest","nest","nest","nest","nest","wall","nest","norm","norm","norm","norm","norm","norm","wall","norm","norm","norm","norm"],
+    ["norm","wall","wall","wall","norm","wall","norm","wall","wall","wall","norm","wall","wall","wall","wall","wall","wall","wall","wall","wall","norm","norm","norm","norm","norm","norm","norm","wall","wall","wall","norm","norm"],
+    ["norm","wall","norm","wall","norm","wall","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","wall","norm","norm","norm","norm","wall","wall","norm","wall","norm","wall","norm","norm"],
+    ["norm","wall","norm","wall","wall","wall","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","wall","wall","norm","wall","norm","norm","wall","norm","wall","norm","norm","wall","norm","wall","norm","norm"],
+    ["norm","wall","norm","norm","norm","norm","norm","wall","wall","norm","norm","norm","norm","norm","norm","norm","wall","norm","norm","wall","norm","norm","wall","norm","wall","norm","norm","wall","norm","norm","norm","norm"],
+    ["norm","wall","wall","wall","norm","norm","norm","wall","wall","norm","norm","norm","norm","norm","norm","norm","wall","wall","wall","wall","norm","norm","wall","wall","wall","norm","norm","wall","norm","norm","norm","norm"],
+    ["norm","norm","norm","wall","norm","norm","norm","wall","wall","wall","wall","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","wall","norm","norm","norm","norm"],
+    ["norm","norm","norm","wall","wall","wall","wall","wall","wall","wall","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","wall","norm","norm","norm","norm"],
+    ["norm","norm","norm","norm","norm","norm","norm","norm","wall","wall","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","wall","wall","wall","wall","wall","norm","norm","norm","norm"],
+    ["norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm"]
+  ],
+```
+
+
+
+
+
+# Maze Preset 2:
+
+```
 "ROOM_SETUP": [
     [ "norm",  "norm", "norm", "norm", "norm", "norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm"],
     [ "norm",  "wall", "norm", "norm", "wall", "norm","wall","wall","norm","wall","norm","norm","norm","norm","wall","norm","norm","norm","wall","norm","norm","wall","norm","norm","wall","norm","norm","norm","norm","wall","norm","norm"],
@@ -50,46 +78,4 @@
     [ "norm",  "norm", "norm", "norm", "norm", "norm","norm","norm","norm","norm","norm","norm","norm","norm","wall","norm","wall","wall","wall","norm","norm","norm","norm","norm","wall","wall","norm","norm","norm","norm","norm","norm"],
     [ "norm",  "norm", "norm", "norm", "norm", "norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm"]
   ],
-  
-  "X_GRID": 32,
-  "Y_GRID": 32,
-  "DAMAGE_CONSTANT": 0.6,
-  "KNOCKBACK_CONSTANT": 1,
-  "ROOM_BOUND_FORCE": 0.01,
-  "FOOD": [
-    0, 
-    0.75,
-    0.22,
-    0.1,
-    0.005,
-    0,
-    0
-  ],
-  "FOOD_NEST": [
-    0, 
-    0.0,
-    0.0,
-    0.75,
-    0.23,
-    0.02,
-    0
-  ],
-  "MAX_SKILL": 10,
-  "SOFT_MAX_SKILL": 0.59,
-  "TIER_1": 10,
-  "TIER_2": 15,
-  "TIER_3": 25,
-  "TIER_4": 45,  
-  "TIER_5": 60,  
-  "SKILL_CAP": 60,
-  "SKILL_SOFT_CAP": 0,
-  "SKILL_CHEAT_CAP": 60,
-  "SKILL_LEAK": 0,
-  "STEALTH": 4,
-  "MIN_SPEED": 0.001,
-  "FOOD_AMOUNT": 0.4, 
-  "SKILL_BOOST": 5,
-  "BOTS": 0,
-  "GLASS_HEALTH_FACTOR": 2
-}
- 
+  ```
