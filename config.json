@@ -12,7 +12,7 @@
   "maxHeartbeatInterval": 300000,
   "verbose": true,
   "WIDTH": 5200,
-  "HEIGHT": 5000,
+  "HEIGHT": 3000,
   "MODE": "ffa",
   "RANDOM_COLORS": false,
   "BANNED_CHARACTER_REGEX": "/[\uFDFD\u200E\u0000]/gi", 
@@ -55,7 +55,7 @@
   "Y_GRID": 32,
   "DAMAGE_CONSTANT": 0.6,
   "KNOCKBACK_CONSTANT": 1,
-  "ROOM_BOUND_FORCE": 0.01,
+  "ROOM_BOUND_FORCE": 1,
   "FOOD": [
     0, 
     0.75,
