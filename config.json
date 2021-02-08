@@ -11,7 +11,7 @@
   "runSpeed": 1.5,
   "maxHeartbeatInterval": 300000,
   "verbose": true,
-  "WIDTH": 6200,
+  "WIDTH": 5200,
   "HEIGHT": 5000,
   "MODE": "ffa",
   "RANDOM_COLORS": false,
