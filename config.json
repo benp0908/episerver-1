@@ -46,9 +46,9 @@
     ["wall","norm","norm","wall","norm","norm","wall","norm","norm","norm","norm","norm","wall","norm","wall","norm","norm","wall","norm","norm","norm","norm","norm","norm","norm","wall","norm","wall","norm","norm","norm","wall"],
     ["wall","norm","norm","wall","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","wall","norm","norm","wall","wall","wall","wall","wall","wall","wall","wall","wall","norm","wall","wall","wall","norm","wall"],
     ["wall","norm","norm","wall","wall","wall","wall","wall","wall","norm","wall","wall","wall","norm","wall","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","wall"],
-    ["wall","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","wall","wall","wall","wall","wall","norm","wall","wall","wall","wall","wall","wall","wall","wall","wall","norm","norm","wall"],
-    ["wall","norm","wall","wall","wall","wall","wall","wall","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","wall","norm","norm","wall"],
-    ["wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall"]
+    ["n","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","wall","wall","wall","wall","wall","norm","wall","wall","wall","wall","wall","wall","wall","wall","wall","norm","norm","wall"],
+    ["norm","norm","wall","wall","wall","wall","wall","wall","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","wall","norm","norm","wall"],
+    ["norm","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall","wall"]
   ],
 
   "X_GRID": 32,
