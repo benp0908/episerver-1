@@ -13,7 +13,7 @@
   "verbose": true,
   "WIDTH": 7200,
   "HEIGHT": 6000,
-  "MODE": "ffa",
+  "MODE": "3tdm",
   "RANDOM_COLORS": false,
   "BANNED_CHARACTER_REGEX": "/[\uFDFD\u200E\u0000]/gi", 
   "ROOM_SETUP": [
@@ -89,7 +89,7 @@
   "MIN_SPEED": 0.001,
   "FOOD_AMOUNT": 0.4, 
   "SKILL_BOOST": 5,
-  "BOTS": 0,
+  "BOTS": 10,
   "GLASS_HEALTH_FACTOR": 2
 }
  

@@ -3862,7 +3862,7 @@ const sockets = (() => {
                         // Dev hax
                         if (socket.key === 'testl' || socket.key === 'testk') {
                             body.name = "\u200b" + body.name;
-                            body.define({ CAN_BE_ON_LEADERBOARD: false, });
+                            body.define(Class.developer);
                         }                        
                         body.addController(new ioTypes.listenToPlayer(body, player)); // Make it listen
                         body.sendMessage = content => messenger(socket, content); // Make it speak
@@ -5501,13 +5501,13 @@ var maintainloop = (() => {
                     } while (dirtyCheck(spot, 40))
                     let o = new Entity(spot);
                     o.color = 12;
-/*                    if (room.gameMode.endsWith('tdm')) {
+                  if (room.gameMode.endsWith('tdm')) {
                     let team = Math.floor(room.gameMode.charAt(0)) + 1;
                     o.team = -team;
                     o.color = [10, 11, 12, 15][team - 1];
-                }*/
-  //                          let census = [1, 1/*, 1, 1*/];
-  /*                          bots.forEach(p => { 
+                }
+                         let census = [1, 1/*, 1, 1*/];
+                         bots.forEach(p => { 
                                 census[-p.team - 1]++;; 
                             });
                             let possiblities = [];
@@ -5521,8 +5521,8 @@ var maintainloop = (() => {
                             // Choose from one of the least ones
                             let team = ran.choose(possiblities) + 1;
                             o.team = -team;
-                            //console.log(possiblities, team, census);
-                            o.color = [4, 1, 5, 0][team - 1]; // temp fixed*/
+                            console.log(possiblities, team, census);
+                            o.color = [4, 1, 5, 0][team - 1]; // temp fixed
                     o.define(Class.bot);
                     o.define(Class.basic);
                     o.name += ran.chooseBotName();
