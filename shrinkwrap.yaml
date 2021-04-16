@@ -1,4 +1,5 @@
 dependencies:
+  eris: 0.15.0
   google-closure-library: 20210106.0.0
   ws: 6.1.0
 packages:
@@ -6,19 +7,50 @@ packages:
     dev: false
     resolution:
       integrity: sha512-jp/uFnooOiO+L211eZOoSyzpOITMXx1rBITauYykG3BRYPu8h0UcxsPNB04RR5vo4Tyz3+ay17tR6JVf9qzYWg==
+  /eris/0.15.0:
+    dependencies:
+      ws: 7.4.4
+    dev: false
+    engines:
+      node: '>=10.4.0'
+    optionalDependencies:
+      opusscript: 0.0.8
+      tweetnacl: 1.0.3
+    resolution:
+      integrity: sha512-muBdi5XyMXdxFQ8xUG6yofq40/Z02CHlqJP7zIdHhpdDiHvFM/mybGiFAHuoSYcsVTTvEfbUaAJ+SDEmMjARYw==
   /google-closure-library/20210106.0.0:
     dev: false
     resolution:
       integrity: sha512-ONJTdzXvBZ8oQ3MscZxSmw2w1SWpIq1FI0dZQdJQQXrXRFXCsBmntj/IFGE+QTOynmOo6Ee1YTq6p2h8O3oQWA==
+  /opusscript/0.0.8:
+    dev: false
+    optional: true
+    resolution:
+      integrity: sha512-VSTi1aWFuCkRCVq+tx/BQ5q9fMnQ9pVZ3JU4UHKqTkf0ED3fKEPdr+gKAAl3IA2hj9rrP6iyq3hlcJq3HELtNQ==
+  /tweetnacl/1.0.3:
+    dev: false
+    optional: true
+    resolution:
+      integrity: sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==
   /ws/6.1.0:
     dependencies:
       async-limiter: 1.0.0
     dev: false
     resolution:
       integrity: sha512-H3dGVdGvW2H8bnYpIDc3u3LH8Wue3Qh+Zto6aXXFzvESkTVT6rAfKR6tR/+coaUvxs8yHtmNV0uioBF62ZGSTg==
+  /ws/7.4.4:
+    dev: false
+    engines:
+      node: '>=8.3.0'
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: ^5.0.2
+    resolution:
+      integrity: sha512-Qm8k8ojNQIMx7S+Zp8u/uHOx7Qazv3Yv4q68MiWWWOJhiwG5W3x7iqmRtJo8xxrciZUY4vRxUTJCKuRnF28ZZw==
 registry: 'https://registry.npmjs.org/'
 shrinkwrapMinorVersion: 9
 shrinkwrapVersion: 3
 specifiers:
+  eris: ^0.15.0
   google-closure-library: ^20210106.0.0
   ws: 6.1.x

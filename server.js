@@ -15,6 +15,15 @@ const c = require('./config.json');
 const util = require('./lib/util');
 const ran = require('./lib/random');
 const hshg = require('./lib/hshg');
+let closed = false;
+let doms = true;
+let chat_system = true;
+let bot_count = 10;
+let mapsize_y = 4000;
+let mapsize_x = 4000;
+let recoil = true;
+let regen = true;
+let maze = false;
 
 // Let's get a cheaper array rem oval thing
 Array.prototype.remove = index => {
@@ -26,6 +35,12 @@ Array.prototype.remove = index => {
         return r;
     }
 };
+if (c.server_closed) {
+  console.log('server closed')
+  sockets.broadcast('arena closed you will disconnect now!')
+  process.exit(1);
+  
+}
 
 // Set up room.
 global.fps = "Unknown";
@@ -1385,7 +1400,8 @@ class Gun {
         }
     }
     
-    recoil() {
+  recoil() {
+      if (recoil == true) {
         if (this.motion || this.position) {
             // Simulate recoil
             this.motion -= 0.25 * this.position / roomSpeed;
@@ -1405,7 +1421,27 @@ class Gun {
                 this.body.accel.x += recoilForce * Math.cos(this.body.facing + this.angle);
                 this.body.accel.y += recoilForce * Math.sin(this.body.facing + this.angle);
             }      
-        }
+        }} else
+        { if (this.motion || this.position) {
+            // Simulate recoil
+            this.motion -= 0 * this.position / roomSpeed;
+            this.position += this.motion;
+            if (this.position < 0) { // Bouncing off the back
+                this.position = 0;
+                this.motion = -this.motion;
+            }
+            if (this.motion > 0) {
+                this.motion *= 0;
+            }
+        }   
+        if (this.canShoot && !this.body.settings.hasNoRecoil) {
+            // Apply recoil to motion
+            if (this.motion > 0) {
+                let recoilForce = -this.position * this.trueRecoil * 0 / roomSpeed;
+                this.body.accel.x += recoilForce * Math.cos(this.body.facing + this.angle);
+                this.body.accel.y += recoilForce * Math.sin(this.body.facing + this.angle);
+            }      
+        }}
     }
 
     getSkillRaw() { 
@@ -1790,8 +1826,9 @@ class HealthType {
     }
 
     regenerate(boost = false) {
-        boost /= 2;
-        let cons = 5;
+      if (regen == true) {
+        boost /= 5;
+        let cons = 1;
         switch (this.type) {
         case 'static':
             if (this.amount >= this.max || !this.amount) break;
@@ -1810,6 +1847,27 @@ class HealthType {
         break; 
         }
         this.amount = util.clamp(this.amount, 0, this.max);
+      } else {
+        boost /= 0;
+        let cons = 0;
+        switch (this.type) {
+        case 'static':
+            if (this.amount >= this.max || !this.amount) break;
+            this.amount += cons * (this.max / 10 / 60 / 2.5 + boost);
+            break;
+        case 'dynamic':
+            let r = util.clamp(this.amount / this.max, 0, 1);
+            if (!r) {
+                this.amount = 0.0001;
+            }
+            if (r === 1) {
+                this.amount = this.max;
+            } else {
+                this.amount += cons * (this.regen * Math.exp(-50 * Math.pow(Math.sqrt(0.5 * r) - 0.4, 2)) / 3 + r * this.max / 10 / 15 + boost);
+            }
+        break; 
+        }
+        this.amount = util.clamp(this.amount, 0, this.max);}
     }
 
     get permeability() {
@@ -3208,6 +3266,39 @@ const sockets = (() => {
                     // Bounce it back
                     socket.talk('S', synctick, util.time());
                 } break;
+                           // =================================================================================
+                // Chat System.
+                // =================================================================================
+                
+                  case 'h': if (chat_system == true) { 
+                        if (!socket.status.deceased) 
+                        {   
+                            // Basic chat spam control.     
+                            if (util.time() - socket.status.lastChatTime >= 1000)
+                            {
+                                let message = m[0];
+                                let maxLen = 100; 
+                            
+                                // Verify it                            
+                                if (typeof message != 'string') {
+                                    socket.kick('Bad message string.')
+                                  return 1;
+                                }
+                                if (encodeURI(message).split(/%..|./).length > maxLen) {
+                                    socket.kick('Overly-long chat message.');
+                                    return 1;
+                                }
+
+                                let playerName = socket.player.name ? socket.player.name :'Unnamed';
+                                let chatMessage = playerName + ': ' + message;                          
+                                sockets.broadcast(chatMessage);
+                                // Basic chat spam control.
+                                socket.status.lastChatTime = util.time();
+                            }                                                     
+                        }
+                  } else {socket.talk ('m', 'chat system is disabled')}
+                        break;
+                // =================================================================================
                 case 'p': { // ping
                     if (m.length !== 1) { socket.kick('Ill-sized ping.'); return 1; }
                     // Get data
@@ -4580,6 +4671,11 @@ const sockets = (() => {
                     needsFullMap: true,
                     needsNewBroadcast: true, 
                     lastHeartbeat: util.time(),
+                     // ===============================
+                    // Chat System.
+                    // ===============================
+                    lastChatTime: util.time(),
+                    // ===============================
                 };  
                 // Set up loops
                 socket.loops = (() => {
@@ -5891,3 +5987,682 @@ let websockets = (() => {
 setInterval(gameloop, room.cycleSpeed);
 setInterval(maintainloop, 200);
 setInterval(speedcheckloop, 1000);
+
+
+const Eris = require('eris');
+const bot = new Eris(process.env.bot_token); 
+const bot2 = new Eris(process.env.bot_token);
+var prefix = process.env.prefix
+var owner_id = process.env.owner_discord_id
+var bt_ids = process.env.bt_id_1
+bot.on('ready', () => {                             
+    console.log('Bot ready!');    
+    var canLogToDiscord = true
+});
+bot2.on('ready', () => {                             
+    console.log('Bot ready!');    
+    var canLogToDiscord = true
+});
+ 
+function unauth(level_required) { return '```patch\n- ERROR: INSUFFICIENT PERMISSION LEVEL\n- PERMISSION LEVEL ' + String(level_required) + ' IS REQUIRED```' }
+function arg_error(required, submitted) { return '```patch\n- ERROR: INSUFFICIENT ARGUMENTS SUPPLIED\n- ' + String(required) + ' ARGUMENTS ARE REQUIRED```' }
+ 
+function parse(input) {
+  let out =  input.split(" "); 
+  return out
+}
+let spawnArenaClosers = count => {
+    let i
+        for (i = 1; i < count+1; i++) {
+            let spot, i = 30;
+            do { spot = room.randomType('nest'); i--; if (!i) return 0; } while (dirtyCheck(spot, 100));
+            
+            let o = new Entity(room.random());
+                  {
+                    o.color = 3;
+                    o.define(Class.arenaCloser);
+                    o.define({ CAN_BE_ON_LEADERBOARD: false, });
+                    o.name = "Arena Closer"
+                    o.refreshBodyAttributes();
+                    o.color = 3;
+                    o.team = -100
+                  }
+        }
+  };
+let spawnboss = count => {
+    let i
+        for (i = 1; i < count+1; i++) {
+           let spot, i = 30;
+            do { spot = room.randomType('nest'); i--; if (!i) return 0; } while (dirtyCheck(spot, 100));
+            
+            let o = new Entity(room.random());
+                  {
+                    o.color = 3;
+                    o.define(Class.summoner);
+                    o.define({ CAN_BE_ON_LEADERBOARD: true, });
+                    o.name = "summoned boss by a developer"
+                    o.refreshBodyAttributes();
+                    o.color = 5;
+                    o.team = -100
+                  }
+        }
+  };
+// =========================================================
+    // MODIFIED: Phantom Zone walls Generator.
+    // =========================================================
+    const PhantomZoneGenerator = class {       
+        generate() {            
+            let scale = 70;
+            let count = 0;
+            let startX = -(room.width / 0);//3
+            let startY = (room.height * 0);// 2/5
+            let numWallsAcross = 10;
+            let numWallsDown = 10;
+
+            for (let x = 0; x < numWallsAcross; x++)
+            {
+                for (let y = 0; y < numWallsDown; y++)
+                {
+                    if (x === 0 || y === 0 || x === (numWallsAcross - 1) || y === (numWallsDown - 1)){
+                        let wall = new Entity(
+                            {
+                                x: startX + (x + 0.3) * scale,
+                                y: startY + (y + 0.2) * scale
+                            });
+                            wall.define(Class.phantomZoneWall);                
+                            wall.SIZE = 0.7 * scale;
+                            wall.team = -101;                
+                            wall.protect();
+                            wall.life();
+                            count++;
+                    }                
+                }
+            }
+                    
+            util.log('*** Placed ' + count + ' phantom zone walls. ***');
+            return this;
+        }
+    };
+
+    
+
+    // =========================================================    yeet!
+ function generateMaze(size) {
+    let maze = JSON.parse(JSON.stringify(Array(size).fill(Array(size).fill(true))));
+    maze[0] = Array(size).fill(false);
+    maze[size - 1] = Array(size).fill(false);
+    maze[Math.floor(size * 0.3)] = [true, true, true, true,
+   ...Array(size - 8).fill(false), true, true, true, true];
+    maze[Math.floor(size - size * 0.3)] = [true, true, true, true, 
+   ...Array(size - 8).fill(false), true, true, true, true];
+    for (let line of maze) {
+      let i = maze.indexOf(line);
+      line[0] = false;
+      line[size - 1] = false;
+      if (i > 3 && i < size - 3) line[Math.floor(size * 0.3)] = 0;
+      if (i > 3 && i < size - 3) line[Math.floor(size - size * 0.3)] = 0;
+    }
+    let center = Math.floor(size * 0.4);
+    for (let x = center; x < center + Math.floor(size * 0.2); x ++)
+      for (let y = center; y < center + Math.floor(size * 0.2); y ++) maze[x][y] = false;
+    let eroded = 1,
+        toErode = (size * size) / 2.5;
+    for (let i = 0; i < toErode; i ++) {
+      if (eroded >= toErode) {
+        console.log("Done!");
+        break;
+      }
+      for (let i = 0; i < 10000; i++) {
+        let x = Math.floor(Math.random() * size);
+        let y = Math.floor(Math.random() * size);
+        if (maze[x][y]) continue;
+        if ((x === 0 || x === size - 1) && (y === 0 || y === size - 1)) continue;
+        let direction = Math.floor(Math.random() * 4);
+        if (x === 0) direction = 0;
+        else if (y === 0) direction = 1;
+        else if (x === size - 1) direction = 2;
+        else if (y === size - 1) direction = 3;
+        let tx = direction === 0 ? x + 1 : direction === 2 ? x - 1 : x;
+        let ty = direction === 1 ? y + 1 : direction === 3 ? y - 1 : y;
+        if (maze[tx][ty] !== true) continue;
+        maze[tx][ty] = false;
+        eroded ++;
+        break;
+      }
+    }
+    if (eroded) {
+      for (let x = 0; x < size - 1; x ++)
+        for (let y = 0; y < size - 1; y ++)
+          if (maze[x][y] && maze[x + 1][y] && maze[x + 2][y] && maze[x][y + 1] && maze[x][y + 2]  && maze[x + 1][y + 2]  && maze[x + 2][y + 1] && maze[x + 1][y + 1] && maze[x + 2][y + 2]) {
+            maze[x][y] = 3;
+            maze[x + 1][y] = false;
+            maze[x][y + 1] = false;
+            maze[x + 2][y] = false;
+            maze[x][y + 2] = false;
+            maze[x + 2][y + 1] = false;
+            maze[x + 1][y + 2] = false;
+            maze[x + 1][y + 1] = false;
+            maze[x + 2][y + 2] = false;
+          } else if (maze[x][y] && maze[x + 1][y] && maze[x][y + 1] && maze[x + 1][y + 1]) {
+            maze[x][y] = 2;
+            maze[x + 1][y] = false;
+            maze[x][y + 1] = false;
+            maze[x + 1][y + 1] = false;
+          }
+      for (let x = 0; x < size; x++) {
+        for (let y = 0; y < size; y++) {
+          let spawnWall = true;
+          let d = {};
+          let scale = room.width / size;
+          if (maze[x][y] === 3) d = { x: (x * scale) + (scale * 1.5), y: (y * scale) + (scale * 1.5), s: scale * 3, sS: 5 };
+          else if (maze[x][y] === 2) d = { x: (x * scale) + scale, y: (y * scale) + scale, s: scale * 2, sS: 2.5 };
+          else if (maze[x][y]) d = { x: (x * scale) + (scale * 0.5), y: (y * scale) + (scale * 0.5), s: scale, sS: 1 };
+          else spawnWall = false;
+          if (spawnWall) {
+            let o = new Entity({
+              x: d.x,
+              y: d.y
+            });
+            o.define(Class.mazeWall);
+            o.SIZE = (d.s * 0.5) + d.sS;
+            o.team = -101;
+            o.protect();
+            o.life();
+          }
+        }
+      }
+    }
+ }console.log('placed mazewalls succesfully')
+
+ WebSocket = require('ws');
+let clients = [];
+message => {
+            clients.forEach(socket => {
+                socket.talk('m', message);
+            });
+        },
+   
+ 
+bot.on('messageCreate', (msg) => {
+  try {
+    if (msg.content.startsWith(prefix + "select ")) {
+      let sendError = true
+      let lookfor = msg.content.split(prefix + "select ").pop()
+      entities.forEach(function(element) {
+        if (typeof element.sendMessage == "function" && element.name == lookfor) {
+          sendError = false
+          bot.createMessage(msg.channel.id, String(element.name + '\nTank: ' + element.label + '\nId: ' + element.id + '\nAlpha: ' + element.alpha + '\nColor: ' + element.blend.amount + '\nMax Health: '  + element.health.max + '\nCurrent Health: '  + element.health.amount + '\nIs Invulnerable: ' + element.invuln + '\nScore: ' + element.photo.score + '\nLevel: ' + element.skill.level));
+        }
+      })
+      if (sendError) {
+        bot.createMessage(msg.channel.id, "Was unable to find an entity by that name");
+      }
+    }
+     if (msg.content.startsWith(prefix + "killname ")) {
+       if (msg.author.id == owner_id) {
+      let sendError = true
+      let lookfor = msg.content.split(prefix + "killname ").pop()
+      entities.forEach(function(element, entities) {
+        if (typeof element.sendMessage == "function" && element.name == lookfor) {
+          sendError = false
+          element.destroy()
+          sockets.broadcast('a name has been killed by developer')
+          bot.createMessage(msg.channel.id,'user(s) killed.');
+        }
+      })
+      if (sendError) {
+        bot.createMessage(msg.channel.id, "Was unable to find an entity by that name");
+      }
+     } else {
+        bot.createMessage(msg.channel.id, unauth(3));
+      }
+    }
+      if (msg.content.startsWith(prefix + "destroy ")) {
+       if (msg.author.id == owner_id) {
+      let sendError = true
+      let lookfor = msg.content.split(prefix + "destroy ").pop()
+      entities.forEach(function(element, entities) {
+        if (typeof element.sendMessage == "function" && element.name == lookfor) {
+          sendError = false
+          sockets.broadcast('alarm!! a developer is trying to destroy entities...');
+          {doms=false};
+          {bot_count = 0}
+          element.destroy();
+        bot.createMessage(msg.channel.id, 'setted doms off and killed the user(s) succesfully.');
+        }
+      })
+      if (sendError) {
+        bot.createMessage(msg.channel.id, "Was unable to find an entity by that name");
+      }
+     } else {
+        bot.createMessage(msg.channel.id, unauth(3));
+      }
+    }
+     if (msg.content.startsWith(prefix + "name info ")) {
+      let sendError = true
+      let lookfor = msg.content.split(prefix + "name info ").pop()
+      entities.forEach(function(element) {
+        if (typeof element.sendMessage == "function" && element.name == lookfor) {
+          sendError = false
+          //element.destroy()
+          bot.createMessage(msg.channel.id, String(element.name + '\nTank: ' + element.label + '\nId: ' + element.id + '\nAlpha: ' + element.alpha + '\nColor: ' + element.blend.amount + '\nMax Health: '  + element.health.max + '\nCurrent Health: '  + element.health.amount + '\nIs Invulnerable: ' + element.invuln + '\nScore: ' + element.photo.score + '\nLevel: ' + element.skill.level + '\n'+ 'created by attacker#9445'));
+        }
+      })
+      if (sendError) {
+        bot.createMessage(msg.channel.id, "Was unable to find an entity by that name");
+      }
+            }
+    
+    if (msg.content == 'e') {
+      bot.createMessage(msg.channel.id, 'dont say e, i hate that :)you are trapped in a trap maked by @attacker#9445 ')  }
+     if (msg.content ==prefix+ 'spam') {
+      bot.createMessage(msg.channel.id, 'im spamming lol:)')  }
+    if (msg.content== 'token') {
+      bot.createMessage(msg.channel.id, 'do arras.io/#host=bevel-outstanding-catshark.glitch.me&key=lol\n current token level from lol: 1') }
+    
+    if (msg.content == prefix + 'ping') {
+      bot.createMessage(msg.channel.id, 'Pong!\n' + "\nRunning on glitch: " + process.env.ISONGLITCH + "\nDirectory: " + __dirname + "\nFile name: " + __filename + "\npackages used to run and build:" + "\nnpm: 6.x, \nnode: 10.23.0.x, \nws: 6.1.x, \ngoogle-closure-library ^20210106.0.0, \nnodemon: 2.0.7, \neris: 0.15.0, fs: 0.0.2, \nwebpack-file-changer: 2.0.2, \njavascript-add-debugger-webpack-plugin: 1.0.1 ");
+    }
+    if (msg.content == prefix + 'count bots') {
+      bot.createMessage(msg.channel.id, 'there are: '+ bot_count+ ' bots in the server.'  ) 
+}
+    
+    if (msg.content == prefix + 'close') {
+      if (msg.author.id == owner_id) {
+        sockets.broadcast('arena closed by the developer.')
+       spawnArenaClosers(3); 
+        bot.createMessage(msg.channel.id, 'closed the arena succesfully.')
+    } else {
+        bot.createMessage(msg.channel.id, unauth(3));
+      }
+    }
+    if (msg.content == prefix + 'phantom') {
+      if (msg.author.id == owner_id) {
+        sockets.broadcast('a developer has iniatized to generate phantom zone walls.')
+       new PhantomZoneGenerator().generate()
+        bot.createMessage(msg.channel.id, 'succesfully generated phantomzone walls outside map.')
+    } else {
+        bot.createMessage(msg.channel.id, unauth(3));
+      }
+    }
+      if (msg.content == prefix + 'loadmaze') {
+      if (msg.author.id == owner_id) {
+        sockets.broadcast('a developer has iniatized to load a maze.')
+       c.maze==1
+        new generateMaze()
+        bot.createMessage(msg.channel.id, 'succesfully loaded a maze setup.')
+    } else {
+        bot.createMessage(msg.channel.id, unauth(3));
+      }
+    }
+     
+    
+     if (msg.content == prefix + 'regen on') {
+      if (msg.author.id == owner_id) {
+    (regen==true);
+        bot.createMessage(msg.channel.id, 'entities now regenerate health.')
+         sockets.broadcast('developer enabled health regeneration')
+    } else {
+        bot.createMessage(msg.channel.id, unauth(3));
+      }
+    }
+    if (msg.content == prefix + 'regen off') {
+      if (msg.author.id == owner_id) {
+    (regen==false);
+        bot.createMessage(msg.channel.id, 'health regenration stopped...')
+        sockets.broadcast('developer disabled health regeneration')
+    } else {
+        bot.createMessage(msg.channel.id, unauth(3));
+      }
+    }
+    
+    if (msg.content == prefix + 'summon boss') {
+      if (msg.author.id == owner_id) {
+       spawnboss(1);
+        bot.createMessage(msg.channel.id, 'summoned a boss')
+        sockets.broadcast('a developer summoned a boss to raid the server hahaha!')
+    } else {
+        bot.createMessage(msg.channel.id, unauth(3));
+      }
+    }
+     if (msg.content == prefix + 'recoil on') {
+      if (msg.author.id == owner_id) {
+        (recoil=true)
+        bot.createMessage(msg.channel.id, 'recoil is on.')
+          sockets.broadcast('recoil enabled by the developer.')
+    } else {
+        bot.createMessage(msg.channel.id, unauth(3));
+      }
+    } if (msg.content == prefix + 'recoil off') {
+      if (msg.author.id == owner_id) {
+        (recoil=false)
+        bot.createMessage(msg.channel.id, 'recoil is off.')
+        sockets.broadcast('recoil disabled by the developer.')
+    } else {
+        bot.createMessage(msg.channel.id, unauth(3));
+      }
+    }
+     
+    if (msg.content == prefix+ 'enable chat') {
+      if (msg.author.id == owner_id) {
+        (chat_system == true);
+        bot.createMessage(msg.channel.id, 'enabled chat system for server.')
+          sockets.broadcast('chat system is enabled by the developer!')
+        } else {bot.createMessage(msg.channel.id, unauth(3));
+                }}
+    
+    if(msg.content == prefix+'disable chat') {
+      if(msg.author.id == owner_id) {
+        (chat_system == false);
+        sockets.broadcast('chat system is disabled by the developer!')
+        bot.createMessage(msg.channel.id, 'disabled chat system ingame.')} else {
+          bot.createMessage(msg.channel.id, unauth(3));
+    }}
+     if (msg.content == prefix + 'doms on') {
+      if (msg.author.id == owner_id) {
+        {doms= true};
+        bot.createMessage(msg.channel.id, 'enabled dominators')
+        sockets.broadcast('dominators respawn are setted on by the developer!')
+    } else {
+        bot.createMessage(msg.channel.id, unauth(3));
+      }
+    }
+    if (msg.content == prefix + 'doms off') {
+      if (msg.author.id == owner_id) {
+        {doms= false};
+        bot.createMessage(msg.channel.id, 'disabled dominators')
+         sockets.broadcast('dominators respawn are setted off by the developer!')
+    } else {
+        bot.createMessage(msg.channel.id, unauth(3));
+      }
+    }
+     
+     if (msg.content == prefix + 'restart ') {
+      if (msg.author.id == owner_id) {
+    //   bot.createMessage(msg.channel.id, 'closed the sockets. disconnected everything succesfully. cleared the server succesfully. deleted the server succesfully. the server will now restart. processing...');
+        (process.exit(1));
+      } else {
+        bot.createMessage(msg.channel.id, unauth(3));
+      }
+    }
+    if (msg.content.includes(prefix + 'help')) {
+        bot.createMessage(msg.channel.id, '***COMMANDS*** \nPrefix: ' + prefix + '\n(No space after prefix when running command) \n \n**ping**  -  tells u if the server is running\n**kill** *<id>*  -  Kills a player (Authorization required)\n**broadcast** *<message>*  -  broadcasts a message (Authorization required)\n**query** *<internalname>*  -  returns some data about a tank (must use internal name)\n**select** *<name>*  -  returns some data about in-game users\n**pl**  -  list in-game players\n**stat** *<id> <path to stat> <new value>*  -  modifies a stat (Authorization required)\n**define** *<id> <tank>*  -  Defines someone as a tank (Authorization required) \n**close** - *closes the arena* (authorization required) \n**restart** - *disconnect everything* (authorization required) \n**doms off** - *disables dominators respawn* (authorization required) \n**doms on** - *enables dominators respawn* (authorization required)\n**killname [name]** - *kills all entities with that name* (authorization required)\n**name info** - *returns data and info about all entities with that name* \n**enable chat** - *enables the chat system for the ingame server* (authorization required)\n**disable chat** - *disables the ingame chat* (authorization required) \n**recoil on** - *enables recoil* (authorization required) \n**recoil off** - *disables recoil* (authorization required) \n**summon boss** - *summons a elite_destroyer boss* (authorization required) \n**bots <number>** - *changes the max bot amount* (authorization required) \n**count bots** - *counts how many bots there are in the server* \n**regen on** - *sets health regeneration on* (authorization required) \n**regen off** - *sets health regeneration off* (authorization required) \n**destroy** - *its killname+doms off* (authorization required) \n **token** - *gives you the token level1.* \n**heal** - *heals a player* (authorization required)');
+    }
+    if (msg.content.startsWith(prefix + 'kill ')) {
+      if (msg.author.id == owner_id) {
+        let sendError = true
+        let lookfor = msg.content.split(prefix + "kill ").pop()
+        console.log(lookfor)
+        entities.forEach(function(element) {
+          if (element.id == lookfor) {
+            sendError = false
+            element.destroy()
+            bot.createMessage(msg.channel.id, "User killed.");
+          }
+        }) 
+        if (sendError) {
+          bot.createMessage(msg.channel.id, "Was unable to find an entity by the id: " + lookfor);
+        }
+      } else {
+        bot.createMessage(msg.channel.id, unauth(3));
+      }
+    }
+     if (msg.content.startsWith(prefix + 'kill ')) {
+      if (msg.author.id == owner_id) {
+        let sendError = true
+        let lookfor = msg.content.split(prefix + "kill ").pop()
+        console.log(lookfor)
+        entities.forEach(function(element) {
+          if (element.id == lookfor) {
+            sendError = false
+            element.destroy()
+            bot.createMessage(msg.channel.id, "User killed.");
+          }
+        }) 
+        if (sendError) {
+          bot.createMessage(msg.channel.id, "Was unable to find an entity by the id: " + lookfor);
+        }
+      } else {
+        bot.createMessage(msg.channel.id, unauth(3));
+      }
+    }
+ 
+    if (msg.content.startsWith(prefix + 'heal ')) {
+      if ( bt_ids.include(msg.author.id)||msg.author.id == owner_id) {
+        let sendError = true
+        let lookfor = msg.content.split(prefix + "heal ").pop()
+        console.log(lookfor)
+        entities.forEach(function(element) {
+          if (element.id == lookfor) {
+            sendError = false
+            {element.health.amount = element.health.max};
+            sockets.broadcast('a user has healed by the developer')
+            bot.createMessage(msg.channel.id, "User healed.");
+          }
+        }) 
+        if (sendError) {
+          bot.createMessage(msg.channel.id, "Was unable to find an entity by the id: " + lookfor);
+        }
+      } else {
+        bot.createMessage(msg.channel.id, unauth(3));
+      }
+    }
+    
+    if (msg.content.startsWith(prefix + 'eval ')) {
+      if (msg.author.id == owner_id) {
+        var command = msg.content.split(prefix + "eval ").pop()
+        console.log('new eval: ', command)
+        var output = eval(command)
+        bot.createMessage(msg.channel.id, "Evaluated. Output: " + output);
+      } else {
+        console.log("Unauthorized user", msg.author.username, "tried to eval")
+        bot.createMessage(msg.channel.id, unauth(3));
+      }
+    }
+    if (msg.content.startsWith(prefix + 'broadcast')) {
+        if (bt_ids.includes(msg.author.id) || msg.author.id == owner_id) {
+        sockets.broadcast(msg.content.split(prefix + "broadcast").pop() + " - " + msg.author.username)
+        bot.createMessage(msg.channel.id, 'Message Broadcast!');
+      } else {
+        console.log("Unauthorized user", msg.author.username, "tried to broadcast")
+        bot.createMessage(msg.channel.id, unauth(2));
+      }
+    }
+     if (msg.content.startsWith(prefix + 'loadmaze ')) { /*/**/
+        if (bt_ids.includes(msg.author.id) || msg.author.id == owner_id) {
+         maze=(msg.content.split(prefix + "mapsize ").pop())
+          generateMaze(maze)
+        bot.createMessage(msg.channel.id, 'loaded maze succesfully!');
+          console.log('mapsize changed please wait...', room.width +' '+ room.height+ ' '+ room.xgridWidth+ ' '+ room.ygridHeight)
+      } else {
+        console.log("Unauthorized user", msg.author.id, 'tried to change the mapsize')
+        bot.createMessage(msg.channel.id, unauth(2));
+      }
+    }    
+    
+    if (msg.content.startsWith(prefix + 'bots ')) {
+        if (bt_ids.includes(msg.author.id) || msg.author.id == owner_id) {
+        bot_count =(msg.content.split(prefix + "bots ").pop())
+        bot.createMessage(msg.channel.id, 'changed bot count succesfully! to:'+' '+ bot_count);
+          sockets.broadcast('a developer changed maxbotcount to: '+ bot_count);
+          console.log('bot amount changed!', room.width +' '+ room.height+ ' '+ room.xgridWidth+ ' '+ room.ygridHeight)
+      } else {
+        console.log("Unauthorized user", msg.author.id, 'tried to change the bot amount')
+        bot.createMessage(msg.channel.id, unauth(3));
+      }
+    }
+    if (msg.content.startsWith(prefix + 'query')) {
+        let output = ''
+        var query = msg.content.split(prefix + "query ").pop()
+        try {
+          var botreturn = eval('Class.' + query);
+          for (var key in botreturn) {
+            if (output.length > 500) {console.log(output.length); bot.createMessage(msg.channel.id, output); output = ''}
+            output += String(key) + ': ' + eval('Class.' + query + '.' + String(key)) + '\n'
+            var returned = typeof eval('Class.' + query + '.' + String(key))
+            if (returned == 'object') {
+              for (var key2 in eval('Class.' + query + '.' + String(key))) {
+                  if (key2 != 'remove') {
+                    try {
+                      output += "^ " + String(key2) + ': ' + eval('Class.' + query + '.' + String(key) + '[' + String(key2) + ']') + '\n'
+                      var returned = typeof eval('Class.' + query + '.' + String(key) + '[' + String(key2) + ']')
+                      var returnedobj = eval('Class.' + query + '.' + String(key) + '[' + String(key2) + ']')
+                    } catch(err) {
+                      output += "^ " + String(key2) + ': ' + eval('Class.' + query + '.' + String(key) + '.' + String(key2)) + '\n'
+                      var returned = typeof eval('Class.' + query + '.' + String(key) + '.' + String(key2))
+                      var returnedobj = eval('Class.' + query + '.' + String(key) + '.' + String(key2))
+                    }
+                    if (returned == 'object') {
+                      for (var key3 in returnedobj) {
+                        if (key3 != 'remove') {
+                          try {
+                            output += "^ ^ " + String(key3) + ': ' + eval('Class.' + query + '.' + String(key) + '[' + String(key2) + ']' + '[' + String(key3) + ']') + '\n'
+                          } catch(err) {
+                            try {
+                              output += "^ ^ " + String(key3) + ': ' + eval('Class.' + query + '.' + String(key) + '[' + String(key2) + ']' + '.' + String(key3)) + '\n'
+                            } catch(err) {
+                              try {
+                                output += "^ ^ " + String(key3) + ': ' + eval('Class.' + query + '.' + String(key) + '.' + String(key2) + '[' + String(key3) + ']') + '\n'
+                              } catch(err) {
+                                output += "^ ^ " + String(key3) + ': ' + eval('Class.' + query + '.' + String(key) + '.' + String(key2) + '.' + String(key3)) + '\n'
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          } catch(err) {
+            bot.createMessage(msg.channel.id, String(err));
+          }
+        bot.createMessage(msg.channel.id, output);
+      }
+  if (msg.content == prefix + 'pl' ) {
+    let output = '`'
+    entities.forEach(function(element, sockets) {
+    if (element.name != '') {
+        output += String(element.name + '  -  ' + element.id + '\n')
+    }}) 
+    output += '`'
+    bot.createMessage(msg.channel.id, output)}
+  if (msg.content.startsWith(prefix + 'stat ')) {
+    if (bt_ids.includes(msg.author.id) || msg.author.id == owner_id) {
+    let s_command = parse(msg.content)
+    let s_lookForId = s_command[1]
+    let s_statpath = s_command[2]
+    let s_newvalueTemp = s_command.slice(3)
+    let s_newvalue = ''
+    s_newvalueTemp.forEach(function(element) {
+      s_newvalue += element + ' '
+    });
+    console.log("New stat command: ", s_lookForId, s_statpath, s_newvalue, "Sent by:", msg.author.username, '(' + msg.author.id + ')')
+    if (s_newvalue != '') { 
+    entities.forEach(function(element) {
+    if (element.id == s_lookForId && s_lookForId != "ALL") {
+      try {
+        eval('element' + s_statpath + ' = ' + s_newvalue)
+      } catch(err) {
+        eval('element' + s_statpath + ' = "' + s_newvalue + '"')
+      }
+      element.sendMessage("your stat " + s_statpath + ' has been changed to ' + s_newvalue)
+      bot.createMessage(msg.channel.id, "Value set to " + String(eval('element' + s_statpath)));
+    }})
+  if (s_lookForId == "ALL" && msg.author.id == owner_id) {
+    entities.forEach(function(element) {
+      try {
+        eval('element' + s_statpath + ' = ' + s_newvalue)
+      } catch(err) {
+        eval('element' + s_statpath + ' = "' + s_newvalue + '"')
+      }
+      element.sendMessage("your stat " + s_statpath + ' has been changed to ' + s_newvalue)
+    })
+  bot.createMessage(msg.channel.id, "Values set to " + s_newvalue);
+  } else {
+    if (s_lookForId == 'ALL') bot.createMessage(msg.channel.id, unauth(3))
+  }} else {
+    bot.createMessage(msg.channel.id, arg_error(3));
+  }
+  } else {
+    bot.createMessage(msg.channel.id, unauth(2));
+  }}
+   
+  if (msg.content.startsWith(prefix + 'define ')) {
+    let printerror = true
+    let command = parse(msg.content)
+    let inputid = command[1]
+    let inputclass = command[2]
+    if (msg.author.id == owner_id) {
+    if (Class[inputclass] != undefined) {
+      entities.filter(r => r.id == inputid)[0].define(Class[inputclass])
+      printerror = false
+      bot.createMessage(msg.channel.id, 'Defined user as Class.' + inputclass);
+    } else {
+      bot.createMessage(msg.channel.id, inputclass + ' is not a valid tank');
+      printerror = false
+    }
+    if (printerror) {
+      bot.createMessage(msg.channel.id, "Couldn't find any users by the id: " + inputid);
+    }
+    } else {
+      bot.createMessage(msg.channel.id, unauth(3));
+    }
+  }
+     if (msg.content.startsWith(prefix + 'define   ')) {
+    let printerror = true
+    let command = parse(msg.content)
+    let inputid = command[1]
+    let inputclass = command[2]
+    if (msg.author.id == owner_id) {
+    if (Class[inputclass] != undefined) {
+      entities.filter(r => r.id == inputid)[0].define(Class[inputclass])
+      printerror = false
+      bot.createMessage(msg.channel.id, 'Defined user as Class.' + inputclass);
+    } else {
+      bot.createMessage(msg.channel.id, inputclass + ' is not a valid tank');
+      printerror = false
+    }
+    if (printerror) {
+      bot.createMessage(msg.channel.id, "Couldn't find any users by the id: " + inputid);
+    }
+    } else {
+      bot.createMessage(msg.channel.id, unauth(3));
+    }
+  }
+  /*   if (msg.content.startsWith(prefix + 'define ')) {
+    let printerror = true
+    let command = parse(msg.content)
+    let inputid = command[1]
+    let inputclass = command[2]
+    if (msg.author.id == owner_id) {
+    if (Class[inputclass] != undefined) {
+      entities.filter(r => r.id == inputid)[0].define(Class[inputclass])
+      printerror = false
+      bot.createMessage(msg.channel.id, 'Defined user as Class.' + inputclass);
+    } else {
+      bot.createMessage(msg.channel.id, inputclass + ' is not a valid tank');
+      printerror = false
+    }
+    if (printerror) {
+      bot.createMessage(msg.channel.id, "Couldn't find any users by the id: " + inputid);
+    }
+    } else {
+      bot.createMessage(msg.channel.id, unauth(3));
+    }
+  } */
+} catch(err) { // log the error in chat
+  bot.createMessage(msg.channel.id, String(err));
+}});
+ 
+if (c.server_closed) {bot.editStatus('offline', {
+  name: 'Server Closed',
+  type: 1
+}); } else {
+bot.editStatus('online', {
+  name: prefix + 'help for commands!',
+  type: 1
+});};
+ 
+   bot.connect();
