@@ -6414,7 +6414,7 @@ bot.on('messageCreate', (msg) => {
         let sendError = true
         let lookfor = msg.content.split(prefix + "generatemaze ").pop()
         console.log(lookfor)
-       
+       generateMaze(lookfor)
       } else {
         bot.createMessage(msg.channel.id, unauth(3));
       }
