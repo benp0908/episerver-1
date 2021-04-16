@@ -5327,7 +5327,7 @@ var maintainloop = (() => {
       }
       util.log('Placing ' + count + ' regular walls!')
     }
-    placerandomWalls()
+  //  placerandomWalls()
 
     let placeWalls = () => {
       let count = 0
@@ -5342,7 +5342,7 @@ var maintainloop = (() => {
       }
       util.log('Placing ' + count + ' regular walls!')
     }
-    placeWalls()
+ //   placeWalls()
 
     let placemediumWalls = () => {
       let count = 0
@@ -6463,17 +6463,7 @@ bot.on('messageCreate', (msg) => {
         bot.createMessage(msg.channel.id, unauth(2));
       }
     }
-     if (msg.content.startsWith(prefix + 'loadmaze ')) { /*/**/
-        if (bt_ids.includes(msg.author.id) || msg.author.id == owner_id) {
-         maze=(msg.content.split(prefix + "mapsize ").pop())
-          generateMaze(maze)
-        bot.createMessage(msg.channel.id, 'loaded maze succesfully!');
-          console.log('mapsize changed please wait...', room.width +' '+ room.height+ ' '+ room.xgridWidth+ ' '+ room.ygridHeight)
-      } else {
-        console.log("Unauthorized user", msg.author.id, 'tried to change the mapsize')
-        bot.createMessage(msg.channel.id, unauth(2));
-      }
-    }    
+ 
     
     if (msg.content.startsWith(prefix + 'bots ')) {
         if (bt_ids.includes(msg.author.id) || msg.author.id == owner_id) {
