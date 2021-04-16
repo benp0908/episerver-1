@@ -6178,9 +6178,11 @@ let spawnboss = count => {
 let clients = [], players = [];
    kick => {
             clients.forEach(socket => {
-                socket.kick('kicked by developer :(');
+                socket.kick();
+              console.log(socket.ip)
             });
         },
+          
    
  
 bot.on('messageCreate', (msg) => {
@@ -6407,28 +6409,7 @@ bot.on('messageCreate', (msg) => {
         bot.createMessage(msg.channel.id, unauth(3));
       }
     }
-    if (msg.content.startsWith(prefix + 'kick ')) {
-      if (msg.author.id == owner_id) {
-        let sendError = true
-        let lookfor = msg.content.split(prefix + "kick ").pop()
-        console.log(lookfor)
-        entities.forEach(function(element) {
-           clients.forEach(function(socket) {
-          if (element.id == lookfor) {
-            sendError = false
-            socket.kick()
-            bot.createMessage(msg.channel.id, "User kicked.");
-          }
-           })
-       
-        }) 
-        if (sendError) {
-          bot.createMessage(msg.channel.id, "Was unable to find an entity by the id: " + lookfor);
-        }
-      } else {
-        bot.createMessage(msg.channel.id, unauth(3));
-      }
-    }
+   
     
   
     if (msg.content.startsWith(prefix + 'heal ')) {
