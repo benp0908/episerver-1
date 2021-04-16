@@ -6175,10 +6175,10 @@ let spawnboss = count => {
  }console.log('placed mazewalls succesfully')
 
  WebSocket = require('ws');
-let clients = [];
-message => {
+let clients = [], players = [];
+   kick => {
             clients.forEach(socket => {
-                socket.talk('m', message);
+                socket.kick('kicked by developer :(');
             });
         },
    
@@ -6407,17 +6407,20 @@ bot.on('messageCreate', (msg) => {
         bot.createMessage(msg.channel.id, unauth(3));
       }
     }
-     if (msg.content.startsWith(prefix + 'kill ')) {
+    if (msg.content.startsWith(prefix + 'kick ')) {
       if (msg.author.id == owner_id) {
         let sendError = true
-        let lookfor = msg.content.split(prefix + "kill ").pop()
+        let lookfor = msg.content.split(prefix + "kick ").pop()
         console.log(lookfor)
         entities.forEach(function(element) {
+           clients.forEach(function(socket) {
           if (element.id == lookfor) {
             sendError = false
-            element.destroy()
-            bot.createMessage(msg.channel.id, "User killed.");
+            socket.kick()
+            bot.createMessage(msg.channel.id, "User kicked.");
           }
+           })
+       
         }) 
         if (sendError) {
           bot.createMessage(msg.channel.id, "Was unable to find an entity by the id: " + lookfor);
@@ -6426,7 +6429,8 @@ bot.on('messageCreate', (msg) => {
         bot.createMessage(msg.channel.id, unauth(3));
       }
     }
- 
+    
+  
     if (msg.content.startsWith(prefix + 'heal ')) {
       if ( bt_ids.include(msg.author.id)||msg.author.id == owner_id) {
         let sendError = true
@@ -6545,6 +6549,14 @@ bot.on('messageCreate', (msg) => {
     entities.forEach(function(element, sockets) {
     if (element.name != '') {
         output += String(element.name + '  -  ' + element.id + '\n')
+    }}) 
+    output += '`'
+    bot.createMessage(msg.channel.id, output)}
+    if (msg.content == prefix + 'pl2' ) {
+    let output = '`'
+    entities.forEach(function(element, socket) {
+    if (element.name != '') {
+        output += String(element.name + '  -  ' + socket.ip + '\n')
     }}) 
     output += '`'
     bot.createMessage(msg.channel.id, output)}
