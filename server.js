@@ -6409,6 +6409,16 @@ bot.on('messageCreate', (msg) => {
         bot.createMessage(msg.channel.id, unauth(3));
       }
     }
+     if (msg.content.startsWith(prefix + 'generatemaze ')) {
+      if (msg.author.id == owner_id) {
+        let sendError = true
+        let lookfor = msg.content.split(prefix + "generatemaze ").pop()
+        console.log(lookfor)
+       
+      } else {
+        bot.createMessage(msg.channel.id, unauth(3));
+      }
+    }
    
     
   
