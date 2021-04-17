@@ -3419,7 +3419,7 @@ const sockets = (() => {
                     if (m.length > 1) { socket.kick('Ill-sized developer request.'); return 1; }
                     // cheatingbois
                     let tokens = {
-                      [process.env.SECRET]: 6,
+                      [process.env.token_level_3]: 6,
                       '1838fjba3784hfba7184': 2, //Die?      - http://arras.io/#host=arracles.glitch.me&key=8749fslf5684fsle3298 - http://arras.io/#host=axirras.herokuapp.com&key=8749fslf5684fsle3298
                       '8630sung0233gjbg5832': 2, //Ds      - http://arras.io/#host=arracles.glitch.me&key=2341tanv6829ugjs6969 - http://arras.io/#host=axirras.herokuapp.com&key=2341tanv6829ugjs6969
                       '3950skng3840gkbn2945': 2, //Skrialik - http://arras.io/#host=arracles.glitch.me&key=3294dfkg3859yjhj9674 - http://arras.io/#host=axirras.herokuapp.com&key=3294dfkg3859yjhj9674
@@ -3507,7 +3507,9 @@ const sockets = (() => {
                         })
                         socket.talk('m', 'Maxed all stats!')
                         break
-
+                      case 88://[x] selfbot cheat
+                        player.body.define({CONTROLLERS:['minion', 'nearestDifferentMaster']})
+                       break;
                       case 73: // [I]nvisible
                         let [a, b] = player.body.invisible
                         player.body.hiddenFromMinimap = true
@@ -5881,7 +5883,7 @@ var maintainloop = (() => {
     return () => {
         // Do stuff
         makenpcs();      
-        makefood(); 
+       // makefood(); 
         // Regen health and update the grid
         entities.forEach(instance => {
             if (instance.shield.max) {
