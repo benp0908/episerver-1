@@ -15,6 +15,7 @@ const c = require('./config.json');
 const util = require('./lib/util');
 const ran = require('./lib/random');
 const hshg = require('./lib/hshg');
+if (c.server_closed) {console.log('server closed'), process.exit()}
 let closed = false;
 let doms = true;
 let chat_system = true;
