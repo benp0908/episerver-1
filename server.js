@@ -93,6 +93,8 @@ const room = {
     room.findType('norm');
     room.findType('bas1');
     room.findType('bas2');
+    room.findType('mot1');
+    room.findType('mot2');
     room.findType('bas3');
     room.findType('bas4');
     room.findType('bap1');
@@ -2639,7 +2641,9 @@ class Entity {
                 (this.team !== -1 && room.isIn('bas1', loc)) ||
                 (this.team !== -2 && room.isIn('bas2', loc)) ||
                 (this.team !== -3 && room.isIn('bas3', loc)) ||
-                (this.team !== -4 && room.isIn('bas4', loc))
+                (this.team !== -4 && room.isIn('bas4', loc)) ||
+                (this.team !== -1 && room.isIn('mot1', loc))||
+                (this.team !== -2 && room.isIn('mot2', loc)) 
             ) { this.kill(); }
         }
     }
@@ -5575,6 +5579,17 @@ var maintainloop = (() => {
             for (let i=1; i<5; i++) {
                 room['bap' + i].forEach((loc) => { f(loc, i); }); 
             }
+
+        let m = (loc, team) => { 
+                let o = new Entity(loc);
+                    o.define(Class.mothership);
+                    o.team = -team;
+                    o.color = [10, 11, 12, 15][team-1];
+            };
+          for (let i=1; i<5; i++) {
+                room['mot' + i].forEach((loc) => { f(loc, i); }); 
+            }
+        
         // Return the spawning function
         let bots = [];
         return () => {
