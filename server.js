@@ -5579,16 +5579,22 @@ var maintainloop = (() => {
             for (let i=1; i<5; i++) {
                 room['bap' + i].forEach((loc) => { f(loc, i); }); 
             }
-
-        let m = (loc, team) => { 
-                let o = new Entity(loc);
-                    o.define(Class.mothership);
-                    o.team = -team;
-                    o.color = [10, 11, 12, 15][team-1];
-            };
-          for (let i=1; i<5; i++) {
-                room['mot' + i].forEach((loc) => { f(loc, i); }); 
-            }
+      
+           (() => {
+              let o = new Entity(room['mot1'])
+              o.define(Class.mothership)
+              o.team = 1
+              o.color = 10
+              o.ondead = () => {
+                  sockets.broadcast('Blues Mothership has been Killed'); 
+                  sockets.broadcast('Green has won the game!');
+                  sockets.broadcastChatMessage('Blues Mothership has been Killed'); 
+                  sockets.broadcastChatMessage('Green has won the game!');
+               //   threeHourRestart()
+                  //process.exit();
+                   
+              }
+          })()
         
         // Return the spawning function
         let bots = [];
