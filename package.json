@@ -3,13 +3,13 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "start": "gulp run"
+    "start": "node server"
   },
   "dependencies": {
     "google-closure-library": "^20210106.0.0",
     "ws": "6.1.x",
     "eris": "^0.15.0",
-    "gulp": "^4.0.2"
+    "node": "^10.16.3"
   },
   "engines": {
     "node": "10.x"
