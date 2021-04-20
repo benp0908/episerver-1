@@ -5582,8 +5582,7 @@ var maintainloop = (() => {
             }
       
            (() => {
-             for (let loc of room['mot1']) {
-              let o = new Entity(loc)
+              let o = new Entity(room.randomType('norm'))
               o.define(Class.mothership)
               o.team = 1
               o.color = 10
@@ -5592,12 +5591,9 @@ var maintainloop = (() => {
                   sockets.broadcast('Green has won the game!');
                   sockets.broadcastChatMessage('Blues Mothership has been Killed'); 
                   sockets.broadcastChatMessage('Green has won the game!');
-                sockets.broadcast('Arena Closed no players may join!')
-                spawnArenaClosers(3);
-               //   threeHourRestart()
                   //process.exit();
-                   
-              }}
+                  
+              }
           })()
         
         // Return the spawning function
