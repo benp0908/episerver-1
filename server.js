@@ -1078,6 +1078,7 @@ const skcnv = {
     hlt: 7,
     rgn: 8,
     mob: 9,
+  sco: 10,
 };
 const levelers = [
          1,  2,  3,  4,  5,  6,  7,  8,  9,
@@ -1096,12 +1097,12 @@ let curve = (() => {
 let apply = (f, x) => x < 0 ? 1 / (1 - x * f) : f * x + 1
 
 class Skill {
-    constructor(inital = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]) { // Just skill stuff. 
+    constructor(inital = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]) { // Just skill stuff. 
         this.raw = inital;
         this.caps = [];
         this.setCaps([
             c.MAX_SKILL, c.MAX_SKILL, c.MAX_SKILL, c.MAX_SKILL, c.MAX_SKILL, 
-            c.MAX_SKILL, c.MAX_SKILL, c.MAX_SKILL, c.MAX_SKILL, c.MAX_SKILL
+            c.MAX_SKILL, c.MAX_SKILL, c.MAX_SKILL, c.MAX_SKILL, c.MAX_SKILL, c.MAX_SKILL
         ]);
         this.name = [
             'Reload',
@@ -1114,6 +1115,7 @@ class Skill {
             'Max Health',
             'Shield Regeneration',
             'Movement Speed',
+          'scope',
         ];
         this.atk = 0;
         this.hlt = 0;
@@ -1129,6 +1131,7 @@ class Skill {
         this.brst = 0;
         this.ghost = 0;
         this.acl = 0;
+      this.scope = 0;
 
         this.reset();        
     }
@@ -1642,13 +1645,14 @@ class Gun {
     interpret() {
         let sizeFactor = this.master.size/this.master.SIZE;
         let shoot = this.settings;
-        let sk = (this.bulletStats == 'master') ? this.body.skill : this.bulletStats;
+        let sk = (this.bulletStats == 'master') ? this.body.skill : this.bulletStats; 
         // Defaults
         let out = {
             SPEED: shoot.maxSpeed * sk.spd,
             HEALTH: shoot.health * sk.str,
             RESIST: shoot.resist + sk.rst,
             DAMAGE: shoot.damage * sk.dam,
+          SCOPE: this.FOV * sk.SCO,
             PENETRATION: Math.max(1, shoot.pen * sk.pen),            
             RANGE: shoot.range / Math.sqrt(sk.spd),
             DENSITY: shoot.density * sk.pen * sk.pen / sizeFactor,
