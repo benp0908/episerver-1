@@ -5581,7 +5581,7 @@ var maintainloop = (() => {
                 room['bap' + i].forEach((loc) => { f(loc, i); }); 
             }
       
-           (() => {
+         /*  (() => {
               let o = new Entity(room.randomType('norm'))
               o.define(Class.mothership)
               o.team = 1
@@ -5594,7 +5594,7 @@ var maintainloop = (() => {
                   //process.exit();
                   
               }
-          })()
+          })() */
         
         // Return the spawning function
         let bots = [];

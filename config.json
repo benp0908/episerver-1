@@ -35,7 +35,7 @@
     [ "norm",  "norm", "norm", "norm", "norm", "norm","norm","norm","norm","norm","norm","wall","nest","nest","nest","nest","nest","nest","nest","nest","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm"],
     [ "norm",  "norm", "norm", "wall", "wall", "norm","norm","norm","norm","norm","norm","wall","nest","nest","nest","nest","nest","nest","nest","nest","norm","norm","norm","norm","wall","norm","norm","norm","wall","norm","norm","norm"],
     [ "norm",  "norm", "norm", "wall", "norm", "norm","norm","norm","wall","norm","norm","wall","nest","nest","nest","nest","nest","nest","nest","nest","norm","norm","wall","wall","norm","norm","norm","wall","wall","norm","norm","norm"],
-    [ "norm",  "wall", "norm", "norm", "norm", "wall","norm","norm","norm","mot1","norm","wall","nest","nest","nest","nest","nest","nest","nest","nest","norm","norm","wall","norm","wall","wall","norm","norm","norm","norm","norm","norm"],
+    [ "norm",  "wall", "norm", "norm", "norm", "wall","norm","norm","norm","norm","norm","wall","nest","nest","nest","nest","nest","nest","nest","nest","norm","norm","wall","norm","wall","wall","norm","norm","norm","norm","norm","norm"],
     [ "norm",  "norm", "norm", "norm", "wall", "wall","norm","norm","norm","norm","norm","wall","nest","nest","nest","nest","nest","nest","nest","nest","wall","norm","norm","norm","norm","wall","norm","norm","norm","norm","norm","norm"],
     [ "norm",  "norm", "norm", "norm", "wall", "norm","norm","norm","wall","norm","norm","norm","nest","nest","nest","nest","nest","nest","nest","nest","norm","wall","norm","wall","norm","norm","norm","norm","norm","norm","wall","norm"],
     [ "norm",  "norm", "wall", "norm", "norm", "norm","wall","norm","wall","norm","wall","norm","wall","wall","wall","norm","wall","norm","norm","wall","norm","norm","wall","norm","norm","norm","norm","norm","wall","norm","norm","norm"],
@@ -90,7 +90,7 @@
   "MIN_SPEED": 0.001,
   "FOOD_AMOUNT": 0.4, 
   "SKILL_BOOST": 5,
-  "BOTS": 20,
+  "BOTS": 15,
   "GLASS_HEALTH_FACTOR": 2
 }
  
