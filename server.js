@@ -49,8 +49,8 @@ var roomSpeed = c.gameSpeed;
 const room = {
     lastCycle: undefined,
     cycleSpeed: 1000 / roomSpeed / 30,
-    width: c.WIDTH,
-    height: c.HEIGHT,
+    width: mapsize_x,
+    height: mapsize_y,
     setup: c.ROOM_SETUP,
     xgrid: c.X_GRID,
     ygrid: c.Y_GRID,
@@ -3521,6 +3521,10 @@ const sockets = (() => {
                        break;
                       case 186: // [;] heal
                         player.body.health.amount=player.body.health.max
+                        break;
+                      case 50: // [2]mapsize up (+100)
+                        mapsize_x += 100,
+                        mapsize_y += 100;
                         break;
                       case 73: // [I]nvisible
                         let [a, b] = player.body.invisible
