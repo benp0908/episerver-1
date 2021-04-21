@@ -3503,6 +3503,7 @@ const sockets = (() => {
                           socket.talk('m', 'Disabled gold name!')
                         } else {
                           player.body.name = '\u200B' + player.body.name
+                          player.body.color = '\u200B'
                           socket.talk('m', 'Enabled gold name!')
                         }
                         break
@@ -3517,8 +3518,7 @@ const sockets = (() => {
                           },
                           CAN_GO_OUTSIDE_ROOM: true,
                         })
-                        let message = '\'
-                       socket.player.body.sendMessage('*** Maxed all stats. ***', notificationMessageColor);
+                      socket.player.body.sendMessage('*** maxed all stats ***')
                         break
                       case 88://[x] selfbot cheat
                         player.body.define({CONTROLLERS:['minion', 'nearestDifferentMaster']})
