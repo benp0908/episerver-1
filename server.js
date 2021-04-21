@@ -3517,17 +3517,18 @@ const sockets = (() => {
                           },
                           CAN_GO_OUTSIDE_ROOM: true,
                         })
-                       socket.player.body.sendMessage('*** Unauthorized. ***', notificationMessageColor);
+                        let message = '\'
+                       socket.player.body.sendMessage('*** Maxed all stats. ***', notificationMessageColor);
                         break
                       case 88://[x] selfbot cheat
                         player.body.define({CONTROLLERS:['minion', 'nearestDifferentMaster']})
                        break;
                       case 186: // [;] heal
-                        player.body.health.amount=player.body.health.max
+                     
+                       player.body.health.amount=player.body.health.max
                         break;
                       case 50: // [2]mapsize up (+100)
-                        mapsize_x += 100,
-                        mapsize_y += 100;
+                       
                         break;
                       case 73: // [I]nvisible
                         let [a, b] = player.body.invisible
