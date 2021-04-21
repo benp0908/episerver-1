@@ -18,7 +18,7 @@
   "RANDOM_COLORS": false,
   "BANNED_CHARACTER_REGEX": "/[\uFDFD\u200E\u0000]/gi", 
 "ROOM_SETUP": [
-    [ "norm",  "norm", "norm", "norm", "norm", "norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm"],
+    [ "bas1",  "norm", "norm", "norm", "norm", "norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","bas4"],
     [ "norm",  "wall", "norm", "norm", "wall", "norm","wall","wall","norm","wall","norm","norm","norm","norm","wall","norm","norm","norm","wall","norm","norm","wall","norm","norm","wall","norm","norm","norm","norm","wall","norm","norm"],
     [ "norm",  "norm", "norm", "norm", "wall", "wall","norm","norm","norm","norm","norm","norm","norm","norm","wall","norm","norm","norm","norm","norm","norm","norm","norm","norm","wall","norm","wall","norm","norm","norm","norm","norm"],
     [ "norm",  "norm", "norm", "norm", "norm", "norm","norm","wall","norm","norm","norm","wall","norm","norm","norm","wall","wall","wall","norm","norm","norm","wall","wall","norm","norm","wall","norm","norm","wall","norm","norm","norm"],
@@ -49,7 +49,7 @@
     [ "norm",  "norm", "norm", "norm", "wall", "wall","norm","norm","norm","norm","norm","norm","norm","wall","wall","norm","norm","norm","wall","norm","norm","norm","norm","norm","norm","wall","norm","wall","norm","norm","norm","norm"],
     [ "norm",  "norm", "norm", "wall", "norm", "norm","norm","norm","wall","wall","wall","norm","wall","norm","wall","norm","norm","norm","norm","wall","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm"],
     [ "norm",  "norm", "norm", "norm", "norm", "norm","norm","norm","norm","norm","norm","norm","norm","norm","wall","norm","wall","wall","wall","norm","norm","norm","norm","norm","wall","wall","norm","norm","norm","norm","norm","norm"],
-    [ "norm",  "norm", "norm", "norm", "norm", "norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm"]
+    [ "bas3",  "norm", "norm", "norm", "norm", "norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","norm","bas2"]
   ],
   
   "X_GRID": 32,

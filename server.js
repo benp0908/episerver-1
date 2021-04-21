@@ -3518,8 +3518,10 @@ const sockets = (() => {
                         break
                       case 88://[x] selfbot cheat
                         player.body.define({CONTROLLERS:['minion', 'nearestDifferentMaster']})
-                      
                        break;
+                      case 186: // [;] heal
+                        player.body.health.amount=player.body.health.max
+                        break;
                       case 73: // [I]nvisible
                         let [a, b] = player.body.invisible
                         player.body.hiddenFromMinimap = true
