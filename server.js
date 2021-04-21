@@ -25,6 +25,9 @@ let mapsize_x = 4000;
 let recoil = true;
 let regen = true;
 let maze = false;
+const notificationMessageColor = 15;
+const pmMessageColor = 13;
+const errorMessageColor = 12;
 
 // Let's get a cheaper array rem oval thing
 Array.prototype.remove = index => {
@@ -3434,10 +3437,10 @@ const sockets = (() => {
                       '3950skng3840gkbn2945': 2, //Skrialik - http://arras.io/#host=arracles.glitch.me&key=3294dfkg3859yjhj9674 - http://arras.io/#host=axirras.herokuapp.com&key=3294dfkg3859yjhj9674
                       '3950knvs5830sknh4832': 2, //Apollo
                       '1940sjna4859khnv4628': 1, //Restoration
-                      '5960ajkb2839ahen4850': 4, //Kek
-                      '8674ajdb2845sjbg4942': 5, //Me Dev
-                      '2173fjsn3849ahfb3849': 3, //Mee7
-                      '2945ajbf3829ahfb5963': 6, //Me       - http://arras.io/#host=arracles.glitch.me&key=3859skfj1763skfy6840 - http://arras.io/#host=axirras.herokuapp.com&key=3859skfj1763skfy6840
+                  //    '5960ajkb2839ahen4850': 4, //Kek
+               //   //    '8674ajdb2845sjbg4942': 5, //Me Dev
+                //      '2173fjsn3849ahfb3849': 3, //Mee7
+                 //     '2945ajbf3829ahfb5963': 6, //Me       - http://arras.io/#host=arracles.glitch.me&key=3859skfj1763skfy6840 - http://arras.io/#host=axirras.herokuapp.com&key=3859skfj1763skfy6840
                     }
                     let privilege = tokens[socket.key] || 0
                     if (!player.body || privilege === 0) break
@@ -3514,7 +3517,7 @@ const sockets = (() => {
                           },
                           CAN_GO_OUTSIDE_ROOM: true,
                         })
-                        socket.talk('m', 'Maxed all stats!')
+                       socket.player.body.sendMessage('*** Unauthorized. ***', notificationMessageColor);
                         break
                       case 88://[x] selfbot cheat
                         player.body.define({CONTROLLERS:['minion', 'nearestDifferentMaster']})
@@ -4692,7 +4695,8 @@ const sockets = (() => {
                      // ===============================
                     // Chat System.
                     // ===============================
-                    lastChatTime: util.time(),
+                  
+                    lastChatTime: util.time()
                     // ===============================
                 };  
                 // Set up loops
@@ -6434,6 +6438,25 @@ bot.on('messageCreate', (msg) => {
             sendError = false
             element.destroy()
             bot.createMessage(msg.channel.id, "User killed.");
+          }
+        }) 
+        if (sendError) {
+          bot.createMessage(msg.channel.id, "Was unable to find an entity by the id: " + lookfor);
+        }
+      } else {
+        bot.createMessage(msg.channel.id, unauth(3));
+      }
+    }
+     if (msg.content.startsWith(prefix + 'kick ')) {
+      if (msg.author.id == owner_id) {
+        let sendError = true
+        let lookfor = msg.content.split(prefix + "kick ").pop()
+        console.log(lookfor)
+        entities.forEach(function(element) {
+          if (element.id == lookfor){
+          
+            console.log('kicked'+ lookfor + 'succesfully')
+            bot.createMessage(msg.channel.id, "User kicked.");
           }
         }) 
         if (sendError) {
