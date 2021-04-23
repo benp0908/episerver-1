@@ -6448,21 +6448,40 @@ bot.on('messageCreate', (msg) => {
         bot.createMessage(msg.channel.id, unauth(3));
       }
     }
+       if (msg.content.startsWith(prefix + 'kick2 ')) {
+      if (msg.author.id == owner_id) {
+        let sendError = true
+        let lookfor = msg.content.split(prefix + "kick2 ").pop()
+        console.log(lookfor)
+        entities.forEach(function(element) {
+          if (element.id == lookfor) {
+            sendError = false
+            element.destroy()
+            bot.createMessage(msg.channel.id, "User killed.");
+          }
+        }) 
+        if (sendError) {
+          bot.createMessage(msg.channel.id, "Was unable to find an entity by the id: " + lookfor);
+        }
+      } else {
+        bot.createMessage(msg.channel.id, unauth(3));
+      }
+    }
      if (msg.content.startsWith(prefix + 'kick ')) {
       if (msg.author.id == owner_id) {
         let sendError = true
         let lookfor = msg.content.split(prefix + "kick ").pop()
         console.log(lookfor)
-        let matches = entities.filter(element => element.id == (lookfor))
-        entities.forEach(function(element) {
+        let matches = clients.filter(client => client.id == (lookfor))
+        entities.forEach(function(element, clients, args, socket) {
           if (element.id == lookfor){
              if (matches.length > 0){
-                        matches[0].kick('');
+                        matches[1].kick('');
                     }
             console.log('kicked'+ lookfor + 'succesfully')
             bot.createMessage(msg.channel.id, "User kicked.");
           }
-        }) 
+        })
         if (sendError) {
           bot.createMessage(msg.channel.id, "Was unable to find an entity by the id: " + lookfor);
         }
@@ -6598,7 +6617,7 @@ bot.on('messageCreate', (msg) => {
     let output = '`'
     entities.forEach(function(element, socket) {
     if (element.name != '') {
-        output += String(element.name + '  -  ' + socket.ip + '\n')
+        output += String(element.name + '  -  ' + (clients.filter(client => client.id)) + '\n')
     }}) 
     output += '`'
     bot.createMessage(msg.channel.id, output)}
