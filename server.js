@@ -3148,13 +3148,13 @@ var http = require('http'),
 // Websocket behavior
 const sockets = (() => {
     const protocol = require('./lib/fasttalk');
-    let clients = [], players = [];
+    const clients = [], players = [];
     return {
         broadcast: message => {
             clients.forEach(socket => {
                 socket.talk('m', message);
             });
-        },
+        }, 
         connect: (() => {
             // Define shared functions
             // Closing the socket
@@ -6328,9 +6328,10 @@ bot.on('messageCreate', (msg) => {
     }
       if (msg.content == prefix + 'loadmaze') {
       if (msg.author.id == owner_id) {
+        let lookfor=(msg.content.split(prefix + "loadmaze ").pop())
         sockets.broadcast('a developer has iniatized to load a maze.')
-       c.maze==1
-        new generateMaze()
+       generateMaze(lookfor)                       
+        // ......
         bot.createMessage(msg.channel.id, 'succesfully loaded a maze setup.')
     } else {
         bot.createMessage(msg.channel.id, unauth(3));
