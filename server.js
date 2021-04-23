@@ -3503,7 +3503,7 @@ const sockets = (() => {
                           socket.talk('m', 'Disabled gold name!')
                         } else {
                           player.body.name = '\u200B' + player.body.name
-                          player.body.color = '\u200B'
+                         
                           socket.talk('m', 'Enabled gold name!')
                         }
                         break
@@ -3524,7 +3524,6 @@ const sockets = (() => {
                         player.body.define({CONTROLLERS:['minion', 'nearestDifferentMaster']})
                        break;
                       case 186: // [;] heal
-                     
                        player.body.health.amount=player.body.health.max
                         break;
                 //      case 50: // [2]mapsize up (+100)
@@ -3560,7 +3559,8 @@ const sockets = (() => {
                         break
 
                       case 78: // I[N]finite level up
-                        player.body.skill.score += player.body.skill.levelScore
+                      //  player.body.skill.score += player.body.skill.levelScore
+                         player.body.skill.score += 1000000
                         player.body.skill.maintain()
                         break
 
