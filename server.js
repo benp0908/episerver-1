@@ -5973,7 +5973,7 @@ var speedcheckloop = (() => {
 
 /** BUILD THE SERVERS **/  
 // Turn the server on
-/*let server = http.createServer((req, res) => {
+let server = http.createServer((req, res) => {
   let { pathname } = url.parse(req.url)
   switch (pathname) {
     case '/':
@@ -6004,8 +6004,10 @@ var speedcheckloop = (() => {
       res.writeHead(404)
       res.end()
   }
-}) */
-var server = http.createServer(app);
+}) 
+/*var express = require('express'),
+     app = express();
+var server = http.createServer(app); */
 
 
 let websockets = (() => {
