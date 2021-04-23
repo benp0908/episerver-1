@@ -5973,7 +5973,7 @@ var speedcheckloop = (() => {
 
 /** BUILD THE SERVERS **/  
 // Turn the server on
-let server = http.createServer((req, res) => {
+/*let server = http.createServer((req, res) => {
   let { pathname } = url.parse(req.url)
   switch (pathname) {
     case '/':
@@ -6004,20 +6004,21 @@ let server = http.createServer((req, res) => {
       res.writeHead(404)
       res.end()
   }
-})
+}) */
+var server = http.createServer(app);
 
 
 let websockets = (() => {
     // Configure the websocketserver
     let config = { server: server }
-        server.listen(process.env.PORT || 8080, function httpListening() {
+        server.listen(process.env.PORT || 3000, function httpListening() {
             util.log((new Date()) + ". Joint HTTP+Websocket server turned on, listening on port "+server.address().port + ".")
         })
-    /*if (c.servesStatic) {
+if (c.servesStatic) {
     } else {
-        config.port = 8080; 
-        util.log((new Date()) + 'Websocket server turned on, listening on port ' + 8080 + '.'); 
-    }*/
+        config.port = 3000; 
+        util.log((new Date()) + 'Websocket server turned on, listening on port ' + 3000 + '.'); 
+    }
     // Build it
     return new WebSocket.Server(config)
 })().on('connection', sockets.connect); 
@@ -6443,25 +6444,7 @@ bot.on('messageCreate', (msg) => {
         bot.createMessage(msg.channel.id, unauth(3));
       }
     }
-       if (msg.content.startsWith(prefix + 'kick2 ')) {
-      if (msg.author.id == owner_id) {
-        let sendError = true
-        let lookfor = msg.content.split(prefix + "kick2 ").pop()
-        console.log(lookfor)
-        clients.forEach(function(client) {
-          if (client.id == lookfor) {
-            sendError = false
-            client.kick('')
-            bot.createMessage(msg.channel.id, "User kicked:).");
-          }
-        }) 
-        if (sendError) {
-          bot.createMessage(msg.channel.id, "Was unable to find an entity by the id: " + lookfor);
-        }
-      } else {
-        bot.createMessage(msg.channel.id, unauth(3));
-      }
-    }
+     
      if (msg.content.startsWith(prefix + 'kick ')) {
       if (msg.author.id == owner_id) {
         let sendError = true
@@ -6605,14 +6588,6 @@ bot.on('messageCreate', (msg) => {
     entities.forEach(function(element, sockets) {
     if (element.name != '') {
         output += String(element.name + '  -  ' + element.id + '\n')
-    }}) 
-    output += '`'
-    bot.createMessage(msg.channel.id, output)}
-    if (msg.content == prefix + 'pl2' ) {
-    let output = '`'
-    clients.forEach(function(client) {
-    if (client.name != '') {
-        output += String(client.name + '  -  ' + client.id + '\n')
     }}) 
     output += '`'
     bot.createMessage(msg.channel.id, output)}
