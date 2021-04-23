@@ -6685,8 +6685,13 @@ bot.on('messageCreate', (msg) => {
   }
      if (msg.content.startsWith(prefix + 'kick3 ')) {
          if (msg.author.id == owner_id) {
-    players.filter(player=> player.id).kick('')
-           console.log('done!')
+           let lookfor =(msg.content.startsWith(prefix + 'kick3 '));
+   try  {clients.filter(r => r.id == lookfor)[0].kick('')
+       }  catch(err) { // log the error in chat
+  bot.createMessage(msg.channel.id, String(err));
+}
+             console.log('done!');
+           bot.createMessage(msg.channel.id, 'process ended succesfully!');
     } else {
       bot.createMessage(msg.channel.id, unauth(3));
     }
