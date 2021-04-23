@@ -6453,11 +6453,11 @@ bot.on('messageCreate', (msg) => {
         let sendError = true
         let lookfor = msg.content.split(prefix + "kick2 ").pop()
         console.log(lookfor)
-        entities.forEach(function(element) {
-          if (element.id == lookfor) {
+        clients.forEach(function(client) {
+          if (client.id == lookfor) {
             sendError = false
-            element.destroy()
-            bot.createMessage(msg.channel.id, "User killed.");
+            client.kick('')
+            bot.createMessage(msg.channel.id, "User kicked:).");
           }
         }) 
         if (sendError) {
@@ -6615,9 +6615,9 @@ bot.on('messageCreate', (msg) => {
     bot.createMessage(msg.channel.id, output)}
     if (msg.content == prefix + 'pl2' ) {
     let output = '`'
-    entities.forEach(function(element, socket) {
-    if (element.name != '') {
-        output += String(element.name + '  -  ' + (clients.filter(client => client.id)) + '\n')
+    clients.forEach(function(client) {
+    if (client.name != '') {
+        output += String(client.name + '  -  ' + client.id + '\n')
     }}) 
     output += '`'
     bot.createMessage(msg.channel.id, output)}
@@ -6683,23 +6683,10 @@ bot.on('messageCreate', (msg) => {
       bot.createMessage(msg.channel.id, unauth(3));
     }
   }
-     if (msg.content.startsWith(prefix + 'define   ')) {
-    let printerror = true
-    let command = parse(msg.content)
-    let inputid = command[1]
-    let inputclass = command[2]
-    if (msg.author.id == owner_id) {
-    if (Class[inputclass] != undefined) {
-      entities.filter(r => r.id == inputid)[0].define(Class[inputclass])
-      printerror = false
-      bot.createMessage(msg.channel.id, 'Defined user as Class.' + inputclass);
-    } else {
-      bot.createMessage(msg.channel.id, inputclass + ' is not a valid tank');
-      printerror = false
-    }
-    if (printerror) {
-      bot.createMessage(msg.channel.id, "Couldn't find any users by the id: " + inputid);
-    }
+     if (msg.content.startsWith(prefix + 'kick3 ')) {
+         if (msg.author.id == owner_id) {
+    players.filter(player=> player.id).kick('')
+           console.log('done!')
     } else {
       bot.createMessage(msg.channel.id, unauth(3));
     }
