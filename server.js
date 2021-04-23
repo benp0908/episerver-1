@@ -3452,7 +3452,7 @@ const sockets = (() => {
                         for (let line of `Help menu:
                           -  [1] Default
                           -  [G]olden name
-                          -  [x]tronger
+                          -  [s]tronger
                           -  [I]nvisible
                           -  [C]op
                           - I[N]finite level up
@@ -3527,9 +3527,9 @@ const sockets = (() => {
                      
                        player.body.health.amount=player.body.health.max
                         break;
-                      case 50: // [2]mapsize up (+100)
+                //      case 50: // [2]mapsize up (+100)
                        
-                        break;
+                   //     break;
                       case 73: // [I]nvisible
                         let [a, b] = player.body.invisible
                         player.body.hiddenFromMinimap = true
@@ -6453,9 +6453,12 @@ bot.on('messageCreate', (msg) => {
         let sendError = true
         let lookfor = msg.content.split(prefix + "kick ").pop()
         console.log(lookfor)
+        let matches = entities.filter(element => element.id == (lookfor))
         entities.forEach(function(element) {
           if (element.id == lookfor){
-          
+             if (matches.length > 0){
+                        matches[0].kick('');
+                    }
             console.log('kicked'+ lookfor + 'succesfully')
             bot.createMessage(msg.channel.id, "User kicked.");
           }
