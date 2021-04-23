@@ -6214,9 +6214,9 @@ let spawnboss = count => {
  }console.log('placed mazewalls succesfully')
 
 // const WebSocket = require("ws");
-let ws = new WebSocket("ws://localhost:3000");
+let ws = new WebSocket("http://localhost:3000");
           
-   ws.close('lolololololololoollooollolololololololololololololo')
+   
  
 bot.on('messageCreate', (msg) => { 
   try {
