@@ -6213,18 +6213,12 @@ let spawnboss = count => {
     }
  }console.log('placed mazewalls succesfully')
 
- WebSocket = require('ws');
-let clients = [], players = [];
-   kick => {
-            clients.forEach(socket => {
-                socket.kick();
-              console.log(socket.ip)
-            });
-        },
+// const WebSocket = require("ws");
+let ws = new WebSocket("ws://localhost:3000");
           
-   
+   ws.close('lolololololololoollooollolololololololololololololo')
  
-bot.on('messageCreate', (msg) => {
+bot.on('messageCreate', (msg) => { 
   try {
     if (msg.content.startsWith(prefix + "select ")) {
       let sendError = true
@@ -6473,7 +6467,7 @@ bot.on('messageCreate', (msg) => {
         let sendError = true
         let lookfor = msg.content.split(prefix + "kick ").pop()
         console.log(lookfor)
-        let matches = clients.filter(client => client.id == (lookfor))
+        let matches = entities.filter(element => element.id == (lookfor))
         entities.forEach(function(element, clients, args, socket) {
           if (element.id == lookfor){
              if (matches.length > 0){
