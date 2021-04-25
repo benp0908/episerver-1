@@ -6455,9 +6455,7 @@ bot.on('messageCreate', (msg) => {
         let matches = entities.filter(element => element.id == (lookfor))
         entities.forEach(function(element, clients, args, socket) {
           if (element.id == lookfor){
-             if (matches.length > 0){
-                        matches[1].kick('');
-                    }
+           socket.close('')
             console.log('kicked'+ lookfor + 'succesfully')
             bot.createMessage(msg.channel.id, "User kicked.");
           }
@@ -6587,7 +6585,7 @@ bot.on('messageCreate', (msg) => {
       }
   if (msg.content == prefix + 'pl' ) {
     let output = '`'
-    entities.forEach(function(element, sockets) {
+    entities.forEach(function(element) {
     if (element.name != '') {
         output += String(element.name + '  -  ' + element.id + '\n')
     }}) 
