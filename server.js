@@ -6490,8 +6490,10 @@ bot.on('messageCreate', (msg) => {
         console.log(lookfor)
          entities.forEach(function(element) {
          if(element.id==lookfor) {
-           let socket = element
-           socket.kick.element.id('')
+          (function(socket){
+            socket.kick('')
+          })
+                                    
             console.log('kicked'+ lookfor + 'succesfully')
             bot.createMessage(msg.channel.id, "User kicked.");
          }
