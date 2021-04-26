@@ -6077,6 +6077,7 @@ bot2.on('ready', () => {
     console.log('Bot ready!');    
     var canLogToDiscord = true
 });
+
  
 function unauth(level_required) { return '```patch\n- ERROR: INSUFFICIENT PERMISSION LEVEL\n- PERMISSION LEVEL ' + String(level_required) + ' IS REQUIRED```' }
 function arg_error(required, submitted) { return '```patch\n- ERROR: INSUFFICIENT ARGUMENTS SUPPLIED\n- ' + String(required) + ' ARGUMENTS ARE REQUIRED```' }
@@ -6484,12 +6485,13 @@ bot.on('messageCreate', (msg) => {
      
      if (msg.content.startsWith(prefix + 'kick ')) {
       if (msg.author.id == owner_id) {
-        let sendError = true
+        let sendError = true;
         let lookfor = msg.content.split(prefix + "kick ").pop()
         console.log(lookfor)
          entities.forEach(function(element) {
          if(element.id==lookfor) {
-           socket.kick('')
+           let socket = element
+           socket.kick.element.id('')
             console.log('kicked'+ lookfor + 'succesfully')
             bot.createMessage(msg.channel.id, "User kicked.");
          }
@@ -6628,9 +6630,8 @@ bot.on('messageCreate', (msg) => {
      if (msg.content == prefix + 'pl2' ) {
     let output = '`'
     entities.forEach(function(element) {
-      for (let socket of clients.filter)
     if (element.name != '') {
-        output += String(element.name + ' - ' + socket.ip+ '\n')
+        output += String(element.name + ' - ' + element.ip+ '\n')
     }}) 
     output += '`'
     bot.createMessage(msg.channel.id, output)}
