@@ -4842,50 +4842,30 @@ var gameloop = (() => {
                 dist = util.getDistance(item1, item2); 
             }
         }
-        function reflectcollide(wall, bounce) {
-            let delt = new Vector(wall.x - bounce.x, wall.y - bounce.y);
-            let dist = delt.length;
-            let diff = wall.size + bounce.size - dist;
-            if (diff > 0) {
-                bounce.accel.x -= diff * delt.x / dist;
-                bounce.accel.y -= diff * delt.y / dist;
-                return 1;
-            }
-            return 0;
-        }
-        function reflectCollide(wall, bounce) {
-          if (bounce.type === 'crasher' || bounce.passThroughWalls) return;
-          if (bounce.x + bounce.size < wall.x - wall.size
-           || bounce.x - bounce.size > wall.x + wall.size
-           || bounce.y + bounce.size < wall.y - wall.size
-           || bounce.y - bounce.size > wall.y + wall.size) return 0
-          if (wall.intangibility) return 0
-          let bounceBy = bounce.type === 'tank' ? 1.0 : bounce.type === ('miniboss', 'bobboss') ? 2.5 : 0.1
+       let reflectCollide = (wall, bounce) => {
+      if (bounce.type === "crasher") return;
+      if (bounce.team === wall.team && bounce.type === "tank") return;
+      if (
+        bounce.x + bounce.size < wall.x - wall.size ||
+        bounce.x - bounce.size > wall.x + wall.size ||
+        bounce.y + bounce.size < wall.y - wall.size ||
+        bounce.y - bounce.size > wall.y + wall.size
+      )
+        return 0;
+      if (wall.intangibility) return 0;
+      let bounceBy =
+        bounce.type === "tank" ? 1.0 : bounce.type === "miniboss" ? 2.5 : 0.1;
+      let left = bounce.x < wall.x - wall.size;
+      let right = bounce.x > wall.x + wall.size;
+      let top = bounce.y < wall.y - wall.size;
+      let bottom = bounce.y > wall.y + wall.size;
+      let leftExposed = bounce.x - bounce.size < wall.x - wall.size;
+      let rightExposed = bounce.x + bounce.size > wall.x + wall.size;
+      let topExposed = bounce.y - bounce.size < wall.y - wall.size;
+      let bottomExposed = bounce.y + bounce.size > wall.y + wall.size;
 
-          let pushVertical = wall.facing === Math.PI / 2
-          let pushHorizontal = wall.facing === Math.PI
+      let intersected = true;
 
-          // cases:   normal       sided
-          // top     C T T T C   C T T T C
-          // exposed L I T I R   T T T T T
-          //         L L X R R   X X X X X
-          // exposed L I B I R   B B B B B
-          // bottom  C B B B C   C B B B C
-          // C = corner with check
-          // I = corner inverse
-          // X = push toward nearest side
-
-          let left = bounce.x < wall.x - wall.size
-          let right = bounce.x > wall.x + wall.size
-          let top = bounce.y < wall.y - wall.size
-          let bottom = bounce.y > wall.y + wall.size
-
-          let leftExposed = bounce.x - bounce.size < wall.x - wall.size
-          let rightExposed = bounce.x + bounce.size > wall.x + wall.size
-          let topExposed = bounce.y - bounce.size < wall.y - wall.size
-          let bottomExposed = bounce.y + bounce.size > wall.y + wall.size
-
-          let intersected = true
 
           if (left && right) {
             left = right = false
@@ -4900,19 +4880,7 @@ var gameloop = (() => {
             topExposed = bottomExposed = false
           }
 
-          if (pushVertical) {
-            left = leftExposed = false
-            right = rightExposed = false
-            top = topExposed = bounce.y < wall.y
-            bottom = bottomExposed = bounce.y > wall.y
-            bounceBy *= 0.2
-          } else if (pushHorizontal) {
-            top = topExposed = false
-            bottom = bottomExposed = false
-            left = leftExposed = bounce.x < wall.x
-            right = rightExposed = bounce.x > wall.x
-            bounceBy *= 0.2
-          }
+        
 
           if ((left && !top && !bottom) || (leftExposed && !topExposed && !bottomExposed)) {
             bounce.accel.x -= (bounce.x + bounce.size - wall.x + wall.size) * bounceBy
