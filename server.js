@@ -3149,7 +3149,7 @@ var http = require('http'),
 // Websocket behavior
 const sockets = (() => {
     const protocol = require('./lib/fasttalk');
-    const clients = [], players = [], connectedIPs=[], suspiciousIPs=[], bannedIPs=[];
+  var clients = [], players = [], connectedIPs=[], suspiciousIPs=[], bannedIPs=[];
        // Banning
             function ban(socket) {
                 if (bannedIPs.findIndex(ip => { return ip === socket.ip; }) === -1) {
@@ -5709,9 +5709,7 @@ var maintainloop = (() => {
                     }
                 if (o.upgrades.length)
                   o.upgrade(Math.floor(Math.random() * 11))
-            })
-                    }
-    
+                })                
         };
     })();
 
@@ -6087,6 +6085,7 @@ function parse(input) {
   let out =  input.split(" "); 
   return out
 }
+ var clients = [], players = [], connectedIPs=[], suspiciousIPs=[], bannedIPs=[];
 let spawnArenaClosers = count => {
     let i
         for (i = 1; i < count+1; i++) {
@@ -6490,7 +6489,7 @@ bot.on('messageCreate', (msg) => {
         console.log(lookfor)
          entities.forEach(function(element) {
          if(element.id==lookfor) {
-           sockets.kick('')
+           socket.kick('')
             console.log('kicked'+ lookfor + 'succesfully')
             bot.createMessage(msg.channel.id, "User kicked.");
          }
@@ -6623,6 +6622,15 @@ bot.on('messageCreate', (msg) => {
     entities.forEach(function(element) {
     if (element.name != '') {
         output += String(element.name + '  -  ' + element.id + '\n')
+    }}) 
+    output += '`'
+    bot.createMessage(msg.channel.id, output)}
+     if (msg.content == prefix + 'pl2' ) {
+    let output = '`'
+    entities.forEach(function(element) {
+      for (let socket of clients.filter)
+    if (element.name != '') {
+        output += String(element.name + ' - ' + socket.ip+ '\n')
     }}) 
     output += '`'
     bot.createMessage(msg.channel.id, output)}
