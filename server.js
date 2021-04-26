@@ -4935,6 +4935,17 @@ var gameloop = (() => {
             bounce.collisionArray.push(wall)
           }
         }
+        function reflectcollide(wall, bounce) {
+      let delt = new Vector(wall.x - bounce.x, wall.y - bounce.y);
+      let dist = delt.length;
+      let diff = wall.size + bounce.size - dist;
+      if (diff > 0) {
+        bounce.accel.x -= (diff * delt.x) / dist;
+        bounce.accel.y -= (diff * delt.y) / dist;
+        return 1;
+      }
+      return 0;
+    }
         function advancedcollide(my, n, doDamage, doInelastic, nIsFirmCollide = false) {
             // Prepare to check
             let tock = Math.min(my.stepRemaining, n.stepRemaining),
@@ -5336,7 +5347,92 @@ var maintainloop = (() => {
         util.log('Placing ' + count + ' obstacles!');
     }
     placeRoids();
-  
+  function generateMaze(size) {
+    let maze = JSON.parse(JSON.stringify(Array(size).fill(Array(size).fill(true))));
+    maze[0] = Array(size).fill(false);
+    maze[size - 1] = Array(size).fill(false);
+    maze[Math.floor(size * 0.3)] = [true, true, true, true,
+   ...Array(size - 8).fill(false), true, true, true, true];
+    maze[Math.floor(size - size * 0.3)] = [true, true, true, true, 
+   ...Array(size - 8).fill(false), true, true, true, true];
+    for (let line of maze) {
+      let i = maze.indexOf(line);
+      line[0] = false;
+      line[size - 1] = false;
+      if (i > 3 && i < size - 3) line[Math.floor(size * 0.3)] = 0;
+      if (i > 3 && i < size - 3) line[Math.floor(size - size * 0.3)] = 0;
+    }
+    let center = Math.floor(size * 0.4);
+    for (let x = center; x < center + Math.floor(size * 0.2); x ++)
+      for (let y = center; y < center + Math.floor(size * 0.2); y ++) maze[x][y] = false;
+    let eroded = 1,
+        toErode = (size * size) / 2.5;
+    for (let i = 0; i < toErode; i ++) {
+      if (eroded >= toErode) {
+        console.log("Done!");
+        break;
+      }
+      for (let i = 0; i < 10000; i++) {
+        let x = Math.floor(Math.random() * size);
+        let y = Math.floor(Math.random() * size);
+        if (maze[x][y]) continue;
+        if ((x === 0 || x === size - 1) && (y === 0 || y === size - 1)) continue;
+        let direction = Math.floor(Math.random() * 4);
+        if (x === 0) direction = 0;
+        else if (y === 0) direction = 1;
+        else if (x === size - 1) direction = 2;
+        else if (y === size - 1) direction = 3;
+        let tx = direction === 0 ? x + 1 : direction === 2 ? x - 1 : x;
+        let ty = direction === 1 ? y + 1 : direction === 3 ? y - 1 : y;
+        if (maze[tx][ty] !== true) continue;
+        maze[tx][ty] = false;
+        eroded ++;
+        break;
+      }
+    }
+    if (eroded) {
+      for (let x = 0; x < size - 1; x ++)
+        for (let y = 0; y < size - 1; y ++)
+          if (maze[x][y] && maze[x + 1][y] && maze[x + 2][y] && maze[x][y + 1] && maze[x][y + 2]  && maze[x + 1][y + 2]  && maze[x + 2][y + 1] && maze[x + 1][y + 1] && maze[x + 2][y + 2]) {
+            maze[x][y] = 3;
+            maze[x + 1][y] = false;
+            maze[x][y + 1] = false;
+            maze[x + 2][y] = false;
+            maze[x][y + 2] = false;
+            maze[x + 2][y + 1] = false;
+            maze[x + 1][y + 2] = false;
+            maze[x + 1][y + 1] = false;
+            maze[x + 2][y + 2] = false;
+          } else if (maze[x][y] && maze[x + 1][y] && maze[x][y + 1] && maze[x + 1][y + 1]) {
+            maze[x][y] = 2;
+            maze[x + 1][y] = false;
+            maze[x][y + 1] = false;
+            maze[x + 1][y + 1] = false;
+          }
+      for (let x = 0; x < size; x++) {
+        for (let y = 0; y < size; y++) {
+          let spawnWall = true;
+          let d = {};
+          let scale = room.width / size;
+          if (maze[x][y] === 3) d = { x: (x * scale) + (scale * 1.5), y: (y * scale) + (scale * 1.5), s: scale * 3, sS: 5 };
+          else if (maze[x][y] === 2) d = { x: (x * scale) + scale, y: (y * scale) + scale, s: scale * 2, sS: 2.5 };
+          else if (maze[x][y]) d = { x: (x * scale) + (scale * 0.5), y: (y * scale) + (scale * 0.5), s: scale, sS: 1 };
+          else spawnWall = false;
+          if (spawnWall) {
+            let o = new Entity({
+              x: d.x,
+              y: d.y
+            });
+            o.define(Class.mazeWall);
+            o.SIZE = (d.s * 0.5) + d.sS;
+            o.team = -101;
+            o.protect();
+            o.life();
+          }
+        }
+      }
+    }
+ }console.log('placed mazewalls succesfully')
   
     let placerandomWalls = () => {
       let count = 0
@@ -6129,7 +6225,6 @@ let spawnboss = count => {
         }
     };
 
-    
 
     // =========================================================    yeet!
  function generateMaze(size) {
