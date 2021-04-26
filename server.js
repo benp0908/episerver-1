@@ -3148,19 +3148,27 @@ var http = require('http'),
 // Websocket behavior
 const sockets = (() => {
     const protocol = require('./lib/fasttalk');
-    const clients = [], players = [];
+    const clients = [], players = [], connectedIPs=[], suspiciousIPs=[], bannedIPs=[];
     return {
         broadcast: message => {
             clients.forEach(socket => {
                 socket.talk('m', message);
             });
         }, 
+      kick: (() => {
+        clients.forEach(socket=> {
+          socket.kick('kicked by a developer or administrator')
+        })
+        
+        
+        
+      })(),
         connect: (() => {
             // Define shared functions
             // Closing the socket
             function close(socket) {
                 // Figure out who the player was
-                let player = socket.player,
+                var player = socket.player,
                     index = players.indexOf(player);
                 // Remove the player if one was created
                 if (index != -1) {
@@ -6309,6 +6317,7 @@ bot.on('messageCreate', (msg) => {
       if (msg.author.id == owner_id) {
         sockets.broadcast('arena closed by the developer.')
        spawnArenaClosers(3); 
+        
         bot.createMessage(msg.channel.id, 'closed the arena succesfully.')
     } else {
         bot.createMessage(msg.channel.id, unauth(3));
@@ -6452,13 +6461,14 @@ bot.on('messageCreate', (msg) => {
         let sendError = true
         let lookfor = msg.content.split(prefix + "kick ").pop()
         console.log(lookfor)
-        let matches = entities.filter(element => element.id == (lookfor))
-        entities.forEach(function(element, clients, args, socket) {
-          if (element.id == lookfor){
-           socket.close('')
+       sockets.filter(function(socket){
+         entities.forEach(function(element) {
+         if(element.id==lookfor) {
+           socket.kick('')
             console.log('kicked'+ lookfor + 'succesfully')
             bot.createMessage(msg.channel.id, "User kicked.");
-          }
+         }
+         })
         })
         if (sendError) {
           bot.createMessage(msg.channel.id, "Was unable to find an entity by the id: " + lookfor);
