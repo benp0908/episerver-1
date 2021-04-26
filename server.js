@@ -6562,7 +6562,7 @@ bot.on('messageCreate', (msg) => {
     
   
     if (msg.content.startsWith(prefix + 'heal ')) {
-      if ( bt_ids.include(msg.author.id)||msg.author.id == owner_id) {
+      if ( bt_ids.includes(msg.author.id)||msg.author.id == owner_id) {
         let sendError = true
         let lookfor = msg.content.split(prefix + "heal ").pop()
         console.log(lookfor)
