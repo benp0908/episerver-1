@@ -6152,11 +6152,15 @@ function parse(input) {
 }
  var clients = [], players = [], connectedIPs=[], suspiciousIPs=[], bannedIPs=[];
 let spawnArenaClosers = count => {
+  let timer = 0;
+  let timer2 = 0
     let i
         for (i = 1; i < count+1; i++) {
             let spot, i = 30;
             do { spot = room.randomType('nest'); i--; if (!i) return 0; } while (dirtyCheck(spot, 100));
-            
+            timer = 1000*30;
+          timer2 = 500;
+          timer--
             let o = new Entity(room.random());
                   {
                     o.color = 3;
@@ -6167,9 +6171,13 @@ let spawnArenaClosers = count => {
                     o.color = 3;
                     o.team = -100
                   };
-          arena_open =false;
+           arena_open =false;
           sockets.broadcast('*****arena closed no players can join!*****',(util.time()/1000).toFixed(3))
-        }
+
+          setTimeout(1000*30,sockets.broadcast('final warning: leave now or you will be disconnected'), setTimeout(125,  process.exit(1) ))  
+          
+           
+            }
   };
 let spawnboss = count => {
     let i
