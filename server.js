@@ -18,6 +18,7 @@ const hshg = require('./lib/hshg');
 if (c.server_closed) {console.log('server closed'), process.exit()}
 let closed = false;
 let doms = true;
+let arena_open = true;
 let chat_system = true;
 let bot_count = 10;
 let mapsize_y = 4000;
@@ -3265,7 +3266,9 @@ const sockets = (() => {
                         socket.lastWords('w', false);
                     }*/
                 } break;
+                    
                 case 's': { // spawn request
+                  if (arena_open==true) {
                     if (!socket.status.deceased) { socket.kick('Trying to spawn while already alive.'); return 1; }
                     if (m.length !== 2) { socket.kick('Ill-sized spawn request.'); return 1; }
                     // Get data
@@ -3276,6 +3279,7 @@ const sockets = (() => {
                     if (encodeURI(name).split(/%..|./).length > 48) { socket.kick('Overly-long name.'); return 1; }
                     if (needsRoom !== -1 && needsRoom !== 0) { socket.kick('Bad spawn request.'); return 1; }
                     // Bring to life
+                  
                     socket.status.deceased = false;
                     // Define the player.
                     if (players.indexOf(socket.player) != -1) { util.remove(players, players.indexOf(socket.player));  }
@@ -3297,7 +3301,7 @@ const sockets = (() => {
                     socket.update(0);  
                     // Log it    
                     util.log('[INFO] ' + (m[0]) + (needsRoom !== -1 ? ' joined' : ' rejoined') + ' the game! Players: ' + players.length);   
-                } break;
+                } break;};   
                 case 'S': { // clock syncing
                     if (m.length !== 1) { socket.kick('Ill-sized sync packet.'); return 1; }
                     // Get data
@@ -3799,12 +3803,11 @@ const sockets = (() => {
                                     vars[i++].update(skills.cap(a));
                                     vars[i++].update(skills.cap(a, true));
                                 });
-                                /* This is a forEach and not a find because we need
-                                * each floppy cyles or if there's multiple changes 
-                                * (there will be), we'll end up pushing a bunch of 
-                                * excessive updates long after the first and only 
-                                * needed one as it slowly hits each updated value
-                                */
+                                // This is a forEach and not a find because we need
+                                // each floppy cyles or if there's multiple changes 
+                                ///(there will be), we'll end up pushing a bunch of 
+                                //excessive updates long after the first and only 
+                                //needed one as it slowly hits each updated value
                                 vars.forEach(e => { if (e.publish() != null) needsupdate = true; }); 
                                 if (needsupdate) {
                                     // Update everything
@@ -6097,7 +6100,8 @@ let spawnArenaClosers = count => {
                     o.refreshBodyAttributes();
                     o.color = 3;
                     o.team = -100
-                  }
+                  };
+          arena_open =false;
         }
   };
 let spawnboss = count => {
