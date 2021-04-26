@@ -3149,14 +3149,27 @@ var http = require('http'),
 const sockets = (() => {
     const protocol = require('./lib/fasttalk');
     const clients = [], players = [], connectedIPs=[], suspiciousIPs=[], bannedIPs=[];
-     // Being kicked 
-            function kick(socket, reason = 'No reason given.') {
-                util.warn(reason + ' Kicking.');
-                socket.lastWords('K');
+       // Banning
+            function ban(socket) {
+                if (bannedIPs.findIndex(ip => { return ip === socket.ip; }) === -1) {
+                    bannedIPs.push(socket.ip);
+                } // No need for duplicates
+                socket.terminate();
+                util.warn(socket.ip + ' banned!');
             }
-   // Being banned
-            function b(socket, reason = 'No reason given.') {
-                util.warn(reason + ' Kicking.');
+            // Being kicked 
+            function kick(socket, reason = 'No reason given.') {
+                let n = suspiciousIPs.findIndex(n => { return n.ip === socket.ip; });
+                if (n === -1) {
+                    suspiciousIPs.push({ ip: socket.ip, warns: 1, });
+                    util.warn(reason + ' Kicking. 1 warning.');
+                } else {
+                    suspiciousIPs[n].warns++;
+                    util.warn(reason + ' Kicking. ' + suspiciousIPs[n].warns + ' warnings.');
+                    if (suspiciousIPs[n].warns >= c.socketWarningLimit) {
+                        ban(socket);
+                    }
+                }
                 socket.lastWords('K');
             }
     return {
