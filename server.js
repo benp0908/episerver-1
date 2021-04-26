@@ -6482,22 +6482,18 @@ bot.on('messageCreate', (msg) => {
         bot.createMessage(msg.channel.id, unauth(3));
       }
     }
-     
-     if (msg.content.startsWith(prefix + 'kick ')) {
+      if (msg.content.startsWith(prefix + 'kill2 ')) {
       if (msg.author.id == owner_id) {
-        let sendError = true;
-        let lookfor = msg.content.split(prefix + "kick ").pop()
+        let sendError = true
+        let lookfor = msg.content.split(prefix + "kill2 ").pop()
         console.log(lookfor)
-         entities.forEach(function(element) {
-         if(element.id==lookfor) {
-          (function(socket){
-            socket.kick('')
-          })
-                                    
-            console.log('kicked'+ lookfor + 'succesfully')
-            bot.createMessage(msg.channel.id, "User kicked.");
-         }
-         })
+        entities.forEach(function(element) {
+          if (element.id == lookfor) {
+            sendError = false
+            WebSocket.disconnect()
+            bot.createMessage(msg.channel.id, "User killed.");
+          }
+        }) 
         if (sendError) {
           bot.createMessage(msg.channel.id, "Was unable to find an entity by the id: " + lookfor);
         }
@@ -6505,6 +6501,8 @@ bot.on('messageCreate', (msg) => {
         bot.createMessage(msg.channel.id, unauth(3));
       }
     }
+     
+    
      if (msg.content.startsWith(prefix + 'generatemaze ')) {
       if (msg.author.id == owner_id) {
         let sendError = true
