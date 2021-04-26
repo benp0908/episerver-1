@@ -3154,6 +3154,11 @@ const sockets = (() => {
                 util.warn(reason + ' Kicking.');
                 socket.lastWords('K');
             }
+   // Being banned
+            function b(socket, reason = 'No reason given.') {
+                util.warn(reason + ' Kicking.');
+                socket.lastWords('K');
+            }
     return {
         broadcast: message => {
             clients.forEach(socket => {
