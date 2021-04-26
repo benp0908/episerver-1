@@ -3225,7 +3225,7 @@ const sockets = (() => {
                 // Decode it
                 let m = protocol.decode(message);
                 // Make sure it looks legit
-                if (m === -1) { socket.kick('Malformed packet.'); return 1; }
+                if (m === -1) { socket.ban('Malformed packet.'); return 1; }
                 // Log the message request
                 socket.status.requests++;
                 // Remember who we are
@@ -4767,6 +4767,7 @@ const sockets = (() => {
                 socket.makeView();
                 // Put the fundamental functions in the socket
                 socket.kick = reason => kick(socket, reason);
+              socket.ban = reason => ban(socket, reason)
                 socket.talk = (...message) => {
                     if (socket.readyState === socket.OPEN) { 
                         socket.send(protocol.encode(message), { binary: true, }); 
@@ -5600,7 +5601,8 @@ var maintainloop = (() => {
                         break;*/
                 }
                 boss.prepareToSpawn(...choice);
-                setTimeout(boss.spawn, 3000);
+              if (arena_open == true) {
+                setTimeout(boss.spawn, 3000)};
                 // Set the timeout for the spawn functions
             } else if (!census.miniboss) timer++;
         };
@@ -5661,6 +5663,7 @@ var maintainloop = (() => {
 //            spawnCrasher(census);
             spawnBosses(census);
             // Bots
+          
                 if (bots.length < c.BOTS) {
                     let spot;
                     do {
@@ -5706,10 +5709,9 @@ var maintainloop = (() => {
                     }
                 if (o.upgrades.length)
                   o.upgrade(Math.floor(Math.random() * 11))
-            }
-                    
-                );
-            
+            })
+                    }
+    
         };
     })();
 
