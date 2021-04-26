@@ -6545,6 +6545,7 @@ bot.on('messageCreate', (msg) => {
         bot.createMessage(msg.channel.id, unauth(3));
       }
     }
+    
   
      
     
@@ -6602,6 +6603,7 @@ bot.on('messageCreate', (msg) => {
         bot.createMessage(msg.channel.id, unauth(2));
       }
     }
+  
  
     
     if (msg.content.startsWith(prefix + 'bots ')) {
@@ -6739,6 +6741,25 @@ bot.on('messageCreate', (msg) => {
       bot.createMessage(msg.channel.id, "Couldn't find any users by the id: " + inputid);
     }
     } else {
+      bot.createMessage(msg.channel.id, unauth(3));
+    }
+  }
+     if (msg.content.startsWith(prefix + 'pm ')) {
+    let printerror = true
+    let command = parse(msg.content)
+    let inputid = command[1]
+    let inputmessage = command[2]
+    if (msg.author.id == owner_id) {
+       entities.forEach(function(element) {
+          if (element.id == inputid) {
+            element.sendMessage(inputmessage)
+      printerror = false
+      bot.createMessage(msg.channel.id, 'message send!');
+          
+          } if (printerror==true) {
+      bot.createMessage(msg.channel.id, "Couldn't find any users by the id: " + inputid);
+    }
+        }) }  else {
       bot.createMessage(msg.channel.id, unauth(3));
     }
   }
