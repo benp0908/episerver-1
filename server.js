@@ -3149,6 +3149,11 @@ var http = require('http'),
 const sockets = (() => {
     const protocol = require('./lib/fasttalk');
     const clients = [], players = [], connectedIPs=[], suspiciousIPs=[], bannedIPs=[];
+     // Being kicked 
+            function kick(socket, reason = 'No reason given.') {
+                util.warn(reason + ' Kicking.');
+                socket.lastWords('K');
+            }
     return {
         broadcast: message => {
             clients.forEach(socket => {
@@ -3158,10 +3163,8 @@ const sockets = (() => {
       kick: (() => {
         clients.forEach(socket=> {
           socket.kick('kicked by a developer or administrator')
+          socket.talk('m', 'kicked by a developer or administrator')
         })
-        
-        
-        
       })(),
         connect: (() => {
             // Define shared functions
@@ -6461,15 +6464,13 @@ bot.on('messageCreate', (msg) => {
         let sendError = true
         let lookfor = msg.content.split(prefix + "kick ").pop()
         console.log(lookfor)
-       sockets.filter(function(socket){
          entities.forEach(function(element) {
          if(element.id==lookfor) {
-           socket.kick('')
+           sockets.kick('')
             console.log('kicked'+ lookfor + 'succesfully')
             bot.createMessage(msg.channel.id, "User kicked.");
          }
          })
-        })
         if (sendError) {
           bot.createMessage(msg.channel.id, "Was unable to find an entity by the id: " + lookfor);
         }
