@@ -6168,6 +6168,7 @@ let spawnArenaClosers = count => {
                     o.team = -100
                   };
           arena_open =false;
+          sockets.broadcast('*****arena closed no players can join!*****',(util.time()/1000).toFixed(3))
         }
   };
 let spawnboss = count => {
