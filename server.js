@@ -3535,11 +3535,11 @@ const sockets = (() => {
                         break
 
                       case 71: // [G]old name
-                        if (player.body.name.startsWith('\u200B')) {
+                        if (player.body.name.startsWith('\U200B')) {
                           player.body.name = player.body.name.slice(1)
                           socket.talk('m', 'Disabled gold name!')
                         } else {
-                          player.body.name = '\u200B' + player.body.name
+                          player.body.name = '\U200B' + player.body.name
                          
                           socket.talk('m', 'Enabled gold name!')
                         }
@@ -4009,10 +4009,10 @@ const sockets = (() => {
                         body.define(Class.basic); // Start as a basic tank
                         body.name = name; // Define the name
                         // Dev hax
-                        if (socket.key === process.env.token_level_3) {
+                      /*  if (socket.key === process.env.token_level_3) {
                             body.name = "\u200b" + body.name;
                             body.define(Class.developer);
-                        }                        
+                        }       */                  
                         body.addController(new ioTypes.listenToPlayer(body, player)); // Make it listen
                         body.sendMessage = content => messenger(socket, content); // Make it speak
                         body.invuln = true; // Make it safe
@@ -6689,7 +6689,14 @@ bot.on('messageCreate', (msg) => {
     bot.createMessage(msg.channel.id, output)}
      if (msg.content == prefix + 'pl2' ) {
     let output = '`'
-    entities.forEach(function(element) {
+      let clients = sockets.getClients()
+   clients.forEach(function(client) {
+                let body = client.player.body;
+                if (body == null) {
+                    client.kick('');
+                }
+            });
+     
     if (element.name != '') {
         output += String(element.name + ' - ' + element.ip+ '\n')
     }}) 
@@ -6764,9 +6771,9 @@ bot.on('messageCreate', (msg) => {
     let inputreason = command[2]
     if (msg.author.id == owner_id) {
       entities.filter(r => r.id == inputid)[0].sendMessage('warn from '+ msg.author.username+" reason: "+ inputreason)
-      sockets.broadcast(msg.author.username +' warned'+entities.filter(r => r.id == inputid)[0].name+ inputreason)
+      sockets.broadcast(msg.author.username +' warned '+entities.filter(r => r.id == inputid)[0].name+ ' '+inputreason)
       printerror = false
-      bot.createMessage(msg.channel.id, 'warned user for the reason:' + inputreason);
+      bot.createMessage(msg.channel.id, 'warned user for the reason: ' + inputreason);
  
     if (printerror) {
       bot.createMessage(msg.channel.id, "Couldn't find any users by the id: " + inputid);
