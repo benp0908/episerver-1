@@ -6114,13 +6114,13 @@ var server = http.createServer(app); */
 let websockets = (() => {
     // Configure the websocketserver
     let config = { server: server }
-        server.listen(process.env.PORT || 3000, function httpListening() {
+        server.listen(process.env.PORT || 7550, function httpListening() {
             util.log((new Date()) + ". Joint HTTP+Websocket server turned on, listening on port "+server.address().port + ".")
         })
 if (c.servesStatic) {
     } else {
-        config.port = 3000; 
-        util.log((new Date()) + 'Websocket server turned on, listening on port ' + 3000 + '.'); 
+        config.port = 7550; 
+        util.log((new Date()) + 'Websocket server turned on, listening on port ' + 7550 + '.'); 
     }
     // Build it
     return new WebSocket.Server(config)
