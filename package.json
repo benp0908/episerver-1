@@ -10,7 +10,8 @@
     "ws": "6.1.x",
     "eris": "^0.15.0",
     "node": "^10.16.3",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "xss-filters": "^1.2.7"
   },
   "engines": {
     "node": "10.x"

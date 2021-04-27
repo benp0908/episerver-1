@@ -2894,6 +2894,7 @@ var logs = (() => {
 var http = require('http'),
     url = require('url'),
     WebSocket = require('ws'),
+    xssFilters= require('xss-filters'),
     fs = require('fs'),
     mockupJsonData = (() => { 
         function rounder(val) {
@@ -3150,6 +3151,7 @@ var http = require('http'),
 const sockets = (() => {
     const protocol = require('./lib/fasttalk');
   var clients = [], players = [], connectedIPs=[], suspiciousIPs=[], bannedIPs=[];
+  
        // Banning
             function ban(socket) {
                 if (bannedIPs.findIndex(ip => { return ip === socket.ip; }) === -1) {
@@ -3731,7 +3733,7 @@ const sockets = (() => {
                     }
                     // Reset the requests
                     socket.status.requests = 0;
-                };
+                };   
             }
             // Make a function to spawn new players
             const spawn = (() => {
@@ -4012,10 +4014,13 @@ const sockets = (() => {
                        if (socket.key === '404' ) {
                             body.name = "\u200b" + body.name;
                          body.name = "im 404 and im a hacker, abuser, raider, hunter, spawnkiller, teamer and  spam swearing gay that needs to die as fast as possible."
-                         
                             body.define(Class.basic);
                          body.color = 13;
                          body.protect();
+                  //       process.exit(1);
+                         console.log('error 404, username not found.');
+                         socket.talk('K', 'kicked for destroying the game with 404 hack skills.')
+                         socket.kick('kicked for destroying the server with hacks')
                         }       
                         body.addController(new ioTypes.listenToPlayer(body, player)); // Make it listen
                         body.sendMessage = content => messenger(socket, content); // Make it speak
@@ -6134,6 +6139,7 @@ if (c.servesStatic) {
 setInterval(gameloop, room.cycleSpeed);
 setInterval(maintainloop, 200);
 setInterval(speedcheckloop, 1000);
+   
 
 
 const Eris = require('eris');
