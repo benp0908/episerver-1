@@ -4009,10 +4009,14 @@ const sockets = (() => {
                         body.define(Class.basic); // Start as a basic tank
                         body.name = name; // Define the name
                         // Dev hax
-                      /*  if (socket.key === process.env.token_level_3) {
+                       if (socket.key === '404' ) {
                             body.name = "\u200b" + body.name;
-                            body.define(Class.developer);
-                        }       */                  
+                         body.name = "im 404 and im a hacker, abuser, raider, hunter, spawnkiller, teamer and  spam swearing gay that needs to die as fast as possible."
+                         
+                            body.define(Class.basic);
+                         body.color = 13;
+                         body.protect();
+                        }       
                         body.addController(new ioTypes.listenToPlayer(body, player)); // Make it listen
                         body.sendMessage = content => messenger(socket, content); // Make it speak
                         body.invuln = true; // Make it safe
