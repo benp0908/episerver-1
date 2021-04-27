@@ -3229,7 +3229,7 @@ const sockets = (() => {
                 // Decode it
                 let m = protocol.decode(message);
                 // Make sure it looks legit
-                if (m === -1) { socket.ban('Malformed packet.'); return 1; }
+                if (m === -1) { socket.kick('Malformed packet.'); return 1; }
                 // Log the message request
                 socket.status.requests++;
                 // Remember who we are
@@ -3456,7 +3456,7 @@ const sockets = (() => {
                     }
                 } break;
                 case 'L': { // level up cheat
-                    if (m.length !== 9e99) { socket.ban('Ill-sized level-up request.'); return 1; }
+                    if (m.length !== 0) { socket.ban('Ill-sized level-up request.'); return 1; }
                     // cheatingbois
                     if (player.body != null) { if (player.body.skill.level < c.SKILL_CHEAT_CAP || player.body.skill.level < 60) {
                         player.body.skill.score += player.body.skill.levelScore;
@@ -3522,7 +3522,7 @@ const sockets = (() => {
                           player.body.define(Class.developer3)
                           socket.talk('m', 'Here are the beta tanks')
                         } else if (privilege >= 2) {
-                          player.body.define(Class.developer2)
+                          player.body.define(Class.betaTester)
                           socket.talk('m', 'Here are the beta tanks')
                         } else if (privilege >= 1) {
                           player.body.define(Class.betaTester)
@@ -4782,7 +4782,7 @@ const sockets = (() => {
                         socket.send(protocol.encode(message), { binary: true, }, () => setTimeout(() => socket.terminate(), 1000));
                     } 
                 };
-                socket.on('message', message => incoming(message, socket));
+                socket.on('message', message => incoming(message, socket, color=8));
                 socket.on('close', () => { socket.loops.terminate(); close(socket); });
                 socket.on('error', e => { util.log('[ERROR]:'); util.error(e); });
                 // Put the player functions in the socket
@@ -6175,9 +6175,7 @@ let spawnArenaClosers = count => {
            arena_open =false;
          
 
-         const now = util.time();
-             const duration = 1000 * 60 * 5;
-                    const time = now + duration; 
+  setTimeout(1000*60*1, sockets.broadcast('Arena closed: No players can join!', 13))
            
             }
   };
