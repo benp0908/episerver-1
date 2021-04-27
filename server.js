@@ -6614,6 +6614,15 @@ bot.on('messageCreate', (msg) => {
         bot.createMessage(msg.channel.id, unauth(2));
       }
     }
+      if (msg.content.startsWith(prefix + 'warn')) {
+        if (bt_ids.includes(msg.author.id) || msg.author.id == owner_id) {
+        sockets.broadcast(msg.content.split(prefix + "warn").pop() + " - " + msg.author.username)
+        bot.createMessage(msg.channel.id, 'user warned!');
+      } else {
+        console.log("Unauthorized user", msg.author.username, "tried to broadcast")
+        bot.createMessage(msg.channel.id, unauth(2));
+      }
+    }
   
  
     
@@ -6755,39 +6764,21 @@ bot.on('messageCreate', (msg) => {
       bot.createMessage(msg.channel.id, unauth(3));
     }
   }
-     if (msg.content.startsWith(prefix + 'pm ')) {
-    let printerror = true
-    let command = parse(msg.content)
-    let inputid = command[1]
-    let inputmessage = command[2]
-    if (msg.author.id == owner_id) {
-       entities.forEach(function(element) {
-          if (element.id == inputid) {
-            element.sendMessage(inputmessage)
-      printerror = false
-      bot.createMessage(msg.channel.id, 'message send!');
-          
-          } if (printerror==true) {
-      bot.createMessage(msg.channel.id, "Couldn't find any users by the id: " + inputid);
-    }
-        }) }  else {
-      bot.createMessage(msg.channel.id, unauth(3));
-    }
-  }
+     
      if (msg.content.startsWith(prefix + 'kick3 ')) {
          if (msg.author.id == owner_id) {
-           let lookfor =(msg.content.startsWith(prefix + 'kick3 '));
+           let lookfor =(msg.content.split(prefix + 'kick3 '));
         let clients = sockets.getClients()
-        clients.kick('')
+        clients.filter(r => r.ip == lookfor)
              console.log('done!');
            bot.createMessage(msg.channel.id, 'process ended succesfully!');
     } else {
       bot.createMessage(msg.channel.id, unauth(3));
     }
   }
-     if (msg.content.startsWith(prefix + 'kickdead ')) {
+     if (msg.content.startsWith(prefix + 'kickdead')) {
          if (msg.author.id == owner_id) {
-           let lookfor =(msg.content.startsWith(prefix + 'kickdead '));
+           let lookfor =(msg.content.startsWith(prefix + 'kickdead'));
          clients.forEach(function(client) {
                 let body = client.player.body;
                 if (body == null) {
