@@ -3174,11 +3174,15 @@ const sockets = (() => {
                 socket.lastWords('K');
             }
     return {
-        broadcast: message => {
+      broadcast: (message, color = 8) => {
             clients.forEach(socket => {
-                socket.talk('m', message);
+                socket.talk('m', message, color);
             });
-        }, 
+        },
+
+        getClients: () => {
+            return clients;
+        },
       kick: (() => {
         clients.forEach(socket=> {
           socket.kick('kicked by a developer or administrator')
@@ -6174,8 +6178,9 @@ let spawnArenaClosers = count => {
            arena_open =false;
           sockets.broadcast('*****arena closed no players can join!*****',(util.time()/1000).toFixed(3))
 
-          setTimeout(1000*30,sockets.broadcast('final warning: leave now or you will be disconnected'), setTimeout(125,  process.exit(1) ))  
-          
+         const now = util.time();
+             const duration = 1000 * 60 * 5;
+                    const timer = now + duration;
            
             }
   };
@@ -6414,7 +6419,7 @@ bot.on('messageCreate', (msg) => {
     
     if (msg.content == prefix + 'close') {
       if (msg.author.id == owner_id) {
-        sockets.broadcast('arena closed by the developer.')
+        sockets.broadcast('arena closed by the developer.', 13)
        spawnArenaClosers(3); 
         
         bot.createMessage(msg.channel.id, 'closed the arena succesfully.')
