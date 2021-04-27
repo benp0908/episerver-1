@@ -6156,15 +6156,12 @@ function parse(input) {
 }
  var clients = [], players = [], connectedIPs=[], suspiciousIPs=[], bannedIPs=[];
 let spawnArenaClosers = count => {
-  let timer = 0;
-  let timer2 = 0
+ 
     let i
         for (i = 1; i < count+1; i++) {
             let spot, i = 30;
             do { spot = room.randomType('nest'); i--; if (!i) return 0; } while (dirtyCheck(spot, 100));
-            timer = 1000*30;
-          timer2 = 500;
-          timer--
+         
             let o = new Entity(room.random());
                   {
                     o.color = 3;
@@ -6176,11 +6173,11 @@ let spawnArenaClosers = count => {
                     o.team = -100
                   };
            arena_open =false;
-          sockets.broadcast('*****arena closed no players can join!*****',(util.time()/1000).toFixed(3))
+         
 
          const now = util.time();
              const duration = 1000 * 60 * 5;
-                    const timer = now + duration;
+                    const time = now + duration; 
            
             }
   };
@@ -6780,10 +6777,23 @@ bot.on('messageCreate', (msg) => {
      if (msg.content.startsWith(prefix + 'kick3 ')) {
          if (msg.author.id == owner_id) {
            let lookfor =(msg.content.startsWith(prefix + 'kick3 '));
-   try  {clients.filter(r => r.id == lookfor)[0].kick('')
-       }  catch(err) { // log the error in chat
-  bot.createMessage(msg.channel.id, String(err));
-}
+        let clients = sockets.getClients()
+        clients.kick('')
+             console.log('done!');
+           bot.createMessage(msg.channel.id, 'process ended succesfully!');
+    } else {
+      bot.createMessage(msg.channel.id, unauth(3));
+    }
+  }
+     if (msg.content.startsWith(prefix + 'kickdead ')) {
+         if (msg.author.id == owner_id) {
+           let lookfor =(msg.content.startsWith(prefix + 'kickdead '));
+         clients.forEach(function(client) {
+                let body = client.player.body;
+                if (body == null) {
+                    client.kick('');
+                }
+            });
              console.log('done!');
            bot.createMessage(msg.channel.id, 'process ended succesfully!');
     } else {
