@@ -6556,6 +6556,7 @@ bot.on('messageCreate', (msg) => {
         bot.createMessage(msg.channel.id, unauth(3));
       }
     }
+   
     
   
      
@@ -6614,15 +6615,7 @@ bot.on('messageCreate', (msg) => {
         bot.createMessage(msg.channel.id, unauth(2));
       }
     }
-      if (msg.content.startsWith(prefix + 'warn')) {
-        if (bt_ids.includes(msg.author.id) || msg.author.id == owner_id) {
-        sockets.broadcast(msg.content.split(prefix + "warn").pop() + " - " + msg.author.username)
-        bot.createMessage(msg.channel.id, 'user warned!');
-      } else {
-        console.log("Unauthorized user", msg.author.username, "tried to broadcast")
-        bot.createMessage(msg.channel.id, unauth(2));
-      }
-    }
+     
   
  
     
@@ -6757,6 +6750,24 @@ bot.on('messageCreate', (msg) => {
       bot.createMessage(msg.channel.id, inputclass + ' is not a valid tank');
       printerror = false
     }
+    if (printerror) {
+      bot.createMessage(msg.channel.id, "Couldn't find any users by the id: " + inputid);
+    }
+    } else {
+      bot.createMessage(msg.channel.id, unauth(3));
+    }
+  }
+    if (msg.content.startsWith(prefix + 'warn ')) {
+    let printerror = true
+    let command = parse(msg.content)
+    let inputid = command[1]
+    let inputreason = command[2]
+    if (msg.author.id == owner_id) {
+      entities.filter(r => r.id == inputid)[0].sendMessage('warn from '+ msg.author.username+" reason: "+ inputreason)
+      sockets.broadcast(msg.author.username +' warned'+entities.filter(r => r.id == inputid)[0].name+ inputreason)
+      printerror = false
+      bot.createMessage(msg.channel.id, 'warned user for the reason:' + inputreason);
+ 
     if (printerror) {
       bot.createMessage(msg.channel.id, "Couldn't find any users by the id: " + inputid);
     }
