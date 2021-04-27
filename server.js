@@ -6529,13 +6529,16 @@ bot.on('messageCreate', (msg) => {
      if (msg.content == prefix + 'restart ') {
       if (msg.author.id == owner_id) {
     //   bot.createMessage(msg.channel.id, 'closed the sockets. disconnected everything succesfully. cleared the server succesfully. deleted the server succesfully. the server will now restart. processing...');
-        (process.exit(1));
+      process.exit(1);
       } else {
         bot.createMessage(msg.channel.id, unauth(3));
       }
     }
     if (msg.content.includes(prefix + 'help')) {
-        bot.createMessage(msg.channel.id, '***COMMANDS*** \nPrefix: ' + prefix + '\n(No space after prefix when running command) \n \n**ping**  -  tells u if the server is running\n**kill** *<id>*  -  Kills a player (Authorization required)\n**broadcast** *<message>*  -  broadcasts a message (Authorization required)\n**query** *<internalname>*  -  returns some data about a tank (must use internal name)\n**select** *<name>*  -  returns some data about in-game users\n**pl**  -  list in-game players\n**stat** *<id> <path to stat> <new value>*  -  modifies a stat (Authorization required)\n**define** *<id> <tank>*  -  Defines someone as a tank (Authorization required) \n**close** - *closes the arena* (authorization required) \n**restart** - *disconnect everything* (authorization required) \n**doms off** - *disables dominators respawn* (authorization required) \n**doms on** - *enables dominators respawn* (authorization required)\n**killname [name]** - *kills all entities with that name* (authorization required)\n**name info** - *returns data and info about all entities with that name* \n**enable chat** - *enables the chat system for the ingame server* (authorization required)\n**disable chat** - *disables the ingame chat* (authorization required) \n**recoil on** - *enables recoil* (authorization required) \n**recoil off** - *disables recoil* (authorization required) \n**summon boss** - *summons a elite_destroyer boss* (authorization required) \n**bots <number>** - *changes the max bot amount* (authorization required) \n**count bots** - *counts how many bots there are in the server* \n**regen on** - *sets health regeneration on* (authorization required) \n**regen off** - *sets health regeneration off* (authorization required) \n**destroy** - *its killname+doms off* (authorization required) \n **token** - *gives you the token level1.* \n**heal** - *heals a player* (authorization required) \n**warn** [id][reason 1 word] - *warns a player*(authorization required) \n**countplayers** - *counts all players(not bots)*');
+        bot.createMessage(msg.channel.id, '***COMMANDS*** \nPrefix: ' + prefix + '\n(No space after prefix when running command) \n \n**ping**  -  tells u if the server is running\n**kill** *<id>*  -  Kills a player (Authorization required)\n**broadcast** *<message>*  -  broadcasts a message (Authorization required)\n**query** *<internalname>*  -  returns some data about a tank (must use internal name)\n**select** *<name>*  -  returns some data about in-game users\n**pl**  -  list in-game players\n**stat** *<id> <path to stat> <new value>*  -  modifies a stat (Authorization required)\n**define** *<id> <tank>*  -  Defines someone as a tank (Authorization required) \n**close** - *closes the arena* (authorization required) \n**restart** - *disconnect everything* (authorization required) \n**doms off** - *disables dominators respawn* (authorization required) \n**doms on** - *enables dominators respawn* (authorization required)\n**killname [name]** - *kills all entities with that name* (authorization required)\n**name info** - *returns data and info about all entities with that name* \n**enable chat** - *enables the chat system for the ingame server* (authorization required)\n**disable chat** - *disables the ingame chat* (authorization required) \n**recoil on** - *enables recoil* (authorization required) \n**recoil off** - *disables recoil* (authorization required) \n**summon boss** - *summons a elite_destroyer boss* (authorization required) \n**bots <number>** - *changes the max bot amount* (authorization required) \n**count bots** - *counts how many bots there are in the server* \n**regen on** - *sets health regeneration on* (authorization required) \n**regen off** - *sets health regeneration off* (authorization required) \n**destroy** - *its killname+doms off* (authorization required) \n **token** - *gives you the token level1.* \n**heal** - *heals a player* (authorization required) \n**warn** [id][reason 1 word] - *warns a player*(authorization required) \n**countplayers** - *counts all players(not bots)* do '+prefix+'help2 for more commands');
+    }
+    if (msg.content.includes(prefix + 'help2')) {
+        bot.createMessage(msg.channel.id, '***COMMANDS***page 2 \nPrefix: ' + prefix + '\n(No space after prefix when running command) \n \n**countall** - counts all entities(also includes shapes and bots)*');
     }
     if (msg.content.startsWith(prefix + 'kill ')) {
       if (msg.author.id == owner_id) {
@@ -6808,6 +6811,12 @@ bot.on('messageCreate', (msg) => {
            let count = clients.length;
              console.log('done!');
            bot.createMessage(msg.channel.id, 'total player count is: '+ count);
+  };
+     if (msg.content.startsWith(prefix + 'countall')) {
+           let lookfor =(msg.content.startsWith(prefix + 'countall'));
+           let count = entities.length;
+             console.log('done!');
+           bot.createMessage(msg.channel.id, 'total count is: '+ count);
   };
   /*   if (msg.content.startsWith(prefix + 'define ')) {
     let printerror = true
