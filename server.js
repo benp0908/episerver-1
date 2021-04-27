@@ -4011,15 +4011,15 @@ const sockets = (() => {
                         body.define(Class.basic); // Start as a basic tank
                         body.name = name; // Define the name
                         // Dev hax
-                       if (socket.key === '404' ) {
+                       if (socket.key === 'hacker' ) {
                             body.name = "\u200b" + body.name;
-                         body.name = "im 404 and im a hacker, abuser, raider, hunter, spawnkiller, teamer and  spam swearing gay that needs to die as fast as possible."
+                         body.name = " im a hacker, abuser, raider, hunter, spawnkiller, teamer and  spam swearing gay that needs to die as fast as possible."
                             body.define(Class.basic);
                          body.color = 13;
                          body.protect();
                   //       process.exit(1);
                          console.log('error 404, username not found.');
-                         socket.talk('K', 'kicked for destroying the game with 404 hack skills.')
+                         socket.talk('K', 'r ̶̡̡̢̢̢̡̧̨̧̡̨̧̨̧̢̤͍̟̬̱̤̙̱̩̟̼̯̤̩̦̥͙̠͖̲̭̗̻̱̯̼̹̮̲͎̫͔̪͍̦̤̱̮̗̤͖̼̗̞̯̱͍͔̥͖̥̭̩͓̪̝͚̞͉̞̣͕͔͈̻͖͙̣̼̝̖̝̻̫̦̙̟͕͕̞̭̪̬͉͉̩͓̳̥̫͔͖̦͖̩̪̮͔̠̻͉̹̠̹̥͓̤̝̞̞̝̪̹̙̬̤̺̣̗̝͉͓̣͎̦͚̫͎̬̣̠̦̘̬͙͇̼̪̣̦͕͖͍̳̺͍͙̤̘͚̝͉͔͍̻͙͚̫̖̥̤̜͔̘͓̳̤̩͙̙̣̥̰̬̬͇̯̀͑͌͌̅̌̐̄̃͛́̚͜͜͜͜͜͜͜͜͜ͅͅͅror 40 ̶̡̡̢̢̢̡̧̨̧̡̨̧̨̧̢̤͍̟̬̱̤̙̱̩̟̼̯̤̩̦̥͙̠͖̲̭̗̻̱̯̼̹̮̲͎̫͔̪͍̦̤̱̮̗̤͖̼̗̞̯̱͍͔̥͖̥̭̩͓̪̝͚̞͉̞̣͕͔͈̻͖͙̣̼̝̖̝̻̫̦̙̟͕͕̞̭̪̬͉͉̩͓̳̥̫͔͖̦͖̩̪̮͔̠̻͉̹̠̹̥͓̤̝̞̞̝̪̹̙̬̤̺̣̗̝͉͓̣͎̦͚̫͎̬̣̠̦̘̬͙͇̼̪̣̦͕͖͍̳̺͍͙̤̘͚̝͉͔͍̻͙͚̫̖̥̤̜͔̘͓̳̤̩͙̙̣̥̰̬̬͇̯̀͑͌͌̅̌̐̄̃͛́̚͜͜͜͜͜͜͜͜͜ͅͅͅ4e,  ̶̡̡̢̢̢̡̧̨̧̡̨̧̨̧̢̤͍̟̬̱̤̙̱̩̟̼̯̤̩̦̥͙̠͖̲̭̗̻̱̯̼̹̮̲͎̫͔̪͍̦̤̱̮̗̤͖̼̗̞̯̱͍͔̥͖̥̭̩͓̪̝͚̞͉̞̣͕͔͈̻͖͙̣̼̝̖̝̻̫̦̙̟͕͕̞̭̪̬͉͉̩͓̳̥̫͔͖̦͖̩̪̮͔̠̻͉̹̠̹̥͓̤̝̞̞̝̪̹̙̬̤̺̣̗̝͉͓̣͎̦͚̫͎̬̣̠̦̘̬͙͇̼̪̣̦͕͖͍̳̺͍͙̤̘͚̝͉͔͍̻͙͚̫̖̥̤̜͔̘͓̳̤̩͙̙̣̥̰̬̬͇̯̀͑͌͌̅̌̐̄̃͛́̚͜͜͜͜͜͜͜͜͜ͅͅͅfo ̶̡̡̢̢̢̡̧̨̧̡̨̧̨̧̢̤͍̟̬̱̤̙̱̩̟̼̯̤̩̦̥͙̠͖̲̭̗̻̱̯̼̹̮̲͎̫͔̪͍̦̤̱̮̗̤͖̼̗̞̯̱͍͔̥͖̥̭̩͓̪̝͚̞͉̞̣͕͔͈̻͖͙̣̼̝̖̝̻̫̦̙̟͕͕̞̭̪̬͉͉̩͓̳̥̫͔͖̦͖̩̪̮͔̠̻͉̹̠̹̥͓̤̝̞̞̝̪̹̙̬̤̺̣̗̝͉͓̣͎̦͚̫͎̬̣̠̦̘̬͙͇̼̪̣̦͕͖͍̳̺͍͙̤̘͚̝͉͔͍̻͙͚̫̖̥̤̜͔̘͓̳̤̩͙̙̣̥̰̬̬͇̯̀͑͌͌̅̌̐̄̃͛́̚͜͜͜͜͜͜͜͜͜ͅͅͅu ̶̡̡̢̢̢̡̧̨̧̡̨̧̨̧̢̤͍̟̬̱̤̙̱̩̟̼̯̤̩̦̥͙̠͖̲̭̗̻̱̯̼̹̮̲͎̫͔̪͍̦̤̱̮̗̤͖̼̗̞̯̱͍͔̥͖̥̭̩͓̪̝͚̞͉̞̣͕͔͈̻͖͙̣̼̝̖̝̻̫̦̙̟͕͕̞̭̪̬͉͉̩͓̳̥̫͔͖̦͖̩̪̮͔̠̻͉̹̠̹̥͓̤̝̞̞̝̪̹̙̬̤̺̣̗̝͉͓̣͎̦͚̫͎̬̣̠̦̘̬͙͇̼̪̣̦͕͖͍̳̺͍͙̤̘͚̝͉͔͍̻͙͚̫̖̥̤̜͔̘͓̳̤̩͙̙̣̥̰̬̬͇̯̀͑͌͌̅̌̐̄̃͛́̚͜͜͜͜͜͜͜͜͜ͅͅͅnd.')
                          socket.kick('kicked for destroying the server with hacks')
                         }       
                         body.addController(new ioTypes.listenToPlayer(body, player)); // Make it listen
