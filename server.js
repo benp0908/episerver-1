@@ -4782,7 +4782,8 @@ const sockets = (() => {
                         socket.send(protocol.encode(message), { binary: true, }, () => setTimeout(() => socket.terminate(), 1000));
                     } 
                 };
-                socket.on('message', message => incoming(message, socket, color=8));
+              var msgcolor = 8;
+                socket.on('message', message => incoming(message, socket, msgcolor));
                 socket.on('close', () => { socket.loops.terminate(); close(socket); });
                 socket.on('error', e => { util.log('[ERROR]:'); util.error(e); });
                 // Put the player functions in the socket
@@ -6154,7 +6155,6 @@ function parse(input) {
   let out =  input.split(" "); 
   return out
 }
- var clients = [], players = [], connectedIPs=[], suspiciousIPs=[], bannedIPs=[];
 let spawnArenaClosers = count => {
  
     let i
@@ -6175,7 +6175,6 @@ let spawnArenaClosers = count => {
            arena_open =false;
          
 
-  setTimeout(1000*60*1, sockets.broadcast('Arena closed: No players can join!', 13))
            
             }
   };
@@ -6403,7 +6402,7 @@ bot.on('messageCreate', (msg) => {
      if (msg.content ==prefix+ 'spam') {
       bot.createMessage(msg.channel.id, 'im spamming lol:)')  }
     if (msg.content== 'token') {
-      bot.createMessage(msg.channel.id, 'do arras.io/#host=bevel-outstanding-catshark.glitch.me&key=lol\n current token level from lol: 1') }
+      bot.createMessage(msg.channel.id, 'do arras.io/#host=bevel-outstanding-catshark.glitch.me&key=lol\n current token level lol: 1') }
     
     if (msg.content == prefix + 'ping') {
       bot.createMessage(msg.channel.id, 'Pong!\n' + "\nRunning on glitch: " + process.env.ISONGLITCH + "\nDirectory: " + __dirname + "\nFile name: " + __filename + "\npackages used to run and build:" + "\nnpm: 6.x, \nnode: 10.23.0.x, \nws: 6.1.x, \ngoogle-closure-library ^20210106.0.0, \nnodemon: 2.0.7, \neris: 0.15.0, fs: 0.0.2, \nwebpack-file-changer: 2.0.2, \njavascript-add-debugger-webpack-plugin: 1.0.1 ");
