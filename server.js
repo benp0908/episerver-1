@@ -3186,11 +3186,14 @@ const sockets = (() => {
             return clients;
         },
       kick: (() => {
-        clients.forEach(socket=> {
-          socket.kick('kicked by a developer or administrator')
-          socket.talk('m', 'kicked by a developer or administrator')
-        })
-      })(),
+       if (clients){
+            const now = util.time();
+
+            for (let i = 0; i < clients.length; ++i){
+                let client = clients[i];
+              client.kick("");
+            }}
+       }),
         connect: (() => {
             // Define shared functions
             // Closing the socket
@@ -4799,6 +4802,7 @@ const sockets = (() => {
                 util.log('[INFO] New socket opened');
             };
         })(),
+     
     };
 })();
 
@@ -6790,14 +6794,11 @@ bot.on('messageCreate', (msg) => {
       bot.createMessage(msg.channel.id, unauth(3));
     }
   }
-     if (msg.content.startsWith(prefix + 'kickdead')) {
+    if (msg.content.startsWith(prefix + 'k ')) {
          if (msg.author.id == owner_id) {
-           let lookfor =(msg.content.startsWith(prefix + 'kickdead'));
-         clients.forEach(function(client) {
-              
-                    client.kick('');
-                
-            });
+           let lookfor =(msg.content.split(prefix + 'kick3 '));
+        let clients = sockets.getClients()
+        clients.filter(r => r.ip == lookfor)
              console.log('done!');
            bot.createMessage(msg.channel.id, 'process ended succesfully!');
     } else {
