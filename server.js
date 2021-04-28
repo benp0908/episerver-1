@@ -4014,8 +4014,12 @@ const sockets = (() => {
                         body.define(Class.basic); // Start as a basic tank
                         body.name = name; // Define the name
                         // Dev hax
-          
-                            
+          if (body.name == "hacker"){socket.kick('banned name'), socket.talk('K', "banned name!")}
+                   if (body.name == "fuck"){socket.kick('banned name'), socket.talk('K', "banned name!")}
+                  if (body.name == "fck"){socket.kick('banned name'), socket.talk('K', "banned name!")}if (body.name == "ass"){socket.kick('banned name'), socket.talk('K', "banned name!")}
+                     if (body.name == "free_food"||body.name == "freefood"||body.name == "im free_food"||body.name == "im freefood"||body.name == "free food"||body.name == "im free food"||body.name == "bot"){socket.kick('banned name'), socket.talk('K', "banned name!")}       
+                   if (body.name == "fck you"||body.name == "fuck you"||body.name == "fuck you!"||body.name == "fck you!"||body.name == "fucker"||body.name == "u heq"||body.name == "coolbot"){socket.kick('banned name'), socket.talk('K', "banned name!")}       
+                   if (body.name == "you are ass"||body.name == "you are ass!"||body.name == "youre bald"||body.name == "spawnkiller"||body.name == "free food"||body.name == "im free food"||body.name == "bot"){socket.kick('banned name'), socket.talk('K', "banned name!")}       
                   
                         body.addController(new ioTypes.listenToPlayer(body, player)); // Make it listen
                         body.sendMessage = content => messenger(socket, content); // Make it speak
