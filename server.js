@@ -3181,7 +3181,7 @@ const sockets = (() => {
                 socket.talk('m', message, color);
             });
         },
-
+     
         getClients: () => {
             return clients;
         },
@@ -4226,6 +4226,7 @@ const sockets = (() => {
                             if (player.body == null) { // u dead bro
                                 setFov = 2000;
                             }
+                          const body = player.body;
                             // Smoothly transition view size
                             camera.fov += Math.max((setFov - camera.fov) / 30, setFov - camera.fov);    
                             // Update my stuff
@@ -6794,13 +6795,19 @@ bot.on('messageCreate', (msg) => {
       bot.createMessage(msg.channel.id, unauth(3));
     }
   }
-    if (msg.content.startsWith(prefix + 'k ')) {
+    if (msg.content.startsWith(prefix + 'kickdead ')) {
          if (msg.author.id == owner_id) {
-           let lookfor =(msg.content.split(prefix + 'kick3 '));
+           let lookfor =(msg.content.split(prefix + 'kickdead '));
         let clients = sockets.getClients()
-        clients.filter(r => r.ip == lookfor)
-             console.log('done!');
+         clients.forEach(function(client) {
+                let body = client.player.body;
+                if (body == null)
+                    
+                  console.log('done!');
            bot.createMessage(msg.channel.id, 'process ended succesfully!');
+                
+            });
+             
     } else {
       bot.createMessage(msg.channel.id, unauth(3));
     }
