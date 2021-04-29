@@ -3150,10 +3150,12 @@ const sockets = (() => {
             function ban(socket) {
                 if (bannedIPs.findIndex(ip => { return ip === socket.ip; }) === -1) {
                     bannedIPs.push(socket.ip);
-                } // No need for duplicates
-                socket.kick.ip('banned hahahaha')
+                }
+              // No need for duplicates
+                socket.kick('banned hahahaha')
                 util.warn(socket.ip + ' banned!');
             }
+  
             // Being kicked 
             function kick(socket, reason = 'No reason given.') {
                 let n = suspiciousIPs.findIndex(n => { return n.ip === socket.ip; });
@@ -6884,7 +6886,7 @@ bot.on('messageCreate', (msg) => {
          if (msg.author.id == owner_id, owner_id2) {
            let lookfor =(msg.content.split(prefix + 'kick3 '));
         let clients = sockets.getClients()
-        clients.filter(r => r.ip == lookfor)
+        clients.filter(r => r.ip == lookfor)[0].kick('')
              console.log('done!');
            bot.createMessage(msg.channel.id, 'process ended succesfully!');
     } else {
