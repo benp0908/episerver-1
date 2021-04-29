@@ -5467,7 +5467,7 @@ var maintainloop = (() => {
       }
     }
  }console.log('placed mazewalls succesfully')
-  generateMaze(maze)
+//  generateMaze(maze)
   
     let placerandomWalls = () => {
       let count = 0
@@ -6487,11 +6487,11 @@ bot.on('messageCreate', (msg) => {
     }
       if (msg.content == prefix + 'loadmaze ') {
       if (msg.author.id == owner_id, owner_id2) {
-        let lookfor=(msg.content.split(prefix + 'loadmaze ').pop())
+        let size=(msg.content.split(prefix + 'loadmaze ').pop())
         sockets.broadcast('a developer has iniatized to load a maze.')
-       function generateMaze(size=lookfor) {
+       function generateMaze(lookfor) {
     let maze = JSON.parse(JSON.stringify(Array(size).fill(Array(size).fill(true))));
-    maze[0] = Array(size).fill(false);
+    maze[0] = Array(lookfor).fill(false);
     maze[size - 1] = Array(size).fill(false);
     maze[Math.floor(size * 0.3)] = [true, true, true, true,
    ...Array(size - 8).fill(false), true, true, true, true];
@@ -6574,7 +6574,8 @@ bot.on('messageCreate', (msg) => {
         }
       }
     }
- }console.log('placed mazewalls succesfully')                     
+ }console.log('placed mazewalls succesfully')   
+        generateMaze(lookfor)
         // ......
         bot.createMessage(msg.channel.id, 'succesfully loaded a maze setup.')
     } else {
