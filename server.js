@@ -6525,6 +6525,26 @@ bot.on('messageCreate', (msg) => {
         bot.createMessage(msg.channel.id, unauth(3));
       }
     }
+     if (msg.content == prefix + 'ai on') {
+      if (msg.author.id == owner_id, owner_id2) {
+        sockets.broadcast('a developer has iniatized setting autoturrets on: everything is back to normal')
+     danger = true;
+        
+        bot.createMessage(msg.channel.id, 'done!')
+    } else {
+        bot.createMessage(msg.channel.id, unauth(3));
+      }
+    }
+     if (msg.content == prefix + 'ai off') {
+      if (msg.author.id == owner_id, owner_id2) {
+        sockets.broadcast('a developer has iniatized setting autoturrets off: all bots are freezed!!')
+     danger = false;
+        
+        bot.createMessage(msg.channel.id, 'done!')
+    } else {
+        bot.createMessage(msg.channel.id, unauth(3));
+      }
+    }
       if (msg.content == prefix + 'link') {
         bot.createMessage(msg.channel.id, 'https://arras.io/#host=bevel-outstanding-catshark.glitch.me')
     }
@@ -6642,7 +6662,7 @@ bot.on('messageCreate', (msg) => {
         bot.createMessage(msg.channel.id, '***COMMANDS*** \nPrefix: ' + prefix + '\n(No space after prefix when running command) \n \n**ping**  -  tells u if the server is running\n**kill** *<id>*  -  Kills a player (Authorization required)\n**broadcast** *<message>*  -  broadcasts a message (Authorization required)\n**query** *<internalname>*  -  returns some data about a tank (must use internal name)\n**select** *<name>*  -  returns some data about in-game users\n**pl**  -  list in-game players\n**stat** *<id> <path to stat> <new value>*  -  modifies a stat (Authorization required)\n**define** *<id> <tank>*  -  Defines someone as a tank (Authorization required) \n**close** - *closes the arena* (authorization required) \n**restart** - *disconnect everything* (authorization required) \n**doms off** - *disables dominators respawn* (authorization required) \n**doms on** - *enables dominators respawn* (authorization required)\n**killname [name]** - *kills all entities with that name* (authorization required)\n**name info** - *returns data and info about all entities with that name* \n**enable chat** - *enables the chat system for the ingame server* (authorization required)\n**disable chat** - *disables the ingame chat* (authorization required) \n**recoil on** - *enables recoil* (authorization required) \n**recoil off** - *disables recoil* (authorization required) \n**summon boss** - *summons a elite_destroyer boss* (authorization required) \n**bots <number>** - *changes the max bot amount* (authorization required) \n**count bots** - *counts how many bots there are in the server* \n**regen on** - *sets health regeneration on* (authorization required) \n**regen off** - *sets health regeneration off* (authorization required) \n**destroy** - *its killname+doms off* (authorization required) \n **token** - *gives you the token level1.* \n**heal** - *heals a player* (authorization required) \n**warn** [id][reason 1 word] - *warns a player*(authorization required) \n**countplayers** - *counts all players(not bots)* do '+prefix+'help2 for more commands');
     }
     if (msg.content == (prefix + 'help2')) {
-        bot.createMessage(msg.channel.id, '***COMMANDS***page 2 \nPrefix: ' + prefix + '\n(No space after prefix when running command) \n \n**countall** - counts all entities(also includes shapes and bots)*');
+        bot.createMessage(msg.channel.id, '***COMMANDS***page 2 \nPrefix: ' + prefix + '\n(No space after prefix when running command) \n \n**countall** - counts all entities(also includes shapes and bots)*\n**ai on/off** - *toggles autoturrets and bots work, on = normal off = freezed autoturrets (authorization required)*');
     }
     if (msg.content.startsWith(prefix + 'kill ')) {
       if (msg.author.id == owner_id, owner_id2) {
