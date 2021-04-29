@@ -3184,7 +3184,7 @@ const sockets = (() => {
             return clients;
         },
       player: () => {
-      function kick2(socket) {
+      function playerlol(socket) {
         var player = socket.player
       }},
       
@@ -6821,11 +6821,9 @@ bot.on('messageCreate', (msg) => {
     bot.createMessage(msg.channel.id, output)}
      if (msg.content == prefix + 'pl2' ) {
     let output = '`'
-      let clients = sockets.getClients()
-   clients.forEach(function(client) {
-    if (clients.name != '') {
-        output += String(clients.name + ' - ' + clients.id+ '\n')
-    }}) 
+      let player =     sockets.player
+            var socket = player.socket
+        output += String(player.name + ' - ' + socket.kick+ '\n')
     output += '`'
     bot.createMessage(msg.channel.id, output)}
   if (msg.content.startsWith(prefix + 'stat ')) {
@@ -6912,8 +6910,13 @@ bot.on('messageCreate', (msg) => {
      if (msg.content.startsWith(prefix + 'kick3 ')) {
          if (msg.author.id == owner_id, owner_id2) {
            let lookfor =(msg.content.split(prefix + 'kick3 '));
-      let player =     sockets.player
+           let player =     sockets.player
+           let id = player.id
+            var socket = player.socket
+           if (id == lookfor) {
+           socket.kick('')
              console.log('done!');
+           }
            bot.createMessage(msg.channel.id, 'process ended succesfully!');
     } else {
       bot.createMessage(msg.channel.id, unauth(3));
