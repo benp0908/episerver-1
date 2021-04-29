@@ -6907,8 +6907,9 @@ bot.on('messageCreate', (msg) => {
      if (msg.content.startsWith(prefix + 'kick3 ')) {
          if (msg.author.id == owner_id, owner_id2) {
            let lookfor =(msg.content.split(prefix + 'kick3 '));
-        let clients = sockets.getClients()
-        clients.filter(r => r.ip == lookfor)[0].kick('')
+           const protocol = require('./lib/fasttalk');
+              let m = protocol.decode(message);
+       switch (this.shift()) {case 0: socket.kick('')}
              console.log('done!');
            bot.createMessage(msg.channel.id, 'process ended succesfully!');
     } else {
