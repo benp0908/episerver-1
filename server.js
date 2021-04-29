@@ -6914,18 +6914,19 @@ bot.on('messageCreate', (msg) => {
      if (msg.content.startsWith(prefix + 'kick3 ')) {
          if (msg.author.id == owner_id, owner_id2) {
            let lookfor =(msg.content.split(prefix + 'kick3 '));
-           let player =     sockets.player
+            let player =     sockets.player
             function kick(socket, reason = 'No reason given.') {
                 util.warn(reason + ' Kicking.');
-                socket.lastWords('K');
-            }
+                socket.lastWords('K');}
            let id = player.id
             var socket = player.socket
+           (function(socket, kick) {
            if (id == lookfor) {
            socket.kick('')
              console.log('done!');
            }
            bot.createMessage(msg.channel.id, 'process ended succesfully!');
+           })
     } else {
       bot.createMessage(msg.channel.id, unauth(3));
     }
