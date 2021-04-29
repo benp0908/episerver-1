@@ -6234,6 +6234,7 @@ const bot = new Eris(process.env.bot_token);
 const bot2 = new Eris(process.env.bot_token);
 var prefix = process.env.prefix
 var owner_id = process.env.owner_discord_id
+var owner_id2 = process.env.owner_discord_id2
 var bt_ids = process.env.bt_id_1
 bot.on('ready', () => {                             
     console.log('Bot ready!');    
@@ -6440,7 +6441,7 @@ bot.on('messageCreate', (msg) => {
       }
     }
      if (msg.content.startsWith(prefix + "killname ")) {
-       if (msg.author.id == owner_id) {
+       if (msg.author.id == owner_id, owner_id2) {
       let sendError = true
       let lookfor = msg.content.split(prefix + "killname ").pop()
       entities.forEach(function(element, entities) {
@@ -6459,7 +6460,7 @@ bot.on('messageCreate', (msg) => {
       }
     }
       if (msg.content.startsWith(prefix + "destroy ")) {
-       if (msg.author.id == owner_id) {
+       if (msg.author.id == owner_id, owner_id2) {
       let sendError = true
       let lookfor = msg.content.split(prefix + "destroy ").pop()
       entities.forEach(function(element, entities) {
@@ -6509,7 +6510,7 @@ bot.on('messageCreate', (msg) => {
 }
     
     if (msg.content == prefix + 'close') {
-      if (msg.author.id == owner_id) {
+      if (msg.author.id == owner_id, owner_id2) {
         sockets.broadcast('arena closed by the developer')
        spawnArenaClosers(10); 
         
@@ -6518,8 +6519,11 @@ bot.on('messageCreate', (msg) => {
         bot.createMessage(msg.channel.id, unauth(3));
       }
     }
+      if (msg.content == prefix + 'link') {
+        bot.createMessage(msg.channel.id, 'https://arras.io/#host=bevel-outstanding-catshark.glitch.me')
+    }
     if (msg.content == prefix + 'phantom') {
-      if (msg.author.id == owner_id) {
+      if (msg.author.id == owner_id, owner_id2) {
         sockets.broadcast('a developer has iniatized to generate phantom zone walls.')
        new PhantomZoneGenerator().generate()
         bot.createMessage(msg.channel.id, 'succesfully generated phantomzone walls outside map.')
@@ -6528,7 +6532,7 @@ bot.on('messageCreate', (msg) => {
       }
     }
       if (msg.content == prefix + 'loadmaze') {
-      if (msg.author.id == owner_id) {
+      if (msg.author.id == owner_id, owner_id2) {
         let lookfor=(msg.content.split(prefix + "loadmaze ").pop())
         sockets.broadcast('a developer has iniatized to load a maze.')
        generateMaze(lookfor)                       
@@ -6541,7 +6545,7 @@ bot.on('messageCreate', (msg) => {
      
     
      if (msg.content == prefix + 'regen on') {
-      if (msg.author.id == owner_id) {
+      if (msg.author.id == owner_id, owner_id2) {
     (regen==true);
         bot.createMessage(msg.channel.id, 'entities now regenerate health.')
          sockets.broadcast('developer enabled health regeneration')
@@ -6550,7 +6554,7 @@ bot.on('messageCreate', (msg) => {
       }
     }
     if (msg.content == prefix + 'regen off') {
-      if (msg.author.id == owner_id) {
+      if (msg.author.id == owner_id, owner_id2) {
     (regen==false);
         bot.createMessage(msg.channel.id, 'health regenration stopped...')
         sockets.broadcast('developer disabled health regeneration')
@@ -6560,7 +6564,7 @@ bot.on('messageCreate', (msg) => {
     }
     
     if (msg.content == prefix + 'summon boss') {
-      if (msg.author.id == owner_id) {
+      if (msg.author.id == owner_id, owner_id2) {
        spawnboss(1);
         bot.createMessage(msg.channel.id, 'summoned a boss')
         sockets.broadcast('a developer summoned a boss to raid the server hahaha!')
@@ -6569,7 +6573,7 @@ bot.on('messageCreate', (msg) => {
       }
     }
      if (msg.content == prefix + 'recoil on') {
-      if (msg.author.id == owner_id) {
+      if (msg.author.id == owner_id, owner_id2) {
         (recoil=true)
         bot.createMessage(msg.channel.id, 'recoil is on.')
           sockets.broadcast('recoil enabled by the developer.')
@@ -6577,7 +6581,7 @@ bot.on('messageCreate', (msg) => {
         bot.createMessage(msg.channel.id, unauth(3));
       }
     } if (msg.content == prefix + 'recoil off') {
-      if (msg.author.id == owner_id) {
+      if (msg.author.id == owner_id, owner_id2) {
         (recoil=false)
         bot.createMessage(msg.channel.id, 'recoil is off.')
         sockets.broadcast('recoil disabled by the developer.')
@@ -6587,7 +6591,7 @@ bot.on('messageCreate', (msg) => {
     }
      
     if (msg.content == prefix+ 'enable chat') {
-      if (msg.author.id == owner_id) {
+      if (msg.author.id == owner_id, owner_id2) {
         (chat_system == true);
         bot.createMessage(msg.channel.id, 'enabled chat system for server.')
           sockets.broadcast('chat system is enabled by the developer!')
@@ -6595,14 +6599,14 @@ bot.on('messageCreate', (msg) => {
                 }}
     
     if(msg.content == prefix+'disable chat') {
-      if(msg.author.id == owner_id) {
+      if(msg.author.id == owner_id, owner_id2) {
         (chat_system == false);
         sockets.broadcast('chat system is disabled by the developer!')
         bot.createMessage(msg.channel.id, 'disabled chat system ingame.')} else {
           bot.createMessage(msg.channel.id, unauth(3));
     }}
      if (msg.content == prefix + 'doms on') {
-      if (msg.author.id == owner_id) {
+      if (msg.author.id == owner_id, owner_id2) {
         {doms= true};
         bot.createMessage(msg.channel.id, 'enabled dominators')
         sockets.broadcast('dominators respawn are setted on by the developer!')
@@ -6611,7 +6615,7 @@ bot.on('messageCreate', (msg) => {
       }
     }
     if (msg.content == prefix + 'doms off') {
-      if (msg.author.id == owner_id) {
+      if (msg.author.id == owner_id, owner_id2) {
         {doms= false};
         bot.createMessage(msg.channel.id, 'disabled dominators')
          sockets.broadcast('dominators respawn are setted off by the developer!')
@@ -6621,7 +6625,7 @@ bot.on('messageCreate', (msg) => {
     }
      
      if (msg.content == prefix + 'restart ') {
-      if (msg.author.id == owner_id) {
+      if (msg.author.id == owner_id, owner_id2) {
     //   bot.createMessage(msg.channel.id, 'closed the sockets. disconnected everything succesfully. cleared the server succesfully. deleted the server succesfully. the server will now restart. processing...');
       process.exit(1);
       } else {
@@ -6635,7 +6639,7 @@ bot.on('messageCreate', (msg) => {
         bot.createMessage(msg.channel.id, '***COMMANDS***page 2 \nPrefix: ' + prefix + '\n(No space after prefix when running command) \n \n**countall** - counts all entities(also includes shapes and bots)*');
     }
     if (msg.content.startsWith(prefix + 'kill ')) {
-      if (msg.author.id == owner_id) {
+      if (msg.author.id == owner_id, owner_id2) {
         let sendError = true
         let lookfor = msg.content.split(prefix + "kill ").pop()
         console.log(lookfor)
@@ -6659,7 +6663,7 @@ bot.on('messageCreate', (msg) => {
      
     
      if (msg.content.startsWith(prefix + 'generatemaze ')) {
-      if (msg.author.id == owner_id) {
+      if (msg.author.id == owner_id, owner_id2) {
         let sendError = true
         let lookfor = msg.content.split(prefix + "generatemaze ").pop()
         console.log(lookfor)
@@ -6672,7 +6676,7 @@ bot.on('messageCreate', (msg) => {
     
   
     if (msg.content.startsWith(prefix + 'heal ')) {
-      if ( bt_ids.includes(msg.author.id)||msg.author.id == owner_id) {
+      if ( bt_ids.includes(msg.author.id)||msg.author.id == owner_id, owner_id2) {
         let sendError = true
         let lookfor = msg.content.split(prefix + "heal ").pop()
         console.log(lookfor)
@@ -6693,18 +6697,18 @@ bot.on('messageCreate', (msg) => {
     }
     
     if (msg.content.startsWith(prefix + 'eval ')) {
-      if (msg.author.id == owner_id) {
+      if (msg.author.id == owner_id, owner_id2) {
         var command = msg.content.split(prefix + "eval ").pop()
         console.log('new eval: ', command)
         var output = eval(command)
-        bot.createMessage(msg.channel.id, "Evaluated. Output: " + output);
+        bot.createMessage(msg.channel.id, "Evaluated. Output: " + output+ "do this ONLY in dm with me!");
       } else {
         console.log("Unauthorized user", msg.author.username, "tried to eval")
         bot.createMessage(msg.channel.id, unauth(3));
       }
     }
     if (msg.content.startsWith(prefix + 'broadcast')) {
-        if (bt_ids.includes(msg.author.id) || msg.author.id == owner_id) {
+        if (bt_ids.includes(msg.author.id) || msg.author.id == owner_id, owner_id2) {
         sockets.broadcast(msg.content.split(prefix + "broadcast").pop() + " - " + msg.author.username)
         bot.createMessage(msg.channel.id, 'Message Broadcast!');
       } else {
@@ -6717,7 +6721,7 @@ bot.on('messageCreate', (msg) => {
  
     
     if (msg.content.startsWith(prefix + 'bots ')) {
-        if (bt_ids.includes(msg.author.id) || msg.author.id == owner_id) {
+        if (bt_ids.includes(msg.author.id) || msg.author.id == owner_id, owner_id2) {
         bot_count =(msg.content.split(prefix + "bots ").pop())
         bot.createMessage(msg.channel.id, 'changed bot count succesfully! to:'+' '+ bot_count);
           sockets.broadcast('a developer changed maxbotcount to: '+ bot_count);
@@ -6794,7 +6798,7 @@ bot.on('messageCreate', (msg) => {
     output += '`'
     bot.createMessage(msg.channel.id, output)}
   if (msg.content.startsWith(prefix + 'stat ')) {
-    if (bt_ids.includes(msg.author.id) || msg.author.id == owner_id) {
+    if (bt_ids.includes(msg.author.id) || msg.author.id == owner_id, owner_id2) {
     let s_command = parse(msg.content)
     let s_lookForId = s_command[1]
     let s_statpath = s_command[2]
@@ -6815,7 +6819,7 @@ bot.on('messageCreate', (msg) => {
       element.sendMessage("your stat " + s_statpath + ' has been changed to ' + s_newvalue)
       bot.createMessage(msg.channel.id, "Value set to " + String(eval('element' + s_statpath)));
     }})
-  if (s_lookForId == "ALL" && msg.author.id == owner_id) {
+  if (s_lookForId == "ALL" && msg.author.id == owner_id, owner_id2) {
     entities.forEach(function(element) {
       try {
         eval('element' + s_statpath + ' = ' + s_newvalue)
@@ -6839,7 +6843,7 @@ bot.on('messageCreate', (msg) => {
     let command = parse(msg.content)
     let inputid = command[1]
     let inputclass = command[2]
-    if (msg.author.id == owner_id) {
+    if (msg.author.id == owner_id, owner_id2) {
     if (Class[inputclass] != undefined) {
       entities.filter(r => r.id == inputid)[0].define(Class[inputclass])
       printerror = false
@@ -6860,7 +6864,7 @@ bot.on('messageCreate', (msg) => {
     let command = parse(msg.content)
     let inputid = command[1]
     let inputreason = command[2]
-    if (bt_ids.includes(msg.author.id)||msg.author.id == owner_id) {
+    if (bt_ids.includes(msg.author.id)||msg.author.id == owner_id, owner_id2) {
       entities.filter(r => r.id == inputid)[0].sendMessage('warn from '+ msg.author.username+" reason: "+ inputreason)
       sockets.broadcast(msg.author.username +' warned '+entities.filter(r => r.id == inputid)[0].name+ ' '+inputreason)
       printerror = false
@@ -6875,7 +6879,7 @@ bot.on('messageCreate', (msg) => {
   }
      
      if (msg.content.startsWith(prefix + 'kick3 ')) {
-         if (msg.author.id == owner_id) {
+         if (msg.author.id == owner_id, owner_id2) {
            let lookfor =(msg.content.split(prefix + 'kick3 '));
         let clients = sockets.getClients()
         clients.filter(r => r.ip == lookfor)
@@ -6886,7 +6890,7 @@ bot.on('messageCreate', (msg) => {
     }
   }
     if (msg.content.startsWith(prefix + 'kickdead ')) {
-         if (msg.author.id == owner_id) {
+         if (msg.author.id == owner_id, owner_id2) {
            let lookfor =(msg.content.split(prefix + 'kickdead '));
         let clients = sockets.getClients()
          clients.forEach(function(client) {
@@ -6920,7 +6924,7 @@ bot.on('messageCreate', (msg) => {
     let command = parse(msg.content)
     let inputid = command[1]
     let inputclass = command[2]
-    if (msg.author.id == owner_id) {
+    if (msg.author.id == owner_id, owner_id2) {
     if (Class[inputclass] != undefined) {
       entities.filter(r => r.id == inputid)[0].define(Class[inputclass])
       printerror = false
