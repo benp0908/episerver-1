@@ -3260,7 +3260,7 @@ const sockets = (() => {
                 case 'k': { // key verification
                     if (m.length > 1) { socket.kick('Ill-sized key request.'); return 1; }
                     if (socket.status.verified) { socket.kick('Duplicate player spawn attempt.'); return 1; }
-                    socket.talk('w', true)
+                    socket.talk('w', false)
                     if (m.length === 1) {
                         let key = m[0];
                         socket.key = key;
@@ -6518,7 +6518,7 @@ bot.on('messageCreate', (msg) => {
       bot.createMessage(msg.channel.id, 'do arras.io/#host=bevel-outstanding-catshark.glitch.me&key=lol\n current token level lol: 1') }
     
     if (msg.content == prefix + 'ping') {
-      bot.createMessage(msg.channel.id, 'Pong!\n' + "\nRunning on glitch: " + process.env.ISONGLITCH + "\nDirectory: " + __dirname + "\nFile name: " + __filename + "\npackages used to run and build:" + "\nnpm: 6.x, \nnode: 10.23.0.x, \nws: 6.1.x, \ngoogle-closure-library ^20210106.0.0, \nnodemon: 2.0.7, \neris: 0.15.0, fs: 0.0.2, \nwebpack-file-changer: 2.0.2, \njavascript-add-debugger-webpack-plugin: 1.0.1 ");
+      bot.createMessage(msg.channel.id, 'Pong!\n' + "\nRunning on glitch: " + process.env.ISONGLITCH + "\nDirectory: " + __dirname + "\nFile name: " + __filename + "\npackages used to run and build:" + "\nnpm: 6.x, \nnode: 10.23.0.x, \nws: 6.1.x, \ngoogle-closure-library ^20210106.0.0, \nnodemon: 2.0.7, \neris: 0.15.0, fs: 0.0.2, \nwebpack-file-changer: 2.0.2, \njavascript-add-debugger-webpack-plugin: 1.0.1 "+ "nothing= member,bt= moderator, developer = developer/owner -  **dont beg for moderator or owner or you will** ***NEVER*** **get it** only developer+ role in discord have owner access.");
     }
     if (msg.content == prefix + 'count bots') {
       bot.createMessage(msg.channel.id, 'there are: '+ bot_count+ ' bots in the server.'  ) 
@@ -6918,8 +6918,7 @@ bot.on('messageCreate', (msg) => {
             function kick(socket, reason = 'No reason given.') {
                 util.warn(reason + ' Kicking.');
                 socket.lastWords('K');}
-           let id = player.id
-            var socket = player.socket
+           let id = player
            (function(socket, kick) {
            if (id == lookfor) {
            socket.kick('')
