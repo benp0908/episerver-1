@@ -11,7 +11,7 @@
   "runSpeed": 1.5,
   "maxHeartbeatInterval": 300000,
   "verbose": true,
-  "server_closed": false,
+  "server_closed": true,
   "WIDTH": 4000,
   "HEIGHT": 4000,
   "MODE": "ffa",

@@ -15,7 +15,6 @@ const c = require('./config.json');
 const util = require('./lib/util');
 const ran = require('./lib/random');
 const hshg = require('./lib/hshg');
-if (c.server_closed) {console.log('server closed'), process.exit()}
 let closed = false;
 let doms = true;
 let arena_open = true;
@@ -40,12 +39,7 @@ Array.prototype.remove = index => {
         return r;
     }
 };
-if (c.server_closed) {
-  console.log('server closed')
-  sockets.broadcast('arena closed you will disconnect now!')
-  process.exit(1);
-  
-}
+
 
 // Set up room.
 global.fps = "Unknown";
@@ -3151,7 +3145,7 @@ var http = require('http'),
 const sockets = (() => {
     const protocol = require('./lib/fasttalk');
   var clients = [], players = [], connectedIPs=[], suspiciousIPs=[], bannedIPs=[];
-  
+ 
        // Banning
             function ban(socket) {
                 if (bannedIPs.findIndex(ip => { return ip === socket.ip; }) === -1) {
@@ -3216,12 +3210,14 @@ const sockets = (() => {
                 } else {
                     util.log('[INFO] A player disconnected before entering the game.');
                 }
+           
                 // Free the view
                 util.remove(views, views.indexOf(socket.view));
                 // Remove the socket
                 util.remove(clients, clients.indexOf(socket));        
                 util.log('[INFO] Socket closed. Views: ' + views.length + '. Clients: ' + clients.length + '.');
             }
+      
             // Being kicked 
             function kick(socket, reason = 'No reason given.') {
                 util.warn(reason + ' Kicking.');
@@ -3239,6 +3235,13 @@ const sockets = (() => {
                 socket.status.requests++;
                 // Remember who we are
                 let player = socket.player;
+              // server closed d
+                     if (c.server_closed) {
+  console.log('server closed')
+  sockets.broadcast('arena closed you will disconnect now!')
+  socket.kick('server closed!')
+  
+}
                 // Handle the request
                 switch (m.shift()) {
                 case 'k': { // key verification
