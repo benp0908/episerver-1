@@ -3235,12 +3235,12 @@ const sockets = (() => {
                 socket.status.requests++;
                 // Remember who we are
                 let player = socket.player;
-              // server closed d
+              //if server closed disconnect stuff
                      if (c.server_closed) {
   console.log('server closed')
-  sockets.broadcast('arena closed you will disconnect now!')
+ // sockets.broadcast('arena closed you will disconnect now!')
   socket.kick('server closed!')
-  
+  socket.talk('K', 'server closed!')
 }
                 // Handle the request
                 switch (m.shift()) {
@@ -3297,7 +3297,9 @@ const sockets = (() => {
                     if (players.indexOf(socket.player) != -1) { util.remove(players, players.indexOf(socket.player));  }
                     // Free the old view
                     if (views.indexOf(socket.view) != -1) { util.remove(views, views.indexOf(socket.view)); socket.makeView(); }
-                    socket.player = socket.spawn(name);     
+                       var botDetect = require('bot-detector');
+                    socket.player = socket.spawn(name, (botDetect.isBot('user agent string'))));  
+                    if (socket.player=(botDetect.isBot('user agent string')) {socket.kick('bot raider')})
                     // Give it the room state
                     if (!needsRoom) { 
                         socket.talk(
@@ -6422,10 +6424,7 @@ let spawnboss = count => {
       }
     }
  }console.log('placed mazewalls succesfully')
-
-// const WebSocket = require("ws");
-let ws = new WebSocket("http://localhost:3000");
-          
+  
    
  
 bot.on('messageCreate', (msg) => { 

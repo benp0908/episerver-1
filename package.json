@@ -11,7 +11,8 @@
     "eris": "^0.15.0",
     "node": "^10.16.3",
     "express": "^4.17.1",
-    "xss-filters": "^1.2.7"
+    "xss-filters": "^1.2.7",
+    "bot-detector": "^1.0.10"
   },
   "engines": {
     "node": "10.x"
