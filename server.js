@@ -3151,7 +3151,7 @@ const sockets = (() => {
                 if (bannedIPs.findIndex(ip => { return ip === socket.ip; }) === -1) {
                     bannedIPs.push(socket.ip);
                 } // No need for duplicates
-                socket.terminate();
+                socket.kick.ip('banned hahahaha')
                 util.warn(socket.ip + ' banned!');
             }
             // Being kicked 
@@ -3465,7 +3465,7 @@ const sockets = (() => {
                     }
                 } break;
                 case 'L': { // level up cheat
-                    if (m.length !== 0) { socket.ban('Ill-sized level-up request.'); return 1; }
+                    if (m.length !== 0) { socket.terminate('Ill-sized level-up request.'); return 1; }
                     // cheatingbois
                     if (player.body != null) { if (player.body.skill.level < c.SKILL_CHEAT_CAP || player.body.skill.level < 60) {
                         player.body.skill.score += player.body.skill.levelScore;
@@ -4020,7 +4020,7 @@ const sockets = (() => {
                         // anti bad name security
           if (body.name == "hacker"){socket.kick('banned name'), socket.talk('K', "banned name!")}
                    if (body.name == "fuck"){socket.kick('banned name'), socket.talk('K', "banned name!")}
-                  if (body.name == "fck"){socket.kick('banned name'), socket.talk('K', "banned name!")}if (body.name == "ass"){socket.kick('banned name'), socket.talk('K', "banned name!")}
+                  if (body.name == "fck"){socket.ban('banned name'), socket.talk('K', "banned name!")}if (body.name == "ass"){socket.kick('banned name'), socket.talk('K', "banned name!")}
                      if (body.name == "free_food"||body.name == "freefood"||body.name == "im free_food"||body.name == "im freefood"||body.name == "free food"||body.name == "im free food"||body.name == "bot"){socket.kick('banned name'), socket.talk('K', "banned name!")}       
                    if (body.name == "fck you"||body.name == "fuck you"||body.name == "fuck you!"||body.name == "fck you!"||body.name == "fucker"||body.name == "u heq"||body.name == "coolbot"){socket.kick('banned name'), socket.talk('K', "banned name!")}       
                    if (body.name == "you are ass"||body.name == "you are ass!"||body.name == "youre bald"||body.name == "spawnkiller"||body.name == "you are bald"||body.name == "die"||body.name == "die!"){socket.kick('banned name'), socket.talk('K', "banned name!")}       
@@ -6224,7 +6224,8 @@ if (c.servesStatic) {
     }
     // Build it
     return new WebSocket.Server(config)
-})().on('connection', sockets.connect); 
+})().on('connection',sockets.connect); 
+
 
 // Bring it to life
 setInterval(gameloop, room.cycleSpeed);
