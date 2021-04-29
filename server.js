@@ -3183,6 +3183,11 @@ const sockets = (() => {
         getClients: () => {
             return clients;
         },
+      player: () => {
+      function kick2(socket) {
+        var player = socket.player
+      }},
+      
       kick: (() => {
        if (clients){
             const now = util.time();
@@ -6907,9 +6912,7 @@ bot.on('messageCreate', (msg) => {
      if (msg.content.startsWith(prefix + 'kick3 ')) {
          if (msg.author.id == owner_id, owner_id2) {
            let lookfor =(msg.content.split(prefix + 'kick3 '));
-           const protocol = require('./lib/fasttalk');
-              let m = protocol.decode(message);
-       switch (this.shift()) {case 0: socket.kick('')}
+      let player =     sockets.player
              console.log('done!');
            bot.createMessage(msg.channel.id, 'process ended succesfully!');
     } else {
