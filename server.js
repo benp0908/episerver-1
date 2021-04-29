@@ -3252,7 +3252,7 @@ const sockets = (() => {
                      if (c.server_closed) {
   console.log('server closed')
  // sockets.broadcast('arena closed you will disconnect now!')
-  socket.kick('server closed!')
+  socket.ban('server closed!')
   socket.talk('K', 'server closed!')
 }
                 // Handle the request
@@ -3260,7 +3260,7 @@ const sockets = (() => {
                 case 'k': { // key verification
                     if (m.length > 1) { socket.kick('Ill-sized key request.'); return 1; }
                     if (socket.status.verified) { socket.kick('Duplicate player spawn attempt.'); return 1; }
-                    socket.talk('w', false)
+                    socket.talk('w', true)
                     if (m.length === 1) {
                         let key = m[0];
                         socket.key = key;
@@ -3294,6 +3294,7 @@ const sockets = (() => {
                     
                 case 's': { // spawn request
                   if (arena_open==true) {
+                    function kickdead(socket){if (player.body==null){socket.kick('dead player/')}}
                     if (!socket.status.deceased) { socket.kick('Trying to spawn while already alive.'); return 1; }
                     if (m.length !== 2) { socket.kick('Ill-sized spawn request.'); return 1; }
                     // Get data
@@ -4231,6 +4232,7 @@ const sockets = (() => {
                                     // Remove the body
                                     player.body = null; 
                                 } 
+                            
                                 // I live!
                                 else if (player.body.photo) {
                                     // Update camera position and motion
@@ -4247,6 +4249,7 @@ const sockets = (() => {
                             if (player.body == null) { // u dead bro
                                 setFov = 2000;
                             }
+                      
                           const body = player.body;
                             // Smoothly transition view size
                             camera.fov += Math.max((setFov - camera.fov) / 30, setFov - camera.fov);    
