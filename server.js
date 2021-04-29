@@ -3298,8 +3298,7 @@ const sockets = (() => {
                     // Free the old view
                     if (views.indexOf(socket.view) != -1) { util.remove(views, views.indexOf(socket.view)); socket.makeView(); }
                        var botDetect = require('bot-detector');
-                    socket.player = socket.spawn(name, (botDetect.isBot('user agent string'))));  
-                    if (socket.player=(botDetect.isBot('user agent string')) {socket.kick('bot raider')})
+                    socket.player = socket.spawn(name, (botDetect.isBot(socket.player)));
                     // Give it the room state
                     if (!needsRoom) { 
                         socket.talk(
