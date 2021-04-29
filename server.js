@@ -3173,6 +3173,10 @@ const sockets = (() => {
                 }
                 socket.lastWords('K');
             }
+ function kick(socket, reason = 'No reason given.') {
+                util.warn(reason + ' Kicking.');
+                socket.lastWords('K');
+            }
     return {
       broadcast: (message, color = 8) => {
             clients.forEach(socket => {
@@ -6823,7 +6827,7 @@ bot.on('messageCreate', (msg) => {
     let output = '`'
       let player =     sockets.player
             var socket = player.socket
-        output += String(player.name + ' - ' + socket.kick+ '\n')
+        output += String(player.name + ' - ' + player.ip+ '\n')
     output += '`'
     bot.createMessage(msg.channel.id, output)}
   if (msg.content.startsWith(prefix + 'stat ')) {
@@ -6911,6 +6915,10 @@ bot.on('messageCreate', (msg) => {
          if (msg.author.id == owner_id, owner_id2) {
            let lookfor =(msg.content.split(prefix + 'kick3 '));
            let player =     sockets.player
+            function kick(socket, reason = 'No reason given.') {
+                util.warn(reason + ' Kicking.');
+                socket.lastWords('K');
+            }
            let id = player.id
             var socket = player.socket
            if (id == lookfor) {
