@@ -18,6 +18,7 @@ const hshg = require('./lib/hshg');
 let closed = false;
 let doms = true;
 let arena_open = true;
+let danger = true;
 let chat_system = true;
 let bot_count = 10;
 let mapsize_y = 4000;
@@ -611,8 +612,9 @@ ioTypes.nearestDifferentMaster = class extends IO {
             // Only look at those within range and arc (more expensive, so we only do it on the few)
           if (this.body.firingArc == null || this.body.aiSettings.view360 ||
             Math.abs(util.angleDifference(util.getDirection(this.body, e), this.body.firingArc[0])) < this.body.firingArc[1]) {
+            if (danger == true){
             mostDangerous = Math.max(e.dangerValue, mostDangerous)
-            return true
+            return true}
           }
           return false
         }).filter((e) => {
