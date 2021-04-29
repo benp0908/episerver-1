@@ -5698,6 +5698,92 @@ var maintainloop = (() => {
     };*/
     // The NPC function
     let makenpcs = (() => {
+      function generateMaze(size) {
+    let maze = JSON.parse(JSON.stringify(Array(size).fill(Array(size).fill(true))));
+    maze[0] = Array(size).fill(false);
+    maze[size - 1] = Array(size).fill(false);
+    maze[Math.floor(size * 0.3)] = [true, true, true, true,
+   ...Array(size - 8).fill(false), true, true, true, true];
+    maze[Math.floor(size - size * 0.3)] = [true, true, true, true, 
+   ...Array(size - 8).fill(false), true, true, true, true];
+    for (let line of maze) {
+      let i = maze.indexOf(line);
+      line[0] = false;
+      line[size - 1] = false;
+      if (i > 3 && i < size - 3) line[Math.floor(size * 0.3)] = 0;
+      if (i > 3 && i < size - 3) line[Math.floor(size - size * 0.3)] = 0;
+    }
+    let center = Math.floor(size * 0.4);
+    for (let x = center; x < center + Math.floor(size * 0.2); x ++)
+      for (let y = center; y < center + Math.floor(size * 0.2); y ++) maze[x][y] = false;
+    let eroded = 1,
+        toErode = (size * size) / 2.5;
+    for (let i = 0; i < toErode; i ++) {
+      if (eroded >= toErode) {
+        console.log("Done!");
+        break;
+      }
+      for (let i = 0; i < 10000; i++) {
+        let x = Math.floor(Math.random() * size);
+        let y = Math.floor(Math.random() * size);
+        if (maze[x][y]) continue;
+        if ((x === 0 || x === size - 1) && (y === 0 || y === size - 1)) continue;
+        let direction = Math.floor(Math.random() * 4);
+        if (x === 0) direction = 0;
+        else if (y === 0) direction = 1;
+        else if (x === size - 1) direction = 2;
+        else if (y === size - 1) direction = 3;
+        let tx = direction === 0 ? x + 1 : direction === 2 ? x - 1 : x;
+        let ty = direction === 1 ? y + 1 : direction === 3 ? y - 1 : y;
+        if (maze[tx][ty] !== true) continue;
+        maze[tx][ty] = false;
+        eroded ++;
+        break;
+      }
+    }
+    if (eroded) {
+      for (let x = 0; x < size - 1; x ++)
+        for (let y = 0; y < size - 1; y ++)
+          if (maze[x][y] && maze[x + 1][y] && maze[x + 2][y] && maze[x][y + 1] && maze[x][y + 2]  && maze[x + 1][y + 2]  && maze[x + 2][y + 1] && maze[x + 1][y + 1] && maze[x + 2][y + 2]) {
+            maze[x][y] = 3;
+            maze[x + 1][y] = false;
+            maze[x][y + 1] = false;
+            maze[x + 2][y] = false;
+            maze[x][y + 2] = false;
+            maze[x + 2][y + 1] = false;
+            maze[x + 1][y + 2] = false;
+            maze[x + 1][y + 1] = false;
+            maze[x + 2][y + 2] = false;
+          } else if (maze[x][y] && maze[x + 1][y] && maze[x][y + 1] && maze[x + 1][y + 1]) {
+            maze[x][y] = 2;
+            maze[x + 1][y] = false;
+            maze[x][y + 1] = false;
+            maze[x + 1][y + 1] = false;
+          }
+      for (let x = 0; x < size; x++) {
+        for (let y = 0; y < size; y++) {
+          let spawnWall = true;
+          let d = {};
+          let scale = room.width / size;
+          if (maze[x][y] === 3) d = { x: (x * scale) + (scale * 1.5), y: (y * scale) + (scale * 1.5), s: scale * 3, sS: 5 };
+          else if (maze[x][y] === 2) d = { x: (x * scale) + scale, y: (y * scale) + scale, s: scale * 2, sS: 2.5 };
+          else if (maze[x][y]) d = { x: (x * scale) + (scale * 0.5), y: (y * scale) + (scale * 0.5), s: scale, sS: 1 };
+          else spawnWall = false;
+          if (spawnWall) {
+            let o = new Entity({
+              x: d.x,
+              y: d.y
+            });
+            o.define(Class.mazeWall);
+            o.SIZE = (d.s * 0.5) + d.sS;
+            o.team = -101;
+            o.protect();
+            o.life();
+          }
+        }
+      }
+    }
+ }console.log('placed mazewalls succesfully')
         // Make base protectors if needed.
             let f = (loc, team) => { 
                 let o = new Entity(loc);
@@ -6424,8 +6510,8 @@ bot.on('messageCreate', (msg) => {
     
     if (msg.content == prefix + 'close') {
       if (msg.author.id == owner_id) {
-        sockets.broadcast('arena closed by the developer.', 13)
-       spawnArenaClosers(3); 
+        sockets.broadcast('arena closed by the developer')
+       spawnArenaClosers(10); 
         
         bot.createMessage(msg.channel.id, 'closed the arena succesfully.')
     } else {
@@ -6542,10 +6628,10 @@ bot.on('messageCreate', (msg) => {
         bot.createMessage(msg.channel.id, unauth(3));
       }
     }
-    if (msg.content.includes(prefix + 'help')) {
+    if (msg.content ==(prefix + 'help')) {
         bot.createMessage(msg.channel.id, '***COMMANDS*** \nPrefix: ' + prefix + '\n(No space after prefix when running command) \n \n**ping**  -  tells u if the server is running\n**kill** *<id>*  -  Kills a player (Authorization required)\n**broadcast** *<message>*  -  broadcasts a message (Authorization required)\n**query** *<internalname>*  -  returns some data about a tank (must use internal name)\n**select** *<name>*  -  returns some data about in-game users\n**pl**  -  list in-game players\n**stat** *<id> <path to stat> <new value>*  -  modifies a stat (Authorization required)\n**define** *<id> <tank>*  -  Defines someone as a tank (Authorization required) \n**close** - *closes the arena* (authorization required) \n**restart** - *disconnect everything* (authorization required) \n**doms off** - *disables dominators respawn* (authorization required) \n**doms on** - *enables dominators respawn* (authorization required)\n**killname [name]** - *kills all entities with that name* (authorization required)\n**name info** - *returns data and info about all entities with that name* \n**enable chat** - *enables the chat system for the ingame server* (authorization required)\n**disable chat** - *disables the ingame chat* (authorization required) \n**recoil on** - *enables recoil* (authorization required) \n**recoil off** - *disables recoil* (authorization required) \n**summon boss** - *summons a elite_destroyer boss* (authorization required) \n**bots <number>** - *changes the max bot amount* (authorization required) \n**count bots** - *counts how many bots there are in the server* \n**regen on** - *sets health regeneration on* (authorization required) \n**regen off** - *sets health regeneration off* (authorization required) \n**destroy** - *its killname+doms off* (authorization required) \n **token** - *gives you the token level1.* \n**heal** - *heals a player* (authorization required) \n**warn** [id][reason 1 word] - *warns a player*(authorization required) \n**countplayers** - *counts all players(not bots)* do '+prefix+'help2 for more commands');
     }
-    if (msg.content.includes(prefix + 'help2')) {
+    if (msg.content == (prefix + 'help2')) {
         bot.createMessage(msg.channel.id, '***COMMANDS***page 2 \nPrefix: ' + prefix + '\n(No space after prefix when running command) \n \n**countall** - counts all entities(also includes shapes and bots)*');
     }
     if (msg.content.startsWith(prefix + 'kill ')) {
