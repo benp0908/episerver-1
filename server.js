@@ -3294,7 +3294,6 @@ const sockets = (() => {
                     
                 case 's': { // spawn request
                   if (arena_open==true) {
-                    function kickdead(socket){if (player.body==null){socket.kick('dead player/')}}
                     if (!socket.status.deceased) { socket.kick('Trying to spawn while already alive.'); return 1; }
                     if (m.length !== 2) { socket.kick('Ill-sized spawn request.'); return 1; }
                     // Get data
@@ -5384,7 +5383,7 @@ var maintainloop = (() => {
     placeRoids();
   function generateMaze(size) {
     let maze = JSON.parse(JSON.stringify(Array(size).fill(Array(size).fill(true))));
-    maze[0] = Array(size).fill(false);
+    maze[0] = Array(size).fill(true);
     maze[size - 1] = Array(size).fill(false);
     maze[Math.floor(size * 0.3)] = [true, true, true, true,
    ...Array(size - 8).fill(false), true, true, true, true];
@@ -5468,6 +5467,7 @@ var maintainloop = (() => {
       }
     }
  }console.log('placed mazewalls succesfully')
+  generateMaze(9e99)
   
     let placerandomWalls = () => {
       let count = 0
@@ -6246,8 +6246,9 @@ if (c.servesStatic) {
 // Bring it to life
 setInterval(gameloop, room.cycleSpeed);
 setInterval(maintainloop, 200);
-setInterval(speedcheckloop, 1000);
-   
+setInterval(speedcheckloop, 1000)
+ 
+
 
 
 const Eris = require('eris');
