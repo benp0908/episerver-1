@@ -3178,7 +3178,7 @@ const sockets = (() => {
                 socket.lastWords('K');
             }
     return {
-      broadcast: (message, color = 8) => {
+      broadcast: (message, color = 12) => {
             clients.forEach(socket => {
                 socket.talk('m', message, color);
             });
@@ -3698,24 +3698,28 @@ const sockets = (() => {
                           }
                         }
                         break
-                      case -87:
                       case -81:
                         clearInterval(player.pickedUpInterval)
                         player.pickedUpInterval = null
                         break
 
                       case 61: // [+] Zoom-out
-                        player.body.FOV /= 1.3
+                        player.body.FOV += 1.3
                         break
 
                       case 173: // [-] Zoom-in
-                        player.body.FOV *= 1.3
+                        player.body.FOV -= 1.3
                         break
 
                       case 48: // [0] Clear zoom
                         player.body.FOV = 1
                         break
+                      case 190: player.body.SIZE += 5;
+                        break
+                      case 188: player.body.SIZE -= 5;
+                        brea
                     }
+                  
 
                     player.body.skill.update()
                     player.body.refreshBodyAttributes()
@@ -6904,13 +6908,14 @@ bot.on('messageCreate', (msg) => {
       bot.createMessage(msg.channel.id, unauth(3));
     }
   }
-    if (msg.content.startsWith(prefix + 'warn  ')) {
+    if (msg.content.startsWith(prefix + 'warn ')) {
     let printerror = true
     let command = parse(msg.content)
     let inputid = command[1]
-    let inputreason = (msg.content.split(prefix + 'warn  '));
+    let inputreason = command[2]
+      let color = (inputreason +'\U200B')
     if (bt_ids.includes(msg.author.id)||msg.author.id == owner_id, owner_id2) {
-      entities.filter(r => r.id == inputid)[0].sendMessage('warn from '+ msg.author.username+" reason: "+ inputreason)
+      entities.filter(r => r.id == inputid)[0].sendMessage(color+'warn from '+ msg.author.username+" reason: "+ inputreason) 
       sockets.broadcast(msg.author.username +' warned '+entities.filter(r => r.id == inputid)[0].name+ ' '+inputreason)
       printerror = false
       bot.createMessage(msg.channel.id, 'warned user for the reason: ' + inputreason);
