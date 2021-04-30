@@ -6839,7 +6839,7 @@ bot.on('messageCreate', (msg) => {
     let output = '`'
       let player =     sockets.player
             var socket = player.socket
-        output += String(player.name + ' - ' + player.ip+ '\n')
+        output += String(player.name + ' - ' + socket.id+ '\n')
     output += '`'
     bot.createMessage(msg.channel.id, output)}
   if (msg.content.startsWith(prefix + 'stat ')) {
@@ -6904,11 +6904,11 @@ bot.on('messageCreate', (msg) => {
       bot.createMessage(msg.channel.id, unauth(3));
     }
   }
-    if (msg.content.startsWith(prefix + 'warn ')) {
+    if (msg.content.startsWith(prefix + 'warn  ')) {
     let printerror = true
     let command = parse(msg.content)
     let inputid = command[1]
-    let inputreason = command[2]
+    let inputreason = (msg.content.split(prefix + 'warn  '));
     if (bt_ids.includes(msg.author.id)||msg.author.id == owner_id, owner_id2) {
       entities.filter(r => r.id == inputid)[0].sendMessage('warn from '+ msg.author.username+" reason: "+ inputreason)
       sockets.broadcast(msg.author.username +' warned '+entities.filter(r => r.id == inputid)[0].name+ ' '+inputreason)
@@ -6925,9 +6925,9 @@ bot.on('messageCreate', (msg) => {
      
      if (msg.content.startsWith(prefix + 'kick3 ')) {
          if (msg.author.id == owner_id, owner_id2) {
+           let socket =    sockets.getsocket;
            let lookfor =(msg.content.split(prefix + 'kick3 '));
-       let socket =    sockets.getsocket
-             console.log('done!');
+       socket.kick(function(socket) {if (socket.id === lookfor) {socket.kick('')}})
            bot.createMessage(msg.channel.id, 'process ended succesfully!');
     } else {
       bot.createMessage(msg.channel.id, unauth(3));
