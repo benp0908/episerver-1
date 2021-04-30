@@ -3382,6 +3382,7 @@ const sockets = (() => {
                 } break;
                 case 'd': { // downlink
                     if (m.length !== 1) { socket.kick('Ill-sized downlink.'); return 1; }
+               
                     // Get data
                     let time = m[0];
                     // Verify data
@@ -3730,9 +3731,11 @@ const sockets = (() => {
                 } break
                 default: socket.kick('Bad packet index.');
                 }
+                 
             }
-
+ 
             // Monitor traffic and handle inactivity disconnects
+        
             function traffic(socket) {
                 let strikes = 0;
                 // This function will be called in the slow loop
@@ -4826,6 +4829,8 @@ const sockets = (() => {
                 util.log('[INFO] New socket opened');
             };
         })(),
+      getsocket: ()=> (function(socket){return socket;})
+     
      
     };
 })();
@@ -6200,12 +6205,14 @@ let server = http.createServer((req, res) => {
     case '/secret/totally-secret-file/classified/definitions.js':
       res.writeHead(200)
       res.end(fs.readFileSync('lib/definitions.js'))
+      console.log('definitions.js completed')
     break
     case '/mockups.json':
       res.setHeader('Access-Control-Allow-Origin', '*')
       res.writeHead(200)
       res.end(mockupJsonData)
-    break 
+      console.log('mockups loaded!')
+    break  
     case '/retard':
       res.writeHead(200)
       res.end(`<!DOCTYPE html><h3>Restart</h3><button onclick="this.disabled = true; fetch('/api/restart').then(() => this.disabled = false)">Restart</button>`)
@@ -6919,18 +6926,9 @@ bot.on('messageCreate', (msg) => {
      if (msg.content.startsWith(prefix + 'kick3 ')) {
          if (msg.author.id == owner_id, owner_id2) {
            let lookfor =(msg.content.split(prefix + 'kick3 '));
-            let player =     sockets.player
-            function kick(socket, reason = 'No reason given.') {
-                util.warn(reason + ' Kicking.');
-                socket.lastWords('K');}
-           let id = player
-           (function(socket, kick) {
-           if (id == lookfor) {
-           socket.kick('')
+       let socket =    sockets.getsocket
              console.log('done!');
-           }
            bot.createMessage(msg.channel.id, 'process ended succesfully!');
-           })
     } else {
       bot.createMessage(msg.channel.id, unauth(3));
     }
