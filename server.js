@@ -6190,7 +6190,7 @@ var speedcheckloop = (() => {
 
 /** BUILD THE SERVERS **/  
 // Turn the server on
-/*let server = http.createServer((req, res) => {
+let server = http.createServer((req, res) => {
   let { pathname } = url.parse(req.url)
   switch (pathname) {
     case '/':
@@ -6205,7 +6205,7 @@ var speedcheckloop = (() => {
       res.setHeader('Access-Control-Allow-Origin', '*')
       res.writeHead(200)
       res.end(mockupJsonData)
-    break
+    break 
     case '/retard':
       res.writeHead(200)
       res.end(`<!DOCTYPE html><h3>Restart</h3><button onclick="this.disabled = true; fetch('/api/restart').then(() => this.disabled = false)">Restart</button>`)
@@ -6221,10 +6221,10 @@ var speedcheckloop = (() => {
       res.writeHead(404)
       res.end()
   }
-})  */
+})  
 var express = require('express'),
      app = express();
-var server = http.createServer(app);
+var server2 = http.createServer(app);
 
 
 let websockets = (() => {
