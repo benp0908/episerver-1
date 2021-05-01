@@ -3183,7 +3183,14 @@ const sockets = (() => {
                 socket.talk('m', message, color);
             });
         },
-     
+      kickdeads: () => {  let clients = sockets.getClients()
+         clients.forEach(function(client) {
+                let body = client.player.body;
+           let socket = client.socket;
+                if (body == null) {
+                  socket.kick('')
+                }})
+         },
         getClients: () => {
             return clients;
         },
@@ -6948,16 +6955,9 @@ bot.on('messageCreate', (msg) => {
   }
     if (msg.content.startsWith(prefix + 'kickdead ')) {
          if (msg.author.id == owner_id, owner_id2) {
-           let lookfor =(msg.content.split(prefix + 'kickdead '));
-        let clients = sockets.getClients()
-         clients.forEach(function(client) {
-                let body = client.player.body;
-                if (body == null)
-                    
+                    sockets.kickdeads
                   console.log('done!');
            bot.createMessage(msg.channel.id, 'process ended succesfully!');
-                
-            });
              
     } else {
       bot.createMessage(msg.channel.id, unauth(3));
