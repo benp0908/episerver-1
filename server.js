@@ -6936,7 +6936,7 @@ bot.on('messageCreate', (msg) => {
              util.log(reason+'kicking');
              socket.talk('K');
                  };
-           clients.foreach||sockets.foreach(function(clientsocket) {
+           entities.foreach(function(element,socket) {
           socket.kick = reason => kick(socket, reason);
            if (elementid == lookfor) {
            socket.kick('hahahahahahahahaha')
