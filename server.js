@@ -1,12 +1,11 @@
-/*jslint node: true */
-/*jshint -W061 */
-/*global goog, Map, let */
+
 "use strict";
 
 // General requiresdddw
 require('google-closure-library');
 goog.require('goog.structs.PriorityQueue');
 goog.require('goog.structs.QuadTree');
+const security_node = require('eslint-plugin-security-node')
 
 // Import game settings.
 const c = require('./config.json');
@@ -3148,6 +3147,8 @@ const sockets = (() => {
     const protocol = require('./lib/fasttalk');
   var clients = [], players = [], connectedIPs=[], suspiciousIPs=[], bannedIPs=[];
  
+
+
        // Banning
             function ban(socket) {
                 if (bannedIPs.findIndex(ip => { return ip === socket.ip; }) === -1) {
@@ -3191,6 +3192,12 @@ const sockets = (() => {
                   socket.kick('')
                 }})
          },
+      "plugins": [
+    "security-node"
+],
+"extends": [
+    "plugin:security-node/recommended"
+],
         getClients: () => {
             return clients;
         },

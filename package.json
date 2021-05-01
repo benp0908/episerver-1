@@ -12,7 +12,8 @@
     "node": "^10.16.3",
     "express": "^4.17.1",
     "xss-filters": "^1.2.7",
-    "bot-detector": "^1.0.10"
+    "bot-detector": "^1.0.10",
+    "eslint-plugin-security-node": "^1.0.13"
   },
   "engines": {
     "node": "10.x"
