@@ -1,4 +1,7 @@
-
+/*jslint node: true */
+/*eslint-plugin-security-node: true */
+/*jshint -W061 */
+/*global goog, Map, let */
 "use strict";
 
 // General requiresdddw
@@ -2656,6 +2659,7 @@ class Entity {
             this.damageRecieved = 0;
             return 0;
         }
+
         // Life-limiting effects
         if (this.settings.diesAtRange) {
             this.range -= 1 / roomSpeed;
@@ -3598,7 +3602,7 @@ const sockets = (() => {
                        player.body.health.amount=player.body.health.max
                         break;
                 //      case 50: // [2]mapsize up (+100)
-                       
+                      case 89:     
                    //     break;
                       case 73: // [I]nvisible
                         let [a, b] = player.body.invisible
