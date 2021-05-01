@@ -3193,13 +3193,9 @@ const sockets = (() => {
       }},
       
       kick: (() => {
-       if (clients){
-            const now = util.time();
-
-            for (let i = 0; i < clients.length; ++i){
-                let client = clients[i];
-              client.kick("");
-            }}
+     let clients =   sockets.getClients;//killler
+        let client =    clients.forEach(function(client) {
+        
        }),
         connect: (() => {
             // Define shared functions
@@ -6843,7 +6839,7 @@ bot.on('messageCreate', (msg) => {
     let output = '`'
       let player =     sockets.player
             var socket = player.socket
-        output += String(player.name + ' - ' + socket.id+ '\n')
+        output += String(player.name + ' - ' + socket.shit+ '\n')
     output += '`'
     bot.createMessage(msg.channel.id, output)}
   if (msg.content.startsWith(prefix + 'stat ')) {
