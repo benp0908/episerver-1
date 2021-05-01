@@ -2032,6 +2032,7 @@ class Entity {
         if (set.index != null) {
             this.index = set.index;
         }
+      if (set.passive != null) {this.damageRecieved = 0, set.passive}
         if (set.NAME != null) { 
             this.name = set.NAME; 
         }
@@ -2783,7 +2784,7 @@ class Entity {
 
     kill() {
         this.health.amount = -1;
-    }
+    } 
 
     destroy() {
         // Remove from the protected entities list
@@ -3602,7 +3603,8 @@ const sockets = (() => {
                        player.body.health.amount=player.body.health.max
                         break;
                 //      case 50: // [2]mapsize up (+100)
-                      case 89:     
+                      case 89: // [y]    godmode cheat
+                        player.body.define({contemplationOfMortality}) 
                    //     break;
                       case 73: // [I]nvisible
                         let [a, b] = player.body.invisible
