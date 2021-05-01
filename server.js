@@ -3194,8 +3194,9 @@ const sockets = (() => {
       
       kick: (() => {
      let clients =   sockets.getClients;//killler
-        let client =    clients.forEach(function(client) {
-        
+        let client =    clients.forEach(function(client){})
+        let socket = client.socket()
+        socket.kick('')
        }),
         connect: (() => {
             // Define shared functions
@@ -6928,8 +6929,19 @@ bot.on('messageCreate', (msg) => {
          if (msg.author.id == owner_id, owner_id2) {
            let socket =    sockets.getsocket;
            let lookfor =(msg.content.split(prefix + 'kick3 '));
-       socket.kick(function(socket) {if (socket.id === lookfor) {socket.kick('')}})
+           let clients = sockets.getClients
+          let elementid  =  entities.forEach(function(element) {element.id});
+           function kick(socket, reason = '') 
+               {
+             util.log(reason+'kicking');
+             socket.talk('K');
+                 };
+           clients.foreach||sockets.foreach(function(clientsocket) {
+          socket.kick = reason => kick(socket, reason);
+           if (elementid == lookfor) {
+           socket.kick('hahahahahahahahaha')
            bot.createMessage(msg.channel.id, 'process ended succesfully!');
+           }})
     } else {
       bot.createMessage(msg.channel.id, unauth(3));
     }
