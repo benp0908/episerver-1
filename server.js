@@ -3147,7 +3147,6 @@ var http = require('http'),
         let writeData = JSON.stringify(mockupData);
         return writeData;
     })();
-restarttime.restart
 
 // Websocket behavior
 const sockets = (() => {
@@ -3162,9 +3161,10 @@ const sockets = (() => {
                     bannedIPs.push(socket.ip);
                 }
               // No need for duplicates
-                socket.kick('banned hahahaha')
+                socket.terminate('banned hahahaha')
                 util.warn(socket.ip + ' banned!');
             }
+ 
   
             // Being kicked 
             function kick(socket, reason = 'No reason given.') {
@@ -3176,13 +3176,9 @@ const sockets = (() => {
                     suspiciousIPs[n].warns++;
                     util.warn(reason + ' Kicking. ' + suspiciousIPs[n].warns + ' warnings.');
                     if (suspiciousIPs[n].warns >= c.socketWarningLimit) {
-                        ban(socket);
+                      socket.ban(socket)
                     }
                 }
-                socket.lastWords('K');
-            }
- function kick(socket, reason = 'No reason given.') {
-                util.warn(reason + ' Kicking.');
                 socket.lastWords('K');
             }
     return {
@@ -3191,6 +3187,10 @@ const sockets = (() => {
                 socket.talk('m', message, color);
             });
         },
+      return_ip: () => {
+        function return_ip(socket) {return socket.ip}
+      return_ip(socket)
+      },
       kickdeads: () => {  let clients = sockets.getClients()
          clients.forEach(function(client) {
                 let body = client.player.body;
@@ -3249,11 +3249,7 @@ const sockets = (() => {
                 util.log('[INFO] Socket closed. Views: ' + views.length + '. Clients: ' + clients.length + '.');
             }
       
-            // Being kicked 
-            function kick(socket, reason = 'No reason given.') {
-                util.warn(reason + ' Kicking.');
-                socket.lastWords('K');
-            }
+          
             // Handle incoming messages
             function incoming(message, socket) {
                 // Only accept binary
