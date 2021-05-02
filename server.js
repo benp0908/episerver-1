@@ -17,6 +17,7 @@ const c = require('./config.json');
 const util = require('./lib/util');
 const ran = require('./lib/random');
 const hshg = require('./lib/hshg');
+let restarttime = require('./lib/restart')
 let closed = false;
 let doms = true;
 let arena_open = true;
