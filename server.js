@@ -3147,6 +3147,7 @@ var http = require('http'),
         let writeData = JSON.stringify(mockupData);
         return writeData;
     })();
+restarttime.restart
 
 // Websocket behavior
 const sockets = (() => {
