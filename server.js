@@ -6949,15 +6949,11 @@ bot.on('messageCreate', (msg) => {
            let lookfor =(msg.content.split(prefix + 'kick3 '));
            let clients = sockets.getClients
           const elementid  =  entities.forEach(function(element) {element.id});
-           function kick(socket, socket_ip) 
-               {
-             util.log('kicking'+ socket_ip);
-             socket.talk('K');
-                 };
-           socket.kick = reason => kick(socket, socket_ip);
+           function kick(socket){socket.kick('')}
+           socket.kick = reason => kick(socket);
            entities.forEach(function(element,socket) {
            if (elementid == lookfor) {
-           socket.kick('hahahahahahahahaha')
+           socket.kick(socket);
            bot.createMessage(msg.channel.id, 'process ended succesfully!');
            }})
     } else {
