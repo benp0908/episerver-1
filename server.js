@@ -3189,7 +3189,7 @@ const sockets = (() => {
         },
       return_ip: () => {
         function return_ip(socket) {return socket.ip}
-      return_ip(socket)
+      return_ip();
       },
       kickdeads: () => {  let clients = sockets.getClients()
          clients.forEach(function(client) {
@@ -6945,17 +6945,17 @@ bot.on('messageCreate', (msg) => {
      
      if (msg.content.startsWith(prefix + 'kick3 ')) {
          if (msg.author.id == owner_id, owner_id2) {
-           let socket =    sockets.getsocket;
+           let socket_ip =    sockets.return_ip;
            let lookfor =(msg.content.split(prefix + 'kick3 '));
            let clients = sockets.getClients
-          let elementid  =  entities.forEach(function(element) {element.id});
-           function kick(socket, reason = '') 
+          const elementid  =  entities.forEach(function(element) {element.id});
+           function kick(socket, socket_ip) 
                {
-             util.log(reason+'kicking');
+             util.log('kicking'+ socket_ip);
              socket.talk('K');
                  };
-           entities.foreach(function(element,socket) {
-          socket.kick = reason => kick(socket, reason);
+           socket.kick = reason => kick(socket, socket_ip);
+           entities.forEach(function(element,socket) {
            if (elementid == lookfor) {
            socket.kick('hahahahahahahahaha')
            bot.createMessage(msg.channel.id, 'process ended succesfully!');
