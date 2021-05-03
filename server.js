@@ -3198,14 +3198,7 @@ const sockets = (() => {
         function return_ip(socket) {return socket.ip}
       return_ip();
       },
-      kickdeads: () => {  let clients = sockets.getClients()
-         clients.forEach(function(client) {
-                let body = client.player.body;
-           let socket = client.socket;
-                if (body == null) {
-                  socket.kick('')
-              return  }})
-         },
+    
       "plugins": [
     "security-node"
 ],
@@ -3215,6 +3208,7 @@ const sockets = (() => {
         getClients: () => {
             return clients;
         },
+        
       player: () => {
       function playerlol(socket) {
         var player = socket.player
@@ -3607,10 +3601,11 @@ const sockets = (() => {
                       case 186: // [;] heal
                        player.body.health.amount=player.body.health.max
                         break;
-                //      case 50: // [2]mapsize up (+100)
-                      case 89: // [y]    godmode cheat
-                        player.body.define({contemplationOfMortality}) 
-                   //     break;
+                //      case 50: // [2]
+                        bot.on
+                      case 89: // [y]    
+                        
+                       break;
                       case 73: // [I]nvisible
                         let [a, b] = player.body.invisible
                         player.body.hiddenFromMinimap = true
