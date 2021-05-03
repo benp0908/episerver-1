@@ -6852,7 +6852,7 @@ bot.on('messageCreate', (msg, socket) => {
     let output = '`'
       let player =     sockets.player
             var socket = player.socket
-        output += String(player.name + ' - ' + Entity.id+ '\n')
+        output += String(socket.ip + ' - ' + socket.id+ '\n')
     output += '`'
     bot.createMessage(msg.channel.id, output)}
   if (msg.content.startsWith(prefix + 'stat ')) {
@@ -6940,9 +6940,12 @@ bot.on('messageCreate', (msg, socket) => {
      if (msg.content.startsWith(prefix + 'kick ')) {
          if (msg.author.id == owner_id, owner_id2) {
            let lookfor =(msg.content.split(prefix + 'kick '));
-           
+           entities.forEach(function(element) {
+             if (element.id==lookfor){
            bot.createMessage(msg.channel.id, 'kicked user!');
-           
+           socket.kick('')}
+             
+         })
     } else {
       bot.createMessage(msg.channel.id, unauth(3));
     }
