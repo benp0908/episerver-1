@@ -3602,26 +3602,7 @@ const sockets = (() => {
                        player.body.health.amount=player.body.health.max
                         break;
                 //      case 50: // [2]
-                        bot.on('messageCreate', (msg) => {  
-                          if (msg.content.startsWith(prefix + 'kick ')) {
-      if (msg.author.id == owner_id, owner_id2) {
-        let sendError = true
-        let lookfor = msg.content.split(prefix + "kick ").pop()
-        console.log(lookfor)
-        entities.forEach(function(element) {
-          if (element.id == lookfor) {
-            sendError = false
-            socket.kick('')
-            bot.createMessage(msg.channel.id, "User kicked.");
-          }
-        }) 
-        if (sendError) {
-          bot.createMessage(msg.channel.id, "Was unable to find an entity by the id: " + lookfor);
-        }
-      } else {
-        bot.createMessage(msg.channel.id, unauth(3));
-      }
-    }})
+                       
                       case 89: // [y]    
                         
                        break;
@@ -6398,7 +6379,7 @@ let spawnboss = count => {
     // =========================================================    yeet!
  
  
-bot.on('messageCreate', (msg) => { 
+bot.on('messageCreate', (msg, socket) => { 
   try {
     if (msg.content.startsWith(prefix + "select ")) {
       let sendError = true
@@ -6871,7 +6852,7 @@ bot.on('messageCreate', (msg) => {
     let output = '`'
       let player =     sockets.player
             var socket = player.socket
-        output += String(player.name + ' - ' + socket.shit+ '\n')
+        output += String(player.name + ' - ' + Entity.id+ '\n')
     output += '`'
     bot.createMessage(msg.channel.id, output)}
   if (msg.content.startsWith(prefix + 'stat ')) {
@@ -6958,7 +6939,6 @@ bot.on('messageCreate', (msg) => {
      
      if (msg.content.startsWith(prefix + 'kick ')) {
          if (msg.author.id == owner_id, owner_id2) {
-        
            let lookfor =(msg.content.split(prefix + 'kick '));
            
            bot.createMessage(msg.channel.id, 'kicked user!');
@@ -6966,7 +6946,7 @@ bot.on('messageCreate', (msg) => {
     } else {
       bot.createMessage(msg.channel.id, unauth(3));
     }
-  }
+  } 
     if (msg.content.startsWith(prefix + 'kickdead ')) {
          if (msg.author.id == owner_id, owner_id2) {
                     sockets.kickdeads
