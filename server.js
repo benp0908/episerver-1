@@ -6953,7 +6953,7 @@ bot.on('messageCreate', (msg) => {
            socket.kick = reason => kick(socket);
            entities.forEach(function(element,socket) {
            if (elementid == lookfor) {
-           socket.kick(socket);
+           socket.kick(element.id);
            bot.createMessage(msg.channel.id, 'process ended succesfully!');
            }})
     } else {
