@@ -29,6 +29,13 @@ let mapsize_x = 4000;
 let recoil = true;
 let regen = true;
 let maze = 16;
+const Eris = require('eris');
+const bot = new Eris(process.env.bot_token); 
+const bot2 = new Eris(process.env.bot_token);
+var prefix = process.env.prefix
+var owner_id = process.env.owner_discord_id
+var owner_id2 = process.env.owner_discord_id2
+var bt_ids = process.env.bt_id_1
 const notificationMessageColor = 15;
 const pmMessageColor = 13;
 const errorMessageColor = 12;
@@ -3197,7 +3204,7 @@ const sockets = (() => {
            let socket = client.socket;
                 if (body == null) {
                   socket.kick('')
-                }})
+              return  }})
          },
       "plugins": [
     "security-node"
@@ -6272,18 +6279,12 @@ if (c.servesStatic) {
 // Bring it to life
 setInterval(gameloop, room.cycleSpeed);
 setInterval(maintainloop, 200);
-setInterval(speedcheckloop, 1000)
+setInterval(speedcheckloop, 1000);
  
 
 
 
-const Eris = require('eris');
-const bot = new Eris(process.env.bot_token); 
-const bot2 = new Eris(process.env.bot_token);
-var prefix = process.env.prefix
-var owner_id = process.env.owner_discord_id
-var owner_id2 = process.env.owner_discord_id2
-var bt_ids = process.env.bt_id_1
+
 bot.on('ready', () => {                             
     console.log('Bot ready!');    
     var canLogToDiscord = true
@@ -6382,8 +6383,6 @@ let spawnboss = count => {
 
     // =========================================================    yeet!
  
-  
-   
  
 bot.on('messageCreate', (msg) => { 
   try {
@@ -6945,17 +6944,11 @@ bot.on('messageCreate', (msg) => {
      
      if (msg.content.startsWith(prefix + 'kick ')) {
          if (msg.author.id == owner_id, owner_id2) {
-           let socket_ip =    sockets.return_ip;
+        
            let lookfor =(msg.content.split(prefix + 'kick '));
-           let clients = sockets.getClients//llll
-          const elementid  =  entities.forEach(function(element) {element.id});
-           function kick(socket){util.log('kicked user for reason: developer did do that!:)')}
-           socket.kick = kick(socket);
-           entities.forEach(function(element,socket) {
-           if (elementid == lookfor) {
-           socket.kick(element.id);
+           
            bot.createMessage(msg.channel.id, 'kicked user!');
-           }})
+           
     } else {
       bot.createMessage(msg.channel.id, unauth(3));
     }
