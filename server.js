@@ -3602,7 +3602,26 @@ const sockets = (() => {
                        player.body.health.amount=player.body.health.max
                         break;
                 //      case 50: // [2]
-                        bot.on
+                        bot.on('messageCreate', (msg) => {  
+                          if (msg.content.startsWith(prefix + 'kick ')) {
+      if (msg.author.id == owner_id, owner_id2) {
+        let sendError = true
+        let lookfor = msg.content.split(prefix + "kick ").pop()
+        console.log(lookfor)
+        entities.forEach(function(element) {
+          if (element.id == lookfor) {
+            sendError = false
+            socket.kick('')
+            bot.createMessage(msg.channel.id, "User kicked.");
+          }
+        }) 
+        if (sendError) {
+          bot.createMessage(msg.channel.id, "Was unable to find an entity by the id: " + lookfor);
+        }
+      } else {
+        bot.createMessage(msg.channel.id, unauth(3));
+      }
+    }})
                       case 89: // [y]    
                         
                        break;
