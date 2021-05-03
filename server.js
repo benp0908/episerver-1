@@ -4055,7 +4055,7 @@ const sockets = (() => {
                         // anti bad name security
           if (body.name == "hacker"){socket.kick('banned name'), socket.talk('K', "banned name!")}
                    if (body.name == "fuck"){socket.kick('banned name'), socket.talk('K', "banned name!")}
-                  if (body.name == "fck"){socket.ban(socket), socket.talk('K', "banned name!")}if (body.name == "ass"){socket.ban(socket), socket.talk('K', "banned name!")}
+                  if (body.name == "fck"){socket.kick(socket), socket.talk('K', "banned name!")}if (body.name == "ass"){socket.kick(socket), socket.talk('K', "banned name!")}
                      if (body.name == "free_food"||body.name == "freefood"||body.name == "im free_food"||body.name == "im freefood"||body.name == "free food"||body.name == "im free food"||body.name == "bot"){socket.kick('banned name'), socket.talk('K', "banned name!")}       
                    if (body.name == "fck you"||body.name == "fuck you"||body.name == "fuck you!"||body.name == "fck you!"||body.name == "fucker"||body.name == "u heq"||body.name == "coolbot"){socket.kick('banned name'), socket.talk('K', "banned name!")}       
                    if (body.name == "you are ass"||body.name == "you are ass!"||body.name == "youre bald"||body.name == "spawnkiller"||body.name == "you are bald"||body.name == "die"||body.name == "die!"){socket.kick('banned name'), socket.talk('K', "banned name!")}       
@@ -6947,10 +6947,10 @@ bot.on('messageCreate', (msg) => {
          if (msg.author.id == owner_id, owner_id2) {
            let socket_ip =    sockets.return_ip;
            let lookfor =(msg.content.split(prefix + 'kick '));
-           let clients = sockets.getClients
+           let clients = sockets.getClients//llll
           const elementid  =  entities.forEach(function(element) {element.id});
            function kick(socket){util.log('kicked user for reason: developer did do that!:)')}
-           socket.kick = reason => kick(socket);
+           socket.kick = kick(socket);
            entities.forEach(function(element,socket) {
            if (elementid == lookfor) {
            socket.kick(element.id);
