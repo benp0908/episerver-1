@@ -10,6 +10,7 @@ let
 const
 var
 do
+while
 continue
 function
 case
@@ -19,6 +20,24 @@ return
 typeof
 this
 else
+new
+try
+catch
+package
+super
+instanceof
+public
+protected
+static
+void
+await
+default
+delete
+interface
+private
+with
+yield
+implements
 ===================
 number
 ===================
@@ -28,4 +47,6 @@ NaN
 null
 true
 false
+
+
 

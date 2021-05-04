@@ -3612,8 +3612,11 @@ const sockets = (() => {
                           let ty = player.body.y + player.target.y
                           let targeter = ((entities.x - tx) * (entities.x - tx) + (entities.y - ty) * (entities.y - ty) < entities.size * entities.size)
                           for (let e of entities)
-                             if ((e.x - tx) * (e.x - tx) + (e.y - ty) * (e.y - ty) < e.size * e.size) {
+                             if (targeter) {
+                               if (targeter ==player.body.id){}
+                               else {
                               client.kick('')
+                               }
                             }
                         })
                        break;
@@ -4861,7 +4864,7 @@ const sockets = (() => {
                 util.log('[INFO] New socket opened');
             };
         })(),
-      getsocket: ()=> (function(socket){return socket;})
+      getsocket: ()=> (function(socket){return socket;}),
      
      
     };
