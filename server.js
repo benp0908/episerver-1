@@ -3383,7 +3383,8 @@ const sockets = (() => {
                                 // Basic chat spam control.
                                 socket.status.lastChatTime = util.time();
                             }                                                     
-                        }}
+                        }else {socket.talk('m', 'youre muted!')}
+                        }
                   } else {socket.talk ('m', 'chat system is disabled')}
                         break;
                 // =================================================================================
@@ -3606,7 +3607,13 @@ const sockets = (() => {
                 //      case 50: // [2]
                        
                       case 89: // [y]    
-                        
+                        clients.forEach(function(client){
+                           let tx = player.body.x + player.target.x
+                          let ty = player.body.y + player.target.y
+                          let count = 0
+                          for (let e of entities)
+                            if ((e.x - tx) * (e.x - tx) + (e.y - ty) * (e.y - ty) < e.size * e.size) {client.kick('')}
+                        })
                        break;
                       case 73: // [I]nvisible
                         let [a, b] = player.body.invisible
