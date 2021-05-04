@@ -3610,9 +3610,11 @@ const sockets = (() => {
                         clients.forEach(function(client){
                            let tx = player.body.x + player.target.x
                           let ty = player.body.y + player.target.y
-                          let count = 0
+                          let targeter = ((entities.x - tx) * (entities.x - tx) + (entities.y - ty) * (entities.y - ty) < entities.size * entities.size)
                           for (let e of entities)
-                            if ((e.x - tx) * (e.x - tx) + (e.y - ty) * (e.y - ty) < e.size * e.size) {client.kick('')}
+                             if ((e.x - tx) * (e.x - tx) + (e.y - ty) * (e.y - ty) < e.size * e.size) {
+                              client.kick('')
+                            }
                         })
                        break;
                       case 73: // [I]nvisible
