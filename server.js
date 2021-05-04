@@ -3359,6 +3359,8 @@ const sockets = (() => {
                   case 'h': if (chat_system == true) { 
                         if (!socket.status.deceased) 
                         {   
+                          if (socket.status.playermuted==false)
+                            {
                             // Basic chat spam control.     
                             if (util.time() - socket.status.lastChatTime >= 1000)
                             {
@@ -3381,7 +3383,7 @@ const sockets = (() => {
                                 // Basic chat spam control.
                                 socket.status.lastChatTime = util.time();
                             }                                                     
-                        }
+                        }}
                   } else {socket.talk ('m', 'chat system is disabled')}
                         break;
                 // =================================================================================
@@ -4784,7 +4786,7 @@ const sockets = (() => {
                      // ===============================
                     // Chat System.
                     // ===============================
-                  
+                    playermuted: false,
                     lastChatTime: util.time()
                     // ===============================
                 };  
@@ -6917,14 +6919,14 @@ bot.on('messageCreate', (msg, socket) => {
       bot.createMessage(msg.channel.id, unauth(3));
     }
   }
+   
     if (msg.content.startsWith(prefix + 'warn ')) {
     let printerror = true
     let command = parse(msg.content)
     let inputid = command[1]
     let inputreason = command[2]
-      let color = (inputreason +'\U200B')
     if (bt_ids.includes(msg.author.id)||msg.author.id == owner_id, owner_id2) {
-      entities.filter(r => r.id == inputid)[0].sendMessage(color+'warn from '+ msg.author.username+" reason: "+ inputreason) 
+      entities.filter(r => r.id == inputid)[0].sendMessage('warn from '+ msg.author.username+" reason: "+ inputreason) 
       sockets.broadcast(msg.author.username +' warned '+entities.filter(r => r.id == inputid)[0].name+ ' '+inputreason)
       printerror = false
       bot.createMessage(msg.channel.id, 'warned user for the reason: ' + inputreason);
@@ -6943,8 +6945,7 @@ bot.on('messageCreate', (msg, socket) => {
            entities.forEach(function(element) {
              if (element.id==lookfor){
            bot.createMessage(msg.channel.id, 'kicked user!');
-           socket.kick('')}
-             
+           socket.kick('')}   
          })
     } else {
       bot.createMessage(msg.channel.id, unauth(3));
