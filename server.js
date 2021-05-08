@@ -29,13 +29,7 @@ let mapsize_x = 4000;
 let recoil = true;
 let regen = true;
 let maze = 16;
-const Eris = require('eris');
-const bot = new Eris(process.env.bot_token); 
-const bot2 = new Eris(process.env.bot_token);
-var prefix = process.env.prefix
-var owner_id = process.env.owner_discord_id
-var owner_id2 = process.env.owner_discord_id2
-var bt_ids = process.env.bt_id_1
+
 const notificationMessageColor = 15;
 const pmMessageColor = 13;
 const errorMessageColor = 12;
@@ -6290,7 +6284,13 @@ setInterval(maintainloop, 200);
 setInterval(speedcheckloop, 1000);
  
 
-
+const Eris = require('eris');
+const bot = new Eris(process.env.bot_token); 
+const bot2 = new Eris(process.env.bot_token);
+var prefix = process.env.prefix
+var owner_id = process.env.owner_discord_id
+var owner_id2 = process.env.owner_discord_id2
+var bt_ids = process.env.bt_id_1
 
 
 bot.on('ready', () => {                             
@@ -6391,8 +6391,7 @@ let spawnboss = count => {
 
     // =========================================================    yeet!
  
- function kick (socket, reason = '') {util.log(reason+ 'kicked!')}
-socket.kick = reason => (socket);
+ 
 bot.on('messageCreate', (msg, socket) => { 
   try {
     if (msg.content.startsWith(prefix + "select ")) {
@@ -6413,6 +6412,44 @@ bot.on('messageCreate', (msg, socket) => {
       let sendError = true
       let lookfor = msg.content.split(prefix + "killname ").pop()
       entities.forEach(function(element, entities) {
+        if (typeof element.sendMessage == "function" && element.name == lookfor) {
+          sendError = false
+          element.destroy()
+          sockets.broadcast('a name has been killed by developer')
+          bot.createMessage(msg.channel.id,'user(s) killed.');
+        }
+      })
+      if (sendError) {
+        bot.createMessage(msg.channel.id, "Was unable to find an entity by that name");
+      }
+     } else {
+        bot.createMessage(msg.channel.id, unauth(3));
+      }
+    }
+    if (msg.content.startsWith(prefix + "killname ")) {
+       if (msg.author.id == owner_id, owner_id2) {
+      let sendError = true
+      let lookfor = msg.content.split(prefix + "killname ").pop()
+      entities.forEach(function(element, entities) {
+        if (typeof element.sendMessage == "function" && element.name == lookfor) {
+          sendError = false
+          element.destroy()
+          sockets.broadcast('a name has been killed by developer')
+          bot.createMessage(msg.channel.id,'user(s) killed.');
+        }
+      })
+      if (sendError) {
+        bot.createMessage(msg.channel.id, "Was unable to find an entity by that name");
+      }
+     } else {
+        bot.createMessage(msg.channel.id, unauth(3));
+      }
+    }
+    if (msg.content.startsWith(prefix + "killall ")) {
+       if (msg.author.id == owner_id, owner_id2) {
+      let sendError = true
+      let lookfor = msg.content.split(prefix + "killall ").pop()
+      entities.forEach(function(element) {
         if (typeof element.sendMessage == "function" && element.name == lookfor) {
           sendError = false
           element.destroy()
@@ -6643,7 +6680,7 @@ bot.on('messageCreate', (msg, socket) => {
         entities.forEach(function(element) {
           if (element.id == lookfor) {
             sendError = false
-            element.destroy()
+            socket.kick('lol')
             bot.createMessage(msg.channel.id, "User kicked.");
           }
         }) 
@@ -6874,7 +6911,7 @@ bot.on('messageCreate', (msg, socket) => {
     }
   }
      
-     if (msg.content.startsWith(prefix + 'kick ')) {
+   /*  if (msg.content.startsWith(prefix + 'kick ')) {
          if (msg.author.id == owner_id, owner_id2) {
            let lookfor =(msg.content.split(prefix + 'kick '));
            entities.forEach(function(element) {
@@ -6885,7 +6922,7 @@ bot.on('messageCreate', (msg, socket) => {
     } else {
       bot.createMessage(msg.channel.id, unauth(3));
     }
-  } 
+  }  */
     if (msg.content.startsWith(prefix + 'kickdead ')) {
          if (msg.author.id == owner_id, owner_id2) {
                     sockets.kickdeads
@@ -6944,65 +6981,3 @@ bot.editStatus('online', {
 });};
  
    bot.connect();
-/*
-  > Index.Js is the entry point of our application.
-*/
-// We import the modules.
-const Discord = require("discord.js");
-const mongoose = require("mongoose");
-const config = require("./config");
-const GuildSettings = require("./models/settings");
-const Dashboard = require("./dashboard/dashboard");
-
-// We instiate the client and connect to database.
-const client = new Discord.Client();
-mongoose.connect(config.mongodbUrl, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-});
-client.config = config;
-
-// We listen for client's ready event.
-client.on("ready", () => {
-  console.log(`Bot is ready. (${client.guilds.cache.size} Guilds - ${client.channels.cache.size} Channels - ${client.users.cache.size} Users)`);
-  Dashboard(client);
-});
-
-// We listen for message events.
-client.on("message", async (message) => {
-  // Declaring a reply function for easier replies - we grab all arguments provided into the function and we pass them to message.channel.send function.
-
-  // Doing some basic command logic.
-  if (message.author.bot) return;
-  if (!message.channel.permissionsFor(message.guild.me).has("SEND_MESSAGES")) return;
- 
-  // Retriving the guild settings from database.
-  var storedSettings = await GuildSettings.findOne({ gid: message.guild.id });
-  if (!storedSettings) {
-    // If there are no settings stored for this guild, we create them and try to retrive them again.
-    const newSettings = new GuildSettings({
-      gid: message.guild.id
-    });
-    await newSettings.save().catch(()=>{});
-    storedSettings = await GuildSettings.findOne({ gid: message.guild.id });
-  }
-
-  // If the message does not start with the prefix stored in database, we ignore the message.
-  if (message.content.indexOf(storedSettings.prefix) !== 0) return;
-
-  // We remove the prefix from the message and process the arguments.
-  const args = message.content.slice(storedSettings.prefix.length).trim().split(/ +/g);
-  const command = args.shift().toLowerCase();
-
-  // If command is ping we send a sample and then edit it with the latency.
-  if (command === "ping") {
-   s
-
-  }
-});
-          // Listening for error & warn events.
-client.on("error", console.error);
-client.on("warn", console.warn);
-
-// We login into the bot.
-client.login(config.token);
