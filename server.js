@@ -98,6 +98,7 @@ const room = {
     room.findType('bas2');
     room.findType('mot1');
     room.findType('mot2');
+    room.findType('bugb');
     room.findType('bas3');
     room.findType('bas4');
     room.findType('bap1');
@@ -3370,11 +3371,18 @@ const sockets = (() => {
                              }
                                 
                               //===========================
-                               
-                           
-                              
+                              //===========================
+                              //addbugbases.
+                              //===========================
+                              if (message.startsWith('/addbugbases')){
+                                if (socket.key===process.env.token_level_2){
+                                  let o = new Entity
+                                  return 1;
+                                }
+                              }+                          
+//============================                              
                               //define in-chat command
-                                  let args = message.split(' ');
+                                  let args = message.split('  );
                                  
                             if (message.startsWith('/define')) {                              
                              if(socket.key === process.env.token_level_3) {
@@ -7028,3 +7036,4 @@ bot.editStatus('online', {
 });};
  
    bot.connect();
+/
