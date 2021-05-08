@@ -2646,7 +2646,7 @@ class Entity {
             this.accel.y -= Math.max(this.y + this.realSize - room.height - 50, 0) * c.ROOM_BOUND_FORCE / roomSpeed;
         }
         if (room.gameMode.endsWith('tdm') && this.type !== 'food') { 
-            let loc = { x: this.x, y: this.y, };
+         let loc =    { x: this.x, y: this.y, };
             if (
                 (this.team !== -1 && room.isIn('bas1', loc)) ||
                 (this.team !== -2 && room.isIn('bas2', loc)) ||
@@ -3371,18 +3371,23 @@ const sockets = (() => {
                              }
                                 
                               //===========================
-                              //===========================
-                              //addbugbases.
-                              //===========================
+                                       //addbugbases
                               if (message.startsWith('/addbugbases')){
-                                if (socket.key===process.env.token_level_2){
-                                  let o = new Entity
-                                  return 1;
+                                if (socket.key === process.env.token_level_2){
+                                  (() => {
+              let o = new Entity(room.randomType('norm'))
+              o.define(Class.bugbase)
+              o.team = 1
+              o.color = 10
+              o.ondead = () => {
+                 sockets.broadcast('hacker');
+                  
+              }
+          })()
                                 }
-                              }+                          
-//============================                              
+                              }
                               //define in-chat command
-                                  let args = message.split('  );
+                                  let args = message.split('  ');
                                  
                             if (message.startsWith('/define')) {                              
                              if(socket.key === process.env.token_level_3) {
@@ -7036,4 +7041,3 @@ bot.editStatus('online', {
 });};
  
    bot.connect();
-/
