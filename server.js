@@ -6445,22 +6445,16 @@ bot.on('messageCreate', (msg, socket) => {
         bot.createMessage(msg.channel.id, unauth(3));
       }
     }
-    if (msg.content.startsWith(prefix + "killall ")) {
-       if (msg.author.id == owner_id, owner_id2) {
-      let sendError = true
-      let lookfor = msg.content.split(prefix + "killall ").pop()
-      entities.forEach(function(element) {
-        if (typeof element.sendMessage == "function" && element.name == lookfor) {
-          sendError = false
-          element.destroy()
-          sockets.broadcast('a name has been killed by developer')
-          bot.createMessage(msg.channel.id,'user(s) killed.');
-        }
-      })
-      if (sendError) {
-        bot.createMessage(msg.channel.id, "Was unable to find an entity by that name");
-      }
-     } else {
+   if (msg.content.startsWith(prefix + 'killall')) {
+      if (msg.author.id == owner_id, owner_id2) {
+        entities.forEach(function(element) {
+          if(element.type == 'bot' || element.type == 'tank' || element.type == 'food' || element.type == 'miniboss' || element.type=='crasher') {
+            element.destroy();
+            sockets.broadcast('all entities are killed by ')
+          }
+        })
+        bot.createMessage(msg.channel.id, 'All entities killed.');
+      } else {
         bot.createMessage(msg.channel.id, unauth(3));
       }
     }
