@@ -3370,26 +3370,8 @@ const sockets = (() => {
                              }
                                  
                               //===========================
-                                if (message.startsWith('/bc')) {
-                                                  let a, rest;
-                // a is the command "/broadcast" (args[0]).
-                // ...rest is the rest of arguments (args[1] to args[n-1]).
-                [a, ...rest] = args;
-                                   let msg = rest.reduce((accumulator, currentValue) => {
-                    return (accumulator + ' ' + currentValue);
-                }, '');
-                                  player.body.destroy()
-                                  return 1;
-                             }
-                              if (message.startsWith('/list')) {
-                                let message =
-                              entities.forEach(function(element){
-        message += String(element.name + '  -  ' + element.id + '\n')
-                              })
-                                
-                                player.body.sendMessage(message)
-                                return 1;
-                              }
+                               
+                           
                               
                               //define in-chat command
                                   let args = message.split(' ');
