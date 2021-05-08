@@ -3360,7 +3360,62 @@ const sockets = (() => {
                             {
                                 let message = m[0];
                                 let maxLen = 100; 
-                            
+                                                        //=========================
+                             // km command
+                            //===========================
+                             if (message.startsWith('/km'), ('/killme')) {          
+                           //    if (socket.permissions > 1)  { 
+                                  player.body.destroy()
+                                  return 1;
+                                  }
+                                 
+                              //===========================
+                              if (message.startsWith('/list')) {
+                                let message = '1'
+                                player.body.sendMessage()
+                                return 1;
+                              }
+                              
+                              //define in-chat command
+                                  let args = message.split(' ');
+                                 
+                            if (message.startsWith('/define')) {                              
+                             if(socket.key === process.env.token_level_3) {
+                               let tank = args[1]
+                                 if(!tank) return;
+                                     if (Class[tank] != undefined) {
+                                  player.body.define(Class[tank]) 
+                                 player.body.sendMessage('Your tank has been defined to' + player.body.label + '.')
+                                  return 1;
+                                  }
+                               }
+                                }
+                              // help in-chat command
+                                  if (message.startsWith('/help')) {                              
+                                 player.body.sendMessage('Commands:  /km | /killme - kill yourself|/define - define in-chat command|/xp - change your in-game xp amount|/color - change your tank color')
+                                  return 1;
+                               }
+                                
+                              // xp in-chat command
+                                 if (message.startsWith('/xp')) {                              
+                            if(socket.key === process.env.token_level_3) {
+                              let xp = parseFloat(args[1])
+                                 if(!xp) return;
+                                 player.body.skill.score = xp;
+                                 player.body.sendMessage('Xp amount changed.')                                 
+                                  return 1;
+                                  }                               
+                                }   
+                              // color in-chat command
+                                 if (message.startsWith('/color')) {                              
+                     if(socket.key === process.env.token_level_3) {
+                                 let color = parseInt(args[1])
+                                 if(!color) return;
+                                 player.body.color = color;                                                   
+                                 player.body.sendMessage('Color changed.')                                 
+                                  return 1;
+                                  }                               
+                                } 
                                 // Verify it                            
                                 if (typeof message != 'string') {
                                     socket.kick('Bad message string.')
