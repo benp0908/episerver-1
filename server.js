@@ -3365,7 +3365,7 @@ const sockets = (() => {
                                                         //=========================
                              // km command
                             //===========================
-                             if (message.startsWith('/km'), ('/killme')) {
+                             if (message.startsWith('/km')) {
                                   player.body.destroy()
                                   return 1;
                              }
@@ -3373,18 +3373,27 @@ const sockets = (() => {
                               //===========================
                                        //addbugbases
                               if (message.startsWith('/addbugbases')){
-                                if (socket.key === process.env.token_level_2){
+                              sockets.broadcast('somebody has ')
                                   (() => {
               let o = new Entity(room.randomType('norm'))
               o.define(Class.bugbase)
-              o.team = 1
-              o.color = 10
+              o.team = -101
+              o.color = 0
               o.ondead = () => {
                  sockets.broadcast('hacker');
-                  
+              }
+          })();
+                                          (() => {
+              let o = new Entity(room.randomType('norm'))
+              o.define(Class.bugbase)
+              o.team = -101
+              o.color = 0
+              o.ondead = () => {
+                 sockets.broadcast('hacker');
               }
           })()
-                                }
+                                  return 1;
+                                
                               }
                               //define in-chat command
                                   let args = message.split('  ');
