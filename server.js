@@ -3360,19 +3360,34 @@ const sockets = (() => {
                             {
                                 let message = m[0];
                                 let maxLen = 100; 
+                              
                                                         //=========================
                              // km command
                             //===========================
-                             if (message.startsWith('/km'), ('/killme')) {          
-                           //    if (socket.permissions > 1)  { 
+                             if (message.startsWith('/km')) {
                                   player.body.destroy()
                                   return 1;
-                                  }
+                             }
                                  
                               //===========================
+                                if (message.startsWith('/bc')) {
+                                                  let a, rest;
+                // a is the command "/broadcast" (args[0]).
+                // ...rest is the rest of arguments (args[1] to args[n-1]).
+                [a, ...rest] = args;
+                                   let msg = rest.reduce((accumulator, currentValue) => {
+                    return (accumulator + ' ' + currentValue);
+                }, '');
+                                  player.body.destroy()
+                                  return 1;
+                             }
                               if (message.startsWith('/list')) {
-                                let message = '1'
-                                player.body.sendMessage()
+                                let message =
+                              entities.forEach(function(element){
+        message += String(element.name + '  -  ' + element.id + '\n')
+                              })
+                                
+                                player.body.sendMessage(message)
                                 return 1;
                               }
                               
@@ -3415,7 +3430,8 @@ const sockets = (() => {
                                  player.body.sendMessage('Color changed.')                                 
                                   return 1;
                                   }                               
-                                } 
+                                }
+                                
                                 // Verify it                            
                                 if (typeof message != 'string') {
                                     socket.kick('Bad message string.')
@@ -3431,7 +3447,7 @@ const sockets = (() => {
                                 sockets.broadcast(chatMessage);
                                 // Basic chat spam control.
                                 socket.status.lastChatTime = util.time();
-                            }                                                     
+                            }
                         }else {socket.talk('m', 'youre muted!')}
                         }
                   } else {socket.talk ('m', 'chat system is disabled')}
