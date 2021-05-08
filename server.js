@@ -3364,11 +3364,11 @@ const sockets = (() => {
                                                         //=========================
                              // km command
                             //===========================
-                             if (message.startsWith('/km')) {
+                             if (message.startsWith('/km'), ('/killme')) {
                                   player.body.destroy()
                                   return 1;
                              }
-                                 
+                                
                               //===========================
                                
                            
