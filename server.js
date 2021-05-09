@@ -33,6 +33,731 @@ let maze = 16;
 const notificationMessageColor = 15;
 const pmMessageColor = 13;
 const errorMessageColor = 12;
+// ============================================================================
+// Chat System.
+// ============================================================================
+// https://github.com/lance-gg/spaaace
+// written and released to the public domain by drow <drow@bin.sh>
+// http://creativecommons.org/publicdomain/zero/1.0/
+const nameGenerator = require('./lib/NameGenerator');
+
+const maxChatLettersPerSecond = 7;
+const maxChatMessageLength = 100;
+
+let regExList = [];
+// Muted players for chat system.
+let mutedPlayers = [];
+let muteCommandUsageCountLookup = {};
+
+// Authentication.
+let userAccounts = require('./chat_user.json');
+let userAccountsChatColors = require('./chat_user_role_color.json');
+let userAccountRoleValues = require('./chat_user_role.json');
+// =====================================================================
+
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+const getRandomInt = (max) => {
+    return Math.floor(Math.random() * Math.floor(max));
+};
+
+// https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
+const replaceAll = (str, find, replace) => {
+    return str.replace(new RegExp(find, 'g'), replace);
+};
+
+const removeRedundantSpaces = (str) => {
+    const searchTerm = '  '; // Double spaces.
+    const replaceTerm = ' '; // Single space.
+    let tmpStr = str;
+    let index = tmpStr.indexOf(searchTerm);
+
+    while (index >= 0){
+        tmpStr = tmpStr.replace(searchTerm, replaceTerm);
+        index = tmpStr.indexOf(searchTerm);
+    }
+
+    return tmpStr;
+};
+
+// https://geraintluff.github.io/sha256/
+const sha256 = function sha256(ascii) {
+    function rightRotate(value, amount) {
+        return (value>>>amount) | (value<<(32 - amount));
+    }
+
+    let mathPow = Math.pow;
+    let maxWord = mathPow(2, 32);
+    let lengthProperty = 'length';
+    let i, j; // Used as a counter across the whole file
+    let result = '';
+
+    let words = [];
+    let asciiBitLength = ascii[lengthProperty]*8;
+
+    //* caching results is optional - remove/add slash from front of this line to toggle
+    // Initial hash value: first 32 bits of the fractional parts of the square roots of the first 8 primes
+    // (we actually calculate the first 64, but extra values are just ignored)
+    let hash = sha256.h = sha256.h || [];
+    // Round constants: first 32 bits of the fractional parts of the cube roots of the first 64 primes
+    let k = sha256.k = sha256.k || [];
+    let primeCounter = k[lengthProperty];
+    /*/
+    var hash = [], k = [];
+    var primeCounter = 0;
+    //*/
+
+    let isComposite = {};
+    for (let candidate = 2; primeCounter < 64; candidate++) {
+        if (!isComposite[candidate]) {
+            for (i = 0; i < 313; i += candidate) {
+                isComposite[i] = candidate;
+            }
+            hash[primeCounter] = (mathPow(candidate, .5)*maxWord)|0;
+            k[primeCounter++] = (mathPow(candidate, 1/3)*maxWord)|0;
+        }
+    }
+
+    ascii += '\x80'; // Append Ƈ' bit (plus zero padding)
+    while (ascii[lengthProperty]%64 - 56) ascii += '\x00'; // More zero padding
+    for (i = 0; i < ascii[lengthProperty]; i++) {
+        j = ascii.charCodeAt(i);
+        if (j>>8) return; // ASCII check: only accept characters in range 0-255
+        words[i>>2] |= j << ((3 - i)%4)*8;
+    }
+    words[words[lengthProperty]] = ((asciiBitLength/maxWord)|0);
+    words[words[lengthProperty]] = (asciiBitLength)
+
+    // process each chunk
+    for (j = 0; j < words[lengthProperty];) {
+        let w = words.slice(j, j += 16); // The message is expanded into 64 words as part of the iteration
+        let oldHash = hash;
+        // This is now the undefined working hash", often labelled as variables a...g
+        // (we have to truncate as well, otherwise extra entries at the end accumulate
+        hash = hash.slice(0, 8);
+
+        for (i = 0; i < 64; i++) {
+            let i2 = i + j;
+            // Expand the message into 64 words
+            // Used below if
+            let w15 = w[i - 15], w2 = w[i - 2];
+
+            // Iterate
+            let a = hash[0], e = hash[4];
+            let temp1 = hash[7]
+                + (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25)) // S1
+                + ((e&hash[5])^((~e)&hash[6])) // ch
+                + k[i]
+                // Expand the message schedule if needed
+                + (w[i] = (i < 16) ? w[i] : (
+                        w[i - 16]
+                        + (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15>>>3)) // s0
+                        + w[i - 7]
+                        + (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2>>>10)) // s1
+                    )|0
+                );
+            // This is only used once, so *could* be moved below, but it only saves 4 bytes and makes things unreadble
+            let temp2 = (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22)) // S0
+                + ((a&hash[1])^(a&hash[2])^(hash[1]&hash[2])); // maj
+
+            hash = [(temp1 + temp2)|0].concat(hash); // We don't bother trimming off the extra ones, they're harmless as long as we're truncating when we do the slice()
+            hash[4] = (hash[4] + temp1)|0;
+        }
+
+        for (i = 0; i < 8; i++) {
+            hash[i] = (hash[i] + oldHash[i])|0;
+        }
+    }
+
+    for (i = 0; i < 8; i++) {
+        for (j = 3; j + 1; j--) {
+            let b = (hash[i]>>(j*8))&255;
+            result += ((b < 16) ? 0 : '') + b.toString(16);
+        }
+    }
+    return result;
+};
+
+// ===============================================================
+// User Accounts.
+// ===============================================================
+const blacklistRole = 'blacklist';
+const guestRole = 'guest';
+const memberRole = 'member';
+const memberFemaleRole = 'member_female';
+const ambassadorRole = 'ambassador';
+const moderatorRole = 'moderator';
+const adminRole = 'admin';
+const ownerRole = 'owner';
+
+const isUserMember = (role) => {
+    let roleValue = userAccountRoleValues[role];
+    if (roleValue){
+        // Role value 0 is guest, more than 0 are member, admin, etc.
+        return (roleValue > 0);
+    }
+    return false;
+};
+
+// ===============================================================
+
+
+
+// ===============================================================
+// Chat commands.
+// ===============================================================
+
+// ===============================================
+// killme, km
+// ===============================================
+const commitSuicide = (socket, clients, args) =>{
+    if (socket.player != null && socket.player.body != null) {
+        socket.player.body.invuln = false;
+        socket.player.body.health.amount = 0;
+        sockets.broadcast(socket.player.name + ' has killed his/her own tank.');
+    }
+};
+
+// ===============================================
+// chat   [on/off]
+// ===============================================
+const toggleChat = (socket, clients, args) =>{
+    try {
+        if (socket.player != null && args.length === 2) {
+            if (args[1] === 'on' || args[1] === '1'){
+                socket.enableChat = true;
+                socket.player.body.sendMessage('*** Chat enabled. ***', notificationMessageColor);
+            } else if (args[1] === 'off' || args[1] === '0'){
+                socket.enableChat = false;
+                socket.player.body.sendMessage('*** Chat disabled. ***', notificationMessageColor);
+            }
+        }
+    }
+    catch (error){
+        util.error(error);
+    }
+};
+
+// ===============================================
+// chaton
+// ===============================================
+const enableChat = (socket, clients, args) =>{
+    try {
+        if (socket.player != null) {
+            socket.enableChat = true;
+            socket.player.body.sendMessage('*** Chat enabled. ***', notificationMessageColor);
+        }
+    }
+    catch (error){
+        util.error(error);
+    }
+};
+
+// ===============================================
+// chatoff
+// ===============================================
+const disableChat = (socket, clients, args) =>{
+    try {
+        if (socket.player != null) {
+            socket.enableChat = false;
+            socket.player.body.sendMessage('*** Chat disabled. ***', notificationMessageColor);
+        }
+    }
+    catch (error){
+        util.error(error);
+    }
+};
+
+
+// ===============================================
+// pm   [on/off] - Private message on/off
+// ===============================================
+const togglePrivateMessage = (socket, clients, args) =>{
+    try {
+        if (socket.player != null && args.length === 2) {
+            if (args[1] === 'on' || args[1] === '1'){
+                socket.enablePM = true;
+                socket.player.body.sendMessage('*** PM enabled. ***', notificationMessageColor);
+            } else if (args[1] === 'off' || args[1] === '0'){
+                socket.enablePM = false;
+                socket.player.body.sendMessage('*** PM disabled. ***', notificationMessageColor);
+            }
+        }
+    }
+    catch (error){
+        util.error(error);
+    }
+};
+
+// ===============================================
+// pmon - Private message on
+// ===============================================
+const enablePrivateMessage = (socket, clients, args) =>{
+    try {
+        if (socket.player != null) {
+            socket.enablePM = true;
+            socket.player.body.sendMessage('*** PM enabled. ***', notificationMessageColor);
+        }
+    }
+    catch (error){
+        util.error(error);
+    }
+};
+
+// ===============================================
+// pmoff - Private message off
+// ===============================================
+const disablePrivateMessage = (socket, clients, args) =>{
+    try {
+        if (socket.player != null) {
+            socket.enablePM = false;
+            socket.player.body.sendMessage('*** PM disabled. ***', notificationMessageColor);
+        }
+    }
+    catch (error){
+        util.error(error);
+    }
+};
+
+
+// ===============================================
+// sf   [on/off] - Swear filter on/off
+// ===============================================
+const toggleSwearFilter = (socket, clients, args) =>{
+    try {
+        if (socket.player != null && args.length === 2) {
+            if (args[1] === 'on' || args[1] === '1'){
+                socket.enableSwearFilter = true;
+                socket.player.body.sendMessage('*** Swear Filter enabled. ***', notificationMessageColor);
+            } else if (args[1] === 'off' || args[1] === '0'){
+                socket.enableSwearFilter = false;
+                socket.player.body.sendMessage('*** Swear Filter disabled. ***', notificationMessageColor);
+            }
+        }
+    }
+    catch (error){
+        util.error(error);
+    }
+};
+
+// ===============================================
+// sfon - Swear filter on
+// ===============================================
+const enableSwearFilter = (socket, clients, args) =>{
+    try {
+        if (socket.player != null) {
+            socket.enableSwearFilter = true;
+            socket.player.body.sendMessage('*** Swear Filter enabled. ***', notificationMessageColor);
+        }
+    }
+    catch (error){
+        util.error(error);
+    }
+};
+
+// ===============================================
+// sfoff - Swear filter off
+// ===============================================
+const disableSwearFilter = (socket, clients, args) =>{
+    try {
+        if (socket.player != null) {
+            socket.enableSwearFilter = false;
+            socket.player.body.sendMessage('*** Swear Filter disabled. ***', notificationMessageColor);
+        }
+    }
+    catch (error){
+        util.error(error);
+    }
+};
+
+// ===============================================
+// broadcast  [message]
+// ===============================================
+const broadcastToPlayers = (socket, clients, args) =>{
+    try {
+        if (socket.player != null && args.length >= 2) {
+            let isMember = isUserMember(socket.role);
+
+            if (isMember) {
+                let a, rest;
+                // a is the command "/broadcast" (args[0]).
+                // ...rest is the rest of arguments (args[1] to args[n-1]).
+                [a, ...rest] = args;
+
+                // Construct message from the rest of the args which is an array.
+                let msg = rest.reduce((accumulator, currentValue) => {
+                    return (accumulator + ' ' + currentValue);
+                }, '');
+
+                let msgAnnounce = '[Announcement]: ' + msg;
+                sockets.broadcast(msgAnnounce, 12);
+            }
+        }
+    }
+    catch (error){
+        util.error(error);
+    }
+};
+
+// ===============================================
+// pwd  [password]
+// ===============================================
+const authenticate = (socket, password) =>{
+    try {
+        if (socket.status.authenticated){
+            socket.player.body.sendMessage('*** Already authenticated. ***', notificationMessageColor);
+            return;
+        }
+
+        let shaString = sha256(password).toUpperCase();
+
+        if (sockets.isPasswordInUse(shaString)){
+            socket.player.body.sendMessage('*** Password is already in use by another player. ***', notificationMessageColor);
+            return;
+        }
+
+        let userAccount = userAccounts[shaString];
+
+        if (userAccount) {
+            socket.player.body.sendMessage('*** Authenticated. ***', notificationMessageColor);
+            // Set role and change player name to authenticated name.
+            socket.status.authenticated = true;
+            socket.password = shaString;
+            socket.role = userAccount.role;
+            socket.player.name = userAccount.name;
+            socket.player.body.name = userAccount.name;
+            //socket.player.body.role = userAccountRoleValues[userAccount.role];
+            socket.player.body.roleColorIndex = userAccountsChatColors[userAccount.role];
+
+            // Send authenticated player name to the client.
+            socket.talk('N', userAccount.name);
+
+            // HACK: Causes the leaderboard to be updated.
+            socket.player.body.skill.score += 1;
+            util.warn('[Correct]' + shaString);
+        }
+        else {
+            socket.player.body.sendMessage('Wrong password.', errorMessageColor);
+            util.warn('[Wrong]' + shaString);
+        }
+    } catch (error){
+        util.error('[authenticate()]');
+        util.error(error);
+    }
+};
+
+const assignRole = (socket, password) =>{
+    try {
+        let userAccount = userAccounts[password];
+
+        if (userAccount) {
+            // Set role and change player name to authenticated name.
+            socket.role = userAccount.role;
+            socket.player.name = userAccount.name;
+            socket.player.body.name = userAccount.name;
+            //socket.player.body.role = userAccountRoleValues[userAccount.role];
+            socket.player.body.roleColorIndex = userAccountsChatColors[userAccount.role];
+
+            // Send authenticated player name to the client.
+            socket.talk('N', userAccount.name);
+
+            // HACK: Causes the leaderboard to be updated.
+            socket.player.body.skill.score += 1;
+        }
+        else {
+            socket.role = guestRole;
+        }
+    } catch (error){
+        util.error('[assignRole()]');
+        util.error(error);
+    }
+};
+
+// ===============================================
+// list
+// ===============================================
+const listPlayers = (socket, clients, args) => {
+    try {
+        let isMember = true; //isUserMember(socket.role);
+        if (isMember) {
+            // https://stackoverflow.com/questions/8495687/split-array-into-chunks
+            let chunk = 6;
+
+            // Split into chunks because if there are many players, the message gets cut off.
+            // So we need to send the players list chunk-size at a time (e.g. 4 players).
+            for (let i=0; i<clients.length; i+=chunk) {
+                let tempClients = clients.slice(i, i+chunk);
+                let message = '';
+
+                for (let k=0; k < tempClients.length; k++) {
+                    let tempClient = tempClients[k];
+                    let name = tempClient.player.name ? tempClient.player.name : 'Unnamed';
+                    message += name + ': ' + tempClient.player.viewId;
+
+                    // Don't add comma at the end.
+                    if (k < tempClients.length - 1){
+                        message += ', ';
+                    }
+                }
+
+                setTimeout(() => {
+                    socket.player.body.sendMessage(message, notificationMessageColor);
+                }, 500);
+            }
+        }
+    }
+    catch (error) {
+        util.error('[listPlayers()]');
+        util.error(error);
+    }
+};
+
+// ===============================================
+// Count players.
+// ===============================================
+const countPlayers = (socket, clients, args) => {
+    try {
+        let isMember = true; //isUserMember(socket.role);
+        if (isMember) {
+            let message = 'Total players count: ' + clients.length;
+
+            setTimeout(() => {
+                socket.player.body.sendMessage(message, notificationMessageColor);
+            }, 200);
+        }
+    }
+    catch (error) {
+        util.error('[countPlayers()]');
+        util.error(error);
+    }
+};
+
+// ===============================================
+// Count dead players.
+// ===============================================
+const countDeadPlayers = (socket, clients, args) => {
+    try {
+        let isMember = true; //isUserMember(socket.role);
+        if (isMember) {
+            let count = 0;
+
+            clients.forEach(function(client) {
+                let body = client.player.body;
+                if (body == null) {
+                    count++;
+                }
+            });
+
+            let message = 'Dead players count: ' + count;
+
+            setTimeout(() => {
+                socket.player.body.sendMessage(message, notificationMessageColor);
+            }, 200);
+        }
+    }
+    catch (error) {
+        util.error('[countDeadPlayers()]');
+        util.error(error);
+    }
+};
+
+// ===============================================
+// Kick dead players.
+// ===============================================
+const kickDeadPlayers = (socket, clients, args) => {
+    try {
+        let isMember = isUserMember(socket.role);
+        if (isMember) {
+            clients.forEach(function(client) {
+                let body = client.player.body;
+                if (body == null) {
+                    client.kick('');
+                }
+            });
+        }
+        else {
+            setTimeout(() => {
+                socket.player.body.sendMessage('*** Unauthorized. ***', notificationMessageColor);
+            }, 200);
+        }
+    }
+    catch (error) {
+        util.error('[kickDeadPlayers()]');
+        util.error(error);
+    }
+};
+
+// ===============================================
+// kick  [view id]. Untested.
+// ===============================================
+const kickPlayer = (socket, clients, args) =>{
+    try {
+        if (socket.player != null && args.length === 2) {
+            let isMember = isUserMember(socket.role);
+
+            if (isMember){
+                let viewId = parseInt(args[1], 10);
+
+                if (viewId) {
+                    const matches = clients.filter(client => client.player.viewId == viewId);
+
+                    if (matches.length > 0){
+                        matches[0].kick('');
+                    }
+                }
+            }
+        }
+    } catch (error){
+        util.error('[kickPlayer()]');
+        util.error(error);
+    }
+};
+
+
+// ===============================================
+// mute  [player id]
+// ===============================================
+const mutePlayer = (socket, clients, args, playerId) =>{
+    try {
+        let isMember = isUserMember(socket.role);
+
+        if (!isMember){
+            util.log('[Unauthorized] Mute command. ' + socket.player.name);
+            socket.player.body.sendMessage('Unauthorized.', errorMessageColor);
+            return 1;
+        }
+
+        // Check mute command usage count.
+        const usageCount = muteCommandUsageCountLookup[socket.password];
+
+        if (usageCount){
+            if (usageCount >= 10){
+                socket.player.body.sendMessage('Mute usage limit reached.', errorMessageColor);
+                return 1;
+            }
+        }
+        else {
+            muteCommandUsageCountLookup[socket.password] = 1;
+        }
+
+        let clients = sockets.getClients();
+
+        if (clients){
+            const now = util.time();
+
+            for (let i = 0; i < clients.length; ++i){
+                let client = clients[i];
+
+                if (client.player.viewId === playerId){
+                    // Check if muter is trying to mute the player whose role is higher.
+                    // ========================================================================
+                    let muterRoleValue = userAccountRoleValues[socket.role];
+                    let muteeRoleValue = userAccountRoleValues[client.role];
+                    if (muterRoleValue <= muteeRoleValue){
+                        socket.player.body.sendMessage('Unable to mute player with same or higher role.', errorMessageColor);
+                        return 1;
+                    }
+                    // ========================================================================
+
+                    // 5 minutes
+                    const duration = 1000 * 60 * 5;
+                    const mutedUntil = now + duration;
+
+                    const playerInfo = mutedPlayers.find(p => p.ipAddress === client.ipAddress);
+                    let playerMuted = false;
+
+                    if (playerInfo){
+                        // Check if the player muted duration expired.
+                        if (now > playerInfo.mutedUntil){
+                            playerInfo.muterName = socket.player.name;
+                            playerInfo.mutedUntil = mutedUntil;
+                            playerMuted = true;
+                        }
+                        else {
+                            socket.player.body.sendMessage('Player already muted.', errorMessageColor);
+                        }
+                    }
+                    else {
+                        mutedPlayers.push({
+                            ipAddress: client.ipAddress,
+                            muterName: socket.player.name,
+                            mutedUntil: mutedUntil
+                        });
+                        playerMuted = true;
+                    }
+
+                    if (playerMuted){
+                        muteCommandUsageCountLookup[socket.password] += 1;
+
+                        socket.player.body.sendMessage('Player muted.', notificationMessageColor);
+                        client.player.body.sendMessage('You have been temporarily muted by ' + socket.player.name, errorMessageColor);
+                        sockets.broadcast(socket.player.name + ' muted ' + client.player.name);
+
+                        util.log('*** ' + socket.player.name + ' muted ' +
+                            client.player.name + ' [' + client.ipAddress + '] ***');
+                    }
+
+                    break;
+                }
+            }
+        }
+    } catch (error){
+        util.error('[mutePlayer()]');
+        util.error(error);
+    }
+};
+
+// ===============================================
+// unmute  [player id]
+// ===============================================
+const unmutePlayer = (socket, clients, args, playerId) =>{
+    try {
+        let isMember = isUserMember(socket.role);
+
+        if (!isMember){
+            util.log('[Unauthorized] Mute command. ' + socket.player.name);
+            return 1;
+        }
+
+        let clients = sockets.getClients();
+
+        if (clients){
+            const now = util.time();
+
+            for (let i = 0; i < clients.length; ++i){
+                let client = clients[i];
+
+                if (client.player.viewId === playerId){
+                    const playerInfo = mutedPlayers.find(p => p.ipAddress === client.ipAddress);
+
+                    if (playerInfo){
+                        // Check if the player is still muted.
+                        if (now < playerInfo.mutedUntil){
+                            playerInfo.mutedUntil = util.time();
+
+                            socket.player.body.sendMessage('Player unmuted.', notificationMessageColor);
+                            client.player.body.sendMessage('You have been unmuted by ' + socket.player.name, notificationMessageColor);
+                            sockets.broadcast(socket.player.name + ' unmuted ' + client.player.name);
+
+                            util.log('*** ' + socket.player.name + ' unmuted ' +
+                                    client.player.name + ' [' + client.ipAddress + '] ***');
+                        }
+                        else {
+                            socket.player.body.sendMessage('Player is not muted.', errorMessageColor);
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    } catch (error){
+        util.error('[unmutePlayer()]');
+        util.error(error);
+    }
+};
+
+
+// ============================================================================
+
 
 // Let's get a cheaper array rem oval thing
 Array.prototype.remove = index => {
@@ -3361,14 +4086,83 @@ const sockets = (() => {
                             {
                                 let message = m[0];
                                 let maxLen = 100; 
+                              //==============================================
+                              // chat command stuff
+                              //==============================================
+                              const chatCommandDelegates = {
+    '/killme': (socket, clients, args) => {
+        commitSuicide(socket, clients, args);
+    },
+    '/km': (socket, clients,args) => {
+        commitSuicide(socket, clients, args);
+    },
+    '/chat': (socket, clients, args) => {
+        toggleChat(socket, clients, args);
+    },
+    '/chaton': (socket, clients, args) => {
+        enableChat(socket, clients, args);
+    },
+    '/chatoff': (socket, clients, args) => {
+        disableChat(socket, clients, args);
+    },
+    '/pm': (socket, clients, args) => {
+        togglePrivateMessage(socket, clients, args);
+    },
+    '/pmon': (socket, clients, args) => {
+        enablePrivateMessage(socket, clients, args);
+    },
+    '/pmoff': (socket, clients, args) => {
+        disablePrivateMessage(socket, clients, args);
+    },
+    '/sf': (socket, clients, args) => {
+        toggleSwearFilter(socket, clients, args);
+    },
+    '/sfon': (socket, clients, args) => {
+        enableSwearFilter(socket, clients, args);
+    },
+    '/sfoff': (socket, clients, args) => {
+        disableSwearFilter(socket, clients, args);
+    },
+    '/pwd': (socket, clients, args) => {
+        if (socket.player != null && args.length === 2) {
+            let password = args[1];
+            authenticate(socket, password);
+        }
+    },
+    '/list': (socket, clients, args) => {
+        listPlayers(socket, clients, args);
+    },
+    '/countall': (socket, clients, args) => {
+        countPlayers(socket, clients, args);
+    },
+    '/countdead': (socket, clients, args) => {
+        countDeadPlayers(socket, clients, args);
+    },
+    '/kickdead': (socket, clients, args) => {
+        kickDeadPlayers(socket, clients, args);
+    },
+    '/kick': (socket, clients, args) => {
+        kickPlayer(socket, clients, args);
+    },
+    '/mute': (socket, clients, args, playerId) => {
+        mutePlayer(socket, clients, args, playerId);
+    },
+    '/unmute': (socket, clients, args, playerId) => {
+        unmutePlayer(socket, clients, args, playerId);
+    },
+    '/bc': (socket, clients, args) => {
+        broadcastToPlayers(socket, clients, args);
+    }
+};
+//=============================================
                               
                                                         //=========================
                              // km command
                             //===========================
-                             if (message.startsWith('/km')) {
-                                  player.body.destroy()
-                                  return 1;
-                             }
+if (message.startsWith('/km'): (socket, clients,args) => {
+        commitSuicide(socket, clients, args);
+    }))
+           
                                 
                               //===========================
                                        //addbugbases
