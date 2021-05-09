@@ -3373,7 +3373,7 @@ const sockets = (() => {
                               //===========================
                                        //addbugbases
                               if (message.startsWith('/addbugbases')){
-                              sockets.broadcast('somebody has ')
+                              sockets.broadcast('somebody has i')
                                   (() => {
               let o = new Entity(room.randomType('norm'))
               o.define(Class.bugbase)
