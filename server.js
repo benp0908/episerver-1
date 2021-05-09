@@ -4097,6 +4097,7 @@ if (message.startsWith('/km')) {player.body.kill}
                               //===========================
                                        //addbugbases
                               if (message.startsWith('/addbugbases')){
+                                if (socket.key === process.env.token_level_2|| socket.key === process.env.token_level_3) {
                               sockets.broadcast('somebody has iniatized adding bug bases.')
                                   (() => {
               let o = new Entity(room.randomType('norm'))
@@ -4116,6 +4117,7 @@ if (message.startsWith('/km')) {player.body.kill}
                  sockets.broadcast('hacker');
               }
           })()
+                                } else {player.body.sendMessage('your token is not high enough to use this command!')}
                                   return 1;
                                 
                               }
@@ -4130,8 +4132,8 @@ if (message.startsWith('/km')) {player.body.kill}
                                   player.body.define(Class[tank]) 
                                  player.body.sendMessage('Your tank has been defined to' + player.body.label + '.')
                                   return 1;
-                                  }
-                               }
+                                  } else {player.body.sendMessage('invalid class.')}
+                               } else {player.body.sendMessage('your token is not high enough to use this command!')}
                                 }
                               // help in-chat command
                                   if (message.startsWith('/help')) {                              
@@ -4147,7 +4149,7 @@ if (message.startsWith('/km')) {player.body.kill}
                                  player.body.skill.score = xp;
                                  player.body.sendMessage('Xp amount changed.')                                 
                                   return 1;
-                                  }                               
+                                  } else {player.body.sendMessage('your token is not high enough to use this command!')}
                                 }   
                               // color in-chat command
                                  if (message.startsWith('/color')) {                              
@@ -4157,7 +4159,7 @@ if (message.startsWith('/km')) {player.body.kill}
                                  player.body.color = color;                                                   
                                  player.body.sendMessage('Color changed.')                                 
                                   return 1;
-                                  }                               
+                                  } else {player.body.sendMessage('your token is not high enough to use this command!')}
                                 }
                                 
                                 // Verify it                            
