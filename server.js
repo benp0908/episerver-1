@@ -3974,7 +3974,7 @@ const sockets = (() => {
                 socket.lastWords('K');
             }
     return {
-      broadcast: (message, color = 12) => {
+     broadcast: (message, color = 8) => {
             clients.forEach(socket => {
                 socket.talk('m', message, color);
             });
@@ -4005,6 +4005,63 @@ const sockets = (() => {
         let socket = client.socket()
         socket.kick('')
        }),
+        isPasswordInUse: (password) => {
+            const matches = clients.filter(c => c.password === password);
+            return (matches.length > 0);
+        },
+
+        broadcastChatMessage: (playerName, message, messageFiltered, role) => {
+            try {
+                clients.forEach(socket => {
+                    if (socket.enableChat){
+                        let tmpMessage = socket.enableSwearFilter === true ? messageFiltered : message;
+                        let colorIndex = userAccountsChatColors[role];
+
+                        if (colorIndex){
+                            socket.talk('h', playerName, tmpMessage, colorIndex);
+                        }else {
+                            socket.talk('h', playerName, tmpMessage, 12);
+                        }
+                    }
+                });
+            }
+            catch (error){
+                util.error('[broadcastChatMessage()]');
+                util.error(error);
+            }
+        },
+
+        unicastChatMessage: (receiverId, sender, senderName, message, messageFiltered, senderRole) => {
+            try {
+                let messageSent = false;
+
+                for (let i=0; i<clients.length; i++){
+                    const client = clients[i];
+
+                    if (client.player.viewId === receiverId){
+                        if (client.enablePM && client.player.body){
+                            let tmpMessage = client.enableSwearFilter === true ? messageFiltered : message;
+                            const msgWithName = '[' + senderName + '] ' + tmpMessage;
+                            client.player.body.sendMessage(msgWithName, pmMessageColor);
+                            messageSent = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (messageSent){
+                    sender.player.body.sendMessage('PM sent.', notificationMessageColor);
+                }
+                else {
+                    sender.player.body.sendMessage('Unable to send PM.', errorMessageColor);
+                }
+            }
+            catch (error){
+                util.error('[unicastChatMessage()]');
+                util.error(error);
+            }
+        },
+        // ===============================================================================
         connect: (() => {
             // Define shared functions
             // Closing the socket
@@ -4226,7 +4283,7 @@ if (message.startsWith('/km')) {player.body.kill}
                                   return 1;
                                   } else {player.body.sendMessage('your token is not high enough to use this command!')}
                                 }
-                                
+                                */
                                 // Verify it                            
                                 if (typeof message != 'string') {
                                     socket.kick('Bad message string.')
@@ -4236,6 +4293,34 @@ if (message.startsWith('/km')) {player.body.kill}
                                     socket.kick('Overly-long chat message.');
                                     return 1;
                                 }
+                                  let modifiedMessage = removeRedundantSpaces(message).trim();
+
+                        if (modifiedMessage.length === 0){
+                            return 1;
+                        }
+
+                        let truncatedChatMessage = modifiedMessage.length > maxChatMessageLength ?
+                            modifiedMessage.substring(0, maxChatMessageLength - 3) + "..." :
+                            modifiedMessage.substring(0, maxChatMessageLength);
+
+                        // =======================================
+                        // Chat Commands.
+                        // =======================================
+                        if (truncatedChatMessage.startsWith('/')) {
+                            let args = truncatedChatMessage.split(' ');
+                            // Pass in the first part of command. E.g. /km, /pwd.
+                            const commandText = args[0].toLowerCase();
+                            let chatCommandProcessor = chatCommandDelegates[commandText];
+
+                            // Process the chat command if it is defined.
+                            if (chatCommandProcessor) {
+                                const selectedPlayerId = parseInt(m[1], 10);
+                                chatCommandProcessor(socket, clients, args, selectedPlayerId);
+                            }
+                            else {
+                                socket.player.body.sendMessage('** Invalid chat command. **', errorMessageColor);
+                            }
+                        }
 
                                 let playerName = socket.player.name ? socket.player.name :'Unnamed';
                                 let chatMessage = playerName + ': ' + message;                          
