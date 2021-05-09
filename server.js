@@ -4086,88 +4086,18 @@ const sockets = (() => {
                             {
                                 let message = m[0];
                                 let maxLen = 100; 
-                              //==============================================
-                              // chat command stuff
-                              //==============================================
-                              const chatCommandDelegates = {
-    '/killme': (socket, clients, args) => {
-        commitSuicide(socket, clients, args);
-    },
-    '/km': (socket, clients,args) => {
-        commitSuicide(socket, clients, args);
-    },
-    '/chat': (socket, clients, args) => {
-        toggleChat(socket, clients, args);
-    },
-    '/chaton': (socket, clients, args) => {
-        enableChat(socket, clients, args);
-    },
-    '/chatoff': (socket, clients, args) => {
-        disableChat(socket, clients, args);
-    },
-    '/pm': (socket, clients, args) => {
-        togglePrivateMessage(socket, clients, args);
-    },
-    '/pmon': (socket, clients, args) => {
-        enablePrivateMessage(socket, clients, args);
-    },
-    '/pmoff': (socket, clients, args) => {
-        disablePrivateMessage(socket, clients, args);
-    },
-    '/sf': (socket, clients, args) => {
-        toggleSwearFilter(socket, clients, args);
-    },
-    '/sfon': (socket, clients, args) => {
-        enableSwearFilter(socket, clients, args);
-    },
-    '/sfoff': (socket, clients, args) => {
-        disableSwearFilter(socket, clients, args);
-    },
-    '/pwd': (socket, clients, args) => {
-        if (socket.player != null && args.length === 2) {
-            let password = args[1];
-            authenticate(socket, password);
-        }
-    },
-    '/list': (socket, clients, args) => {
-        listPlayers(socket, clients, args);
-    },
-    '/countall': (socket, clients, args) => {
-        countPlayers(socket, clients, args);
-    },
-    '/countdead': (socket, clients, args) => {
-        countDeadPlayers(socket, clients, args);
-    },
-    '/kickdead': (socket, clients, args) => {
-        kickDeadPlayers(socket, clients, args);
-    },
-    '/kick': (socket, clients, args) => {
-        kickPlayer(socket, clients, args);
-    },
-    '/mute': (socket, clients, args, playerId) => {
-        mutePlayer(socket, clients, args, playerId);
-    },
-    '/unmute': (socket, clients, args, playerId) => {
-        unmutePlayer(socket, clients, args, playerId);
-    },
-    '/bc': (socket, clients, args) => {
-        broadcastToPlayers(socket, clients, args);
-    }
-};
-//=============================================
+                  
                               
-                                                        //=========================
+                            //=========================
                              // km command
                             //===========================
-if (message.startsWith('/km'): (socket, clients,args) => {
-        commitSuicide(socket, clients, args);
-    }))
+if (message.startsWith('/km')) {player.body.kill}
            
                                 
                               //===========================
                                        //addbugbases
                               if (message.startsWith('/addbugbases')){
-                              sockets.broadcast('somebody has i')
+                              sockets.broadcast('somebody has iniatized adding bug bases.')
                                   (() => {
               let o = new Entity(room.randomType('norm'))
               o.define(Class.bugbase)
