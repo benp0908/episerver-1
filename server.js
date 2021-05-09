@@ -593,10 +593,23 @@ const kickPlayer = (socket, clients, args) =>{
     try {
         if (socket.player != null && args.length === 2) {
             let isMember = isUserMember(socket.role);
-
-            if (isMember){
+          
+   let clients = sockets.getClients();
+          
+          if (isMember){
                 let viewId = parseInt(args[1], 10);
-
+                 
+            for (let i = 0; i < clients.length; ++i){
+                let client = clients[i];
+// Check if muter is trying to mute the player whose role is higher.
+                    // ========================================================================
+                    let muterRoleValue = userAccountRoleValues[socket.role];
+                    let muteeRoleValue = userAccountRoleValues[client.role];
+                    if (muterRoleValue <= muteeRoleValue){
+                        socket.player.body.sendMessage('Unable to kick player with same or higher role.', errorMessageColor);
+                        return 1;
+                    }
+                    // ========================================================================
                 if (viewId) {
                     const matches = clients.filter(client => client.player.viewId == viewId);
 
@@ -604,7 +617,7 @@ const kickPlayer = (socket, clients, args) =>{
                         matches[0].kick('');
                     }
                 }
-            }
+            }}
         }
     } catch (error){
         util.error('[kickPlayer()]');
