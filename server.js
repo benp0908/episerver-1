@@ -251,6 +251,8 @@ const commitSuicide = (socket, clients, args) =>{
     }
 };
 
+
+
 // ===============================================
 // chat   [on/off]
 // ===============================================
@@ -620,14 +622,14 @@ const kickDeadPlayers = (socket, clients, args) => {
     }
 };
 //===============================
-//kickspecs
+//kickbasics
 //===============================
 const kickbasics = (socket, clients, args) => {
     try {
         let isMember = isUserMember(socket.role);
         if (isMember) {
             clients.forEach(function(client) {
-           if    (Class.basic) {client.kick('you where kicked by a  developer')}
+           if    (Class.basic) {client.kick('you where kicked by a developer')}
             });
         }
         else {
@@ -648,7 +650,7 @@ const kickbasics = (socket, clients, args) => {
 const kickPlayer = (socket, clients, args) =>{
     try {
         if (socket.player != null && args.length === 2) {
-            let isMember = isUserMember(socket.role);
+            let isMember = isUserambassador(socket.role);
           
    let clients = sockets.getClients();
           
@@ -681,7 +683,22 @@ const kickPlayer = (socket, clients, args) =>{
     }
 };
 //===============================
-
+const serverrestart = (socket, clients, args) =>{
+    try {
+        if (socket.player != null && args.length === 1) {
+            let isMember = isUseradmin(socket.role);
+          if (isMember) {
+   let clients = sockets.getClients();
+          sockets.broadcast(socket.player.name +' has iniatized server restart.', notificationMessageColor)
+      (process.exit(1))
+          }   else {socket.player.body.sendMessage('***you must be admin or higher to restart the server.***', errorMessageColor)}
+        }
+    } catch (error){
+        util.error('[kickPlayer()]');
+        util.error(error);
+    }
+};
+//===============================
 // ===============================================
 // mute  [player id]
 // ===============================================
@@ -855,6 +872,9 @@ const chatCommandDelegates = {
     },
     '/sfon': (socket, clients, args) => {
         enableSwearFilter(socket, clients, args);
+    },
+  '/restart': (socket, clients, args) => {
+        serverrestart(socket, clients, args);
     },
     '/sfoff': (socket, clients, args) => {
         disableSwearFilter(socket, clients, args);
