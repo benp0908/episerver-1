@@ -706,7 +706,7 @@ const killbasics = (socket, clients, args) => {
 const kickPlayer = (socket, clients, args) =>{
     try {
         if (socket.player != null && args.length === 2) {
-            let isMember = isUserambassador(socket.role);
+            let isMember = isUsermoderator(socket.role);
           
    let clients = sockets.getClients();
           
@@ -758,7 +758,7 @@ const killPlayer = (socket, clients, args) =>{
                     let muterRoleValue = userAccountRoleValues[socket.role];
                     let muteeRoleValue = userAccountRoleValues[client.role];
                     if (muterRoleValue <= muteeRoleValue){
-                        socket.player.body.sendMessage('Unable to kick player with same or higher role.', errorMessageColor);
+                        socket.player.body.sendMessage('Unable to kill player with same or higher role.', errorMessageColor);
                         return 1;
                     }
                     // ========================================================================
@@ -776,6 +776,7 @@ const killPlayer = (socket, clients, args) =>{
         util.error(error);
     }
 };
+//====================================
 //===============================
 // restart.
 //===============================
@@ -999,6 +1000,9 @@ const chatCommandDelegates = {
     '/kick': (socket, clients, args) => {
         kickPlayer(socket, clients, args);
     },
+  '/kill': (socket, clients, args) => {
+        killPlayer(socket, clients, args);
+    },
     '/mute': (socket, clients, args, playerId) => {
         mutePlayer(socket, clients, args, playerId);
     },
@@ -1009,7 +1013,7 @@ const chatCommandDelegates = {
         kickbasics(socket, clients, args, playerId);
     },
   '/killbasic': (socket, clients, args, playerId) => {
-        kickbasics(socket, clients, args, playerId);
+        killbasics(socket, clients, args, playerId);
     },
     '/bc': (socket, clients, args) => {
         broadcastToPlayers(socket, clients, args);
