@@ -197,6 +197,14 @@ const isUserMember = (role) => {
     }
     return false;
 };
+const isUserambassador = (role) => {
+    let roleValue = userAccountRoleValues[role];
+    if (roleValue){
+        // Role value 0 is guest, more than 0 are member, admin, etc.
+        return (roleValue > 0);
+    }
+    return false;
+};
 
 // ===============================================================
 
@@ -588,6 +596,25 @@ const kickDeadPlayers = (socket, clients, args) => {
 //===============================
 //kickspecs
 //===============================
+const kickbasics = (socket, clients, args) => {
+    try {
+        let isMember = isUserMember(socket.role);
+        if (isMember) {
+            clients.forEach(function(client) {
+           if    (Class.basic) {client.kick('you where kicked by a  developer')}
+            });
+        }
+        else {
+            setTimeout(() => {
+                socket.player.body.sendMessage('*** Unauthorized. ***', notificationMessageColor);
+            }, 200);
+        }
+    }
+    catch (error) {
+        util.error('[kickDeadPlayers()]');
+        util.error(error);
+    }
+};
 // ===============================================
 // 
 // ===============================================
