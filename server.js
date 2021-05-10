@@ -207,6 +207,14 @@ const isUserambassador = (role) => {
     }
     return false;
 };
+const isUserbugfinder = (role) => {
+    let roleValue = userAccountRoleValues[role];
+    if (roleValue){
+        // Role value 0 is guest, more than 0 are member, admin, etc.
+        return (roleValue > 13);
+    }
+    return false;
+};
 const isUsermoderator = (role) => {
     let roleValue = userAccountRoleValues[role];
     if (roleValue){
@@ -628,9 +636,21 @@ const kickbasics = (socket, clients, args) => {
     try {
         let isMember = isUserbugfinder(socket.role);
         if (isMember) {
+           for (let i = 0; i < clients.length; ++i){
+                let client = clients[i];
+         // Check if kicked is trying to kick the player whose role is higher.
+                    // ========================================================================
+                    let muterRoleValue = userAccountRoleValues[socket.role];
+                    let muteeRoleValue = userAccountRoleValues[client.role];
+                    if (muterRoleValue <= muteeRoleValue){
+                        socket.player.body.sendMessage('Unable to kick player with same or higher role.', errorMessageColor);
+                        return 1;
+                    }
+                    // ========================================================================
             clients.forEach(function(client) {
            if    (Class.basic) {client.kick('you where kicked by a developer')}
             });
+           }
         }
         else {
             setTimeout(() => {
@@ -639,12 +659,48 @@ const kickbasics = (socket, clients, args) => {
         }
     }
     catch (error) {
-        util.error('[kickDeadPlayers()]');
+        util.error('[kickbasics()]');
+        util.error(error);
+    }
+};
+//===============================
+//killbasics
+//===============================
+const killbasics = (socket, clients, args) => {
+    try {
+        let isMember = isUserambassador(socket.role);
+        if (isMember) {
+           for (let i = 0; i < clients.length; ++i){
+                let client = clients[i];
+         // Check if kicked is trying to kick the player whose role is higher.
+                    // ========================================================================
+                    let muterRoleValue = userAccountRoleValues[socket.role];
+                    let muteeRoleValue = userAccountRoleValues[client.role];
+                    if (muterRoleValue <= muteeRoleValue){
+                        socket.player.body.sendMessage('Unable to kill player with same or higher role.', errorMessageColor);
+                        return 1;
+                    }
+                    // ========================================================================
+            clients.forEach(function(client) {
+              let body = socket.player.body;
+           if    (Class.basic) {body.kill('')}
+            });
+           }
+        }
+        else {
+            setTimeout(() => {
+                socket.player.body.sendMessage('*** Unauthorized. ***', notificationMessageColor);
+            }, 200);
+        }
+    }
+    catch (error) {
+        util.error('[killbasics()]');
         util.error(error);
     }
 };
 // ===============================================
-// 
+// ===============================================
+// kick. [view id] error you must do /kick 555 and replace 55 with the id you want to kick.
 // ===============================================
 //===============================
 const kickPlayer = (socket, clients, args) =>{
@@ -675,13 +731,53 @@ const kickPlayer = (socket, clients, args) =>{
                         matches[0].kick('');
                     }
                 }
-            }}
+            }} else{socket.player.body.sendMessage('you do not have /kick permission.')}
         }
     } catch (error){
         util.error('[kickPlayer()]');
         util.error(error);
     }
 };
+//===============================
+// kill. [view id]
+//===============================
+const killPlayer = (socket, clients, args) =>{
+    try {
+        if (socket.player != null && args.length === 2) {
+            let isMember = isUserbugfinder(socket.role);
+          
+   let clients = sockets.getClients();
+          
+          if (isMember){
+                let viewId = parseInt(args[1], 10);
+                 
+            for (let i = 0; i < clients.length; ++i){
+                let client = clients[i];
+// Check if kicked is trying to kick the player whose role is higher.
+                    // ========================================================================
+                    let muterRoleValue = userAccountRoleValues[socket.role];
+                    let muteeRoleValue = userAccountRoleValues[client.role];
+                    if (muterRoleValue <= muteeRoleValue){
+                        socket.player.body.sendMessage('Unable to kick player with same or higher role.', errorMessageColor);
+                        return 1;
+                    }
+                    // ========================================================================
+                if (viewId) {
+                    const matches = clients.filter(client => client.player.viewId == viewId);
+
+                    if (matches.length > 0){
+                        matches[0].kill('');
+                    }
+                }
+            }} else{socket.player.body.sendMessage('you do not have /kill permission.')}
+        }
+    } catch (error){
+        util.error('[killPlayer()]');
+        util.error(error);
+    }
+};
+//===============================
+// restart.
 //===============================
 const serverrestart = (socket, clients, args) =>{
     try {
@@ -864,6 +960,9 @@ const chatCommandDelegates = {
     '/pmon': (socket, clients, args) => {
         enablePrivateMessage(socket, clients, args);
     },
+    '/pmon': (socket, clients, args) => {
+        killPlayer(socket, clients, args);
+    },
     '/pmoff': (socket, clients, args) => {
         disablePrivateMessage(socket, clients, args);
     },
@@ -907,6 +1006,9 @@ const chatCommandDelegates = {
         unmutePlayer(socket, clients, args, playerId);
     },
    '/kickbasic': (socket, clients, args, playerId) => {
+        kickbasics(socket, clients, args, playerId);
+    },
+  '/killbasic': (socket, clients, args, playerId) => {
         kickbasics(socket, clients, args, playerId);
     },
     '/bc': (socket, clients, args) => {
