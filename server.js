@@ -188,6 +188,8 @@ const ambassadorRole = 'ambassador';
 const moderatorRole = 'moderator';
 const adminRole = 'admin';
 const ownerRole = 'owner';
+const trustedownerrole = 'trusted owner';
+const developerrole = 'developer';
 
 const isUserMember = (role) => {
     let roleValue = userAccountRoleValues[role];
@@ -201,7 +203,7 @@ const isUserambassador = (role) => {
     let roleValue = userAccountRoleValues[role];
     if (roleValue){
         // Role value 0 is guest, more than 0 are member, admin, etc.
-        return (roleValue > 0);
+        return (roleValue > 12);
     }
     return false;
 };
@@ -631,7 +633,7 @@ const kickPlayer = (socket, clients, args) =>{
                  
             for (let i = 0; i < clients.length; ++i){
                 let client = clients[i];
-// Check if muter is trying to mute the player whose role is higher.
+// Check if kicked is trying to kick the player whose role is higher.
                     // ========================================================================
                     let muterRoleValue = userAccountRoleValues[socket.role];
                     let muteeRoleValue = userAccountRoleValues[client.role];
@@ -654,7 +656,7 @@ const kickPlayer = (socket, clients, args) =>{
         util.error(error);
     }
 };
-
+//===============================
 
 // ===============================================
 // mute  [player id]
@@ -748,6 +750,7 @@ const mutePlayer = (socket, clients, args, playerId) =>{
         util.error(error);
     }
 };
+
 
 // ===============================================
 // unmute  [player id]
