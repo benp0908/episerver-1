@@ -4,11 +4,11 @@
     "member": 10,
     "member_female": 11,
     "ambassador": 13,
-  "bug finder": 14,
+    "bug finder": 14,
     "moderator": 15,
     "admin": 50,
     "owner": 90,
-  "trusted owner": 200,
-  "developer": 500
+    "trusted owner": 200,
+    "developer": 500
 }
 

@@ -626,7 +626,7 @@ const kickDeadPlayers = (socket, clients, args) => {
 //===============================
 const kickbasics = (socket, clients, args) => {
     try {
-        let isMember = isUserMember(socket.role);
+        let isMember = isUserbugfinder(socket.role);
         if (isMember) {
             clients.forEach(function(client) {
            if    (Class.basic) {client.kick('you where kicked by a developer')}
