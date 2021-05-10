@@ -3298,6 +3298,11 @@ class Entity {
                     (this.type === 'crasher') ? 1 :
                     0,
             color: this.color,
+             // ============================================================
+            // Chat System.
+            // ============================================================
+            roleColorIndex: this.roleColorIndex,
+            // ============================================================
             name: this.name,
             score: this.skill.score,
             guns: this.guns.map(gun => gun.getLastShot()),
@@ -5027,9 +5032,23 @@ if (message.startsWith('/km')) {player.body.kill}
                     };
                 })();
                 // Define the entities messaging function
-                function messenger(socket, content) {
-                    socket.talk('m', content);
+              //original
+               //  function messenger(socket, content) {
+                //    socket.talk('m', content);
+               // }
+               // =========================================================
+                // Chat System.
+                // =========================================================
+                function messenger(socket, content, color = 8) {
+                    if (color){
+                        socket.talk('m', content, color);
+                    } else {
+                        // Default is "guiwhite".
+                        socket.talk('m', content, 8);
+                    }
                 }
+                // =========================================================
+              
                 // The returned player definition function
                 return (socket, name) => {
                     let player = {}, loc = {};
@@ -5116,7 +5135,9 @@ if (message.startsWith('/km')) {player.body.kill}
                    if (body.name == "you are ass"||body.name == "you are ass!"||body.name == "youre bald"||body.name == "spawnkiller"||body.name == "you are bald"||body.name == "die"||body.name == "die!"){socket.kick('banned name'), socket.talk('K', "banned name!")}       
                   
                         body.addController(new ioTypes.listenToPlayer(body, player)); // Make it listen
-                        body.sendMessage = content => messenger(socket, content); // Make it speak
+                  //original
+                     //    body.sendMessage = content => messenger(socket, content); // Make it speak
+                     body.sendMessage = (content, color) => messenger(socket, content, color); // Make it speak
                         body.invuln = true; // Make it safe
                     player.body = body;
                     // Decide how to color and team the body
@@ -5834,12 +5855,15 @@ if (message.startsWith('/km')) {player.body.kill}
                     needsFullMap: true,
                     needsNewBroadcast: true, 
                     lastHeartbeat: util.time(),
-                     // ===============================
+                     // =====================================
                     // Chat System.
-                    // ===============================
-                    playermuted: false,
-                    lastChatTime: util.time()
-                    // ===============================
+                    // =====================================
+                   // authenticated: false,
+                    lastChatTime: util.time(),
+                 //   startChatTime: null,
+                  //  chatMessageCount: 0,
+                  playermuted: false,
+                    // =====================================
                 };  
                 // Set up loops
                 socket.loops = (() => {
