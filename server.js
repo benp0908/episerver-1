@@ -648,7 +648,7 @@ const kickPlayer = (socket, clients, args) =>{
                     }
                 }
             }}
-        }
+        } else {socket.player.body.sendMessage('invalid /kick attempt')}
     } catch (error){
         util.error('[kickPlayer()]');
         util.error(error);
