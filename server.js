@@ -694,7 +694,7 @@ const serverrestart = (socket, clients, args) =>{
           }   else {socket.player.body.sendMessage('***you must be admin or higher to restart the server.***', errorMessageColor)}
         }
     } catch (error){
-        util.error('[kickPlayer()]');
+        util.error('[serverrestart()]');
         util.error(error);
     }
 };
@@ -2849,6 +2849,12 @@ class Entity {
         this.damp = 0.05;
         this.collisionArray = [];
         this.invuln = false;
+      // ==================================================
+        // Chat System.
+        // ==================================================
+        this.roleColorIndex = 8; // White
+        // ==================================================
+
         this.alpha = 1;
         this.invisible = [0, 0];
         // Get a new unique id
