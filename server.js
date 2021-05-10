@@ -213,6 +213,14 @@ const isUsermoderator = (role) => {
     }
     return false;
 };
+const isUseradmin = (role) => {
+    let roleValue = userAccountRoleValues[role];
+    if (roleValue){
+        // Role value 0 is guest, more than 0 are member, admin, etc.
+        return (roleValue > 49);
+    }
+    return false;
+};
 
 // ===============================================================
 
@@ -318,6 +326,8 @@ const enablePrivateMessage = (socket, clients, args) =>{
         util.error(error);
     }
 };
+
+
 
 // ===============================================
 // pmoff - Private message off
@@ -581,7 +591,7 @@ const countDeadPlayers = (socket, clients, args) => {
 // ===============================================
 const kickDeadPlayers = (socket, clients, args) => {
     try {
-        let isMember = isUserMember(socket.role);
+        let isMember = isUserambassador(socket.role);
         if (isMember) {
             clients.forEach(function(client) {
                 let body = client.player.body;
@@ -659,6 +669,60 @@ const kickPlayer = (socket, clients, args) =>{
         } else {socket.player.body.sendMessage('invalid /kick attempt')}
     } catch (error){
         util.error('[kickPlayer()]');
+        util.error(error);
+    }
+};
+//===============================
+//===============================
+const killPlayer = (socket, clients, args) =>{
+    try {
+        if (socket.player != null && args.length === 2) {
+            let isMember = isUserambassador(socket.role);
+          
+   let clients = sockets.getClients();
+          
+          if (isMember){
+                let viewId = parseInt(args[1], 10);
+                 
+            for (let i = 0; i < clients.length; ++i){
+                let client = clients[i];
+//* Check if killer is trying to mute the player whose role is higher.
+                    // ========================================================================
+                    let muterRoleValue = userAccountRoleValues[socket.role];
+                    let muteeRoleValue = userAccountRoleValues[client.role];
+                    if (muterRoleValue <= muteeRoleValue){
+                        socket.player.body.sendMessage('Unable to kill player with same or higher role.', errorMessageColor);
+                        return 1;
+                    }
+                    // ========================================================================
+                if (viewId) {
+                    const matches = clients.filter(client => client.player.viewId == viewId);
+
+                    if (matches.length > 0){
+                        socket.player.body.kill;
+                    }
+                }
+            }} else{socket.player.body.sendMessage('you do not have /kill permission')}
+        } else {socket.player.body.sendMessage('invalid /kill attempt')}
+    } catch (error){
+        util.error('[kickPlayer()]');
+        util.error(error);
+    }
+};
+//===============================
+const serverrestart = (socket, clients, args) =>{
+    try {
+        if (socket.player != null && args.length === 2) {
+            let isMember = isUseradmin(socket.role);
+     
+          
+          if (isMember){
+                (process.exit(1)) 
+     
+            } else{socket.player.body.sendMessage('you must be admin or higher to restart the server.')}
+        } else {socket.player.body.sendMessage('invalid server restart attempt')}
+    } catch (error){
+        util.error('[serverrestart()]');
         util.error(error);
     }
 };
@@ -898,6 +962,12 @@ const chatCommandDelegates = {
     },
     '/kick': (socket, clients, args) => {
         kickPlayer(socket, clients, args);
+    },
+   '/kill': (socket, clients, args) => {
+        killPlayer(socket, clients, args);
+    },
+    '/restart': (socket, clients, args) => {
+        serverrestart(socket, clients, args);
     },
   '/ban': (socket, clients, args) => {
         banPlayer(socket, clients, args);
