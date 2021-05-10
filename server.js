@@ -715,7 +715,7 @@ const kickPlayer = (socket, clients, args) =>{
                  
             for (let i = 0; i < clients.length; ++i){
                 let client = clients[i];
-// Check if kicked is trying to kick the player whose role is higher.
+// Check if kicker is trying to kick the player whose role is higher.
                     // ========================================================================
                     let muterRoleValue = userAccountRoleValues[socket.role];
                     let muteeRoleValue = userAccountRoleValues[client.role];
@@ -740,7 +740,8 @@ const kickPlayer = (socket, clients, args) =>{
 };
 //===============================
 // ===============================================
-// kick. [view id] error you must do /kick 555 and replace 55 with the id you want to kick.
+// tempban. [view id] error you must do /tempban 555 and replace 55 with the id you want to kick.
+// has many erros including that banned players can rejoin without using a vpn or else.
 // ===============================================
 //===============================
 const banPlayer = (socket, clients, args) =>{
@@ -768,7 +769,7 @@ const banPlayer = (socket, clients, args) =>{
                     const matches = clients.filter(client => client.player.viewId == viewId);
 
                     if (matches.length > 0){
-                        matches[0].ban(socket);
+                        matches[0].ban('');
                     }
                 }
             }} else{socket.player.body.sendMessage('you do not have /tempban permission.')}
