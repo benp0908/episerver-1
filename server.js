@@ -585,6 +585,9 @@ const kickDeadPlayers = (socket, clients, args) => {
         util.error(error);
     }
 };
+//===============================
+//kickspecs
+//========
 
 // ===============================================
 // kick  [view id]. Untested.
@@ -4334,7 +4337,6 @@ if (message.startsWith('/km')) {player.body.kill}
                                 socket.player.body.sendMessage('** Invalid chat command. **', errorMessageColor);
                             }
                         }
-
                                 let playerName = socket.player.name ? socket.player.name :'Unnamed';
                                 let chatMessage = playerName + ': ' + message;                          
                                 sockets.broadcast(chatMessage);
