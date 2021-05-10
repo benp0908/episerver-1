@@ -587,8 +587,28 @@ const kickDeadPlayers = (socket, clients, args) => {
 };
 //===============================
 //kickspecs
-//========
-
+//===============================
+// ===============================================
+// Kick dead players.
+// ===============================================
+const kickspecs = (socket, clients, args) => {
+    try {
+        let isMember = isUserMember(socket.role);
+        if (isMember) {
+            clients.forEach(function(client) {
+            
+            });
+        }
+        else {
+            setTimeout(() => {
+                socket.player.body.sendMessage('*** Unauthorized. ***', notificationMessageColor);
+            }, 200);
+        }
+    }
+    catch (error) {
+        util.error('[kickDeadPlayers()]');
+        util.error(error);
+   
 // ===============================================
 // kick  [view id]. Untested.
 // ===============================================
