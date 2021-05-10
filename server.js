@@ -906,6 +906,9 @@ const chatCommandDelegates = {
     '/unmute': (socket, clients, args, playerId) => {
         unmutePlayer(socket, clients, args, playerId);
     },
+   '/kickbasic': (socket, clients, args, playerId) => {
+        kickbasics(socket, clients, args, playerId);
+    },
     '/bc': (socket, clients, args) => {
         broadcastToPlayers(socket, clients, args);
     }
