@@ -1,4 +1,4 @@
-//*jslint node: true */
+/*jslint node: true */
 /*eslint-plugin-security-node: true */
 /*jshint -W061 */
 /*global goog, Map, let */
@@ -188,54 +188,12 @@ const ambassadorRole = 'ambassador';
 const moderatorRole = 'moderator';
 const adminRole = 'admin';
 const ownerRole = 'owner';
-const trustedownerrole = 'trusted owner';
-const developerrole = 'developer';
 
 const isUserMember = (role) => {
     let roleValue = userAccountRoleValues[role];
     if (roleValue){
         // Role value 0 is guest, more than 0 are member, admin, etc.
         return (roleValue > 0);
-    }
-    return false;
-};
-const isUserambassador = (role) => {
-    let roleValue = userAccountRoleValues[role];
-    if (roleValue){
-        // Role value 0 is guest, more than 0 are member, admin, etc.
-        return (roleValue > 12);
-    }
-    return false;
-};
-const isUserbugfinder = (role) => {
-    let roleValue = userAccountRoleValues[role];
-    if (roleValue){
-        // Role value 0 is guest, more than 0 are member, admin, etc.
-        return (roleValue > 13);
-    }
-    return false;
-};
-const isUsermoderator = (role) => {
-    let roleValue = userAccountRoleValues[role];
-    if (roleValue){
-        // Role value 0 is guest, more than 0 are member, admin, etc.
-        return (roleValue > 14);
-    }
-    return false;
-};
-const isUseradmin = (role) => {
-    let roleValue = userAccountRoleValues[role];
-    if (roleValue){
-        // Role value 0 is guest, more than 0 are member, admin, etc.
-        return (roleValue > 49);
-    }
-    return false;
-};
-const isUserowner = (role) => {
-    let roleValue = userAccountRoleValues[role];
-    if (roleValue){
-        // Role value 0 is guest, more than 0 are member, admin, etc.
-        return (roleValue > 89);
     }
     return false;
 };
@@ -258,8 +216,6 @@ const commitSuicide = (socket, clients, args) =>{
         sockets.broadcast(socket.player.name + ' has killed his/her own tank.');
     }
 };
-
-
 
 // ===============================================
 // chat   [on/off]
@@ -419,7 +375,7 @@ const disableSwearFilter = (socket, clients, args) =>{
 const broadcastToPlayers = (socket, clients, args) =>{
     try {
         if (socket.player != null && args.length >= 2) {
-            let isMember = isUsermoderator(socket.role);
+            let isMember = isUserMember(socket.role);
 
             if (isMember) {
                 let a, rest;
@@ -609,7 +565,7 @@ const countDeadPlayers = (socket, clients, args) => {
 // ===============================================
 const kickDeadPlayers = (socket, clients, args) => {
     try {
-        let isMember = isUserambassador(socket.role);
+        let isMember = isUserMember(socket.role);
         if (isMember) {
             clients.forEach(function(client) {
                 let body = client.player.body;
@@ -629,214 +585,34 @@ const kickDeadPlayers = (socket, clients, args) => {
         util.error(error);
     }
 };
-//===============================
-//kickbasics
-//===============================
-const kickbasics = (socket, clients, args) => {
-    try {
-        let isMember = isUserbugfinder(socket.role);
-        if (isMember) {
-           for (let i = 0; i < clients.length; ++i){
-                let client = clients[i];
-         // Check if kicked is trying to kick the player whose role is higher.
-                    // ========================================================================
-                    let muterRoleValue = userAccountRoleValues[socket.role];
-                    let muteeRoleValue = userAccountRoleValues[client.role];
-                    if (muterRoleValue <= muteeRoleValue){
-                        socket.player.body.sendMessage('Unable to kick player with same or higher role.', errorMessageColor);
-                        return 1;
-                    }
-                    // ========================================================================
-            clients.forEach(function(client) {
-           if    (Class.basic) {client.kick('you where kicked by a developer')}
-            });
-           }
-        }
-        else {
-            setTimeout(() => {
-                socket.player.body.sendMessage('*** Unauthorized. ***', notificationMessageColor);
-            }, 200);
-        }
-    }
-    catch (error) {
-        util.error('[kickbasics()]');
-        util.error(error);
-    }
-};
-//===============================
-//killbasics
-//===============================
-const killbasics = (socket, clients, args) => {
-    try {
-        let isMember = isUserambassador(socket.role);
-        if (isMember) {
-           for (let i = 0; i < clients.length; ++i){
-                let client = clients[i];
-         // Check if kicked is trying to kick the player whose role is higher.
-                    // ========================================================================
-                    let muterRoleValue = userAccountRoleValues[socket.role];
-                    let muteeRoleValue = userAccountRoleValues[client.role];
-                    if (muterRoleValue <= muteeRoleValue){
-                        socket.player.body.sendMessage('Unable to kill player with same or higher role.', errorMessageColor);
-                        return 1;
-                    }
-                    // ========================================================================
-            clients.forEach(function(client) {
-              let body = socket.player.body;
-           if    (Class.basic) {body.kill('')}
-            });
-           }
-        }
-        else {
-            setTimeout(() => {
-                socket.player.body.sendMessage('*** Unauthorized. ***', notificationMessageColor);
-            }, 200);
-        }
-    }
-    catch (error) {
-        util.error('[killbasics()]');
-        util.error(error);
-    }
-};
+
 // ===============================================
+// kick  [view id]. Untested.
 // ===============================================
-// kick. [view id] error you must do /kick 555 and replace 55 with the id you want to kick.
-// ===============================================
-//===============================
 const kickPlayer = (socket, clients, args) =>{
     try {
         if (socket.player != null && args.length === 2) {
-            let isMember = isUsermoderator(socket.role);
-          
-   let clients = sockets.getClients();
-          
-          if (isMember){
+            let isMember = isUserMember(socket.role);
+
+            if (isMember){
                 let viewId = parseInt(args[1], 10);
-                 
-            for (let i = 0; i < clients.length; ++i){
-                let client = clients[i];
-// Check if kicker is trying to kick the player whose role is higher.
-                    // ========================================================================
-                    let muterRoleValue = userAccountRoleValues[socket.role];
-                    let muteeRoleValue = userAccountRoleValues[client.role];
-                    if (muterRoleValue <= muteeRoleValue){
-                        socket.player.body.sendMessage('Unable to kick player with same or higher role.', errorMessageColor);
-                        return 1;
-                    }
-                    // ========================================================================
+
                 if (viewId) {
                     const matches = clients.filter(client => client.player.viewId == viewId);
 
                     if (matches.length > 0){
                         matches[0].kick('');
-                    } else {socket.player.body.sendMessage('a unknown error has been found, please dm attacker#9445 on discord about the error.')}
+                    }
                 }
-            }} else{socket.player.body.sendMessage('you do not have /kick permission.')}
-        } else {socket.player.body.sendMessage('invalid /kick attempt.')}
+            }
+        }
     } catch (error){
         util.error('[kickPlayer()]');
         util.error(error);
     }
 };
-//===============================
-// ===============================================
-// tempban. [view id] error you must do /tempban 555 and replace 55 with the id you want to kick.
-// has many erros including that banned players can rejoin without using a vpn or else.
-// ===============================================
-//===============================
-const banPlayer = (socket, clients, args) =>{
-    try {
-        if (socket.player != null && args.length === 2) {
-            let isMember = isUserowner(socket.role);
-          
-   let clients = sockets.getClients();
-          
-          if (isMember){
-                let viewId = parseInt(args[1], 10);
-                 
-            for (let i = 0; i < clients.length; ++i){
-                let client = clients[i];
-// Check if banner is trying to kick the player whose role is higher.
-                    // ========================================================================
-                    let muterRoleValue = userAccountRoleValues[socket.role];
-                    let muteeRoleValue = userAccountRoleValues[client.role];
-                    if (muterRoleValue <= muteeRoleValue){
-                        socket.player.body.sendMessage('Unable to ban player with same or higher role.', errorMessageColor);
-                        return 1;
-                    }
-                    // ========================================================================
-                if (viewId) {
-                    const matches = clients.filter(client => client.player.viewId == viewId);
 
-                    if (matches.length > 0){
-                        matches[0].ban('');
-                    }
-                }
-            }} else{socket.player.body.sendMessage('you do not have /tempban permission.')}
-        } else {socket.player.body.sendMessage('invalid /tempban attempt.')}
-    } catch (error){
-        util.error('[banPlayer()]');
-        util.error(error);
-    }
-};
-//===============================
-// kill. [view id]
-//===============================
-const killPlayer = (socket, clients, args) =>{
-    try {
-        if (socket.player != null && args.length === 2) {
-            let isMember = isUserbugfinder(socket.role);
-          
-   let clients = sockets.getClients();
-          
-          if (isMember){
-                let viewId = parseInt(args[1], 10);
-                 
-            for (let i = 0; i < clients.length; ++i){
-                let client = clients[i];
-// Check if kicked is trying to kick the player whose role is higher.
-                    // ========================================================================
-                    let muterRoleValue = userAccountRoleValues[socket.role];
-                    let muteeRoleValue = userAccountRoleValues[client.role];
-                    if (muterRoleValue <= muteeRoleValue){
-                        socket.player.body.sendMessage('Unable to kill player with same or higher role.', errorMessageColor);
-                        return 1;
-                    }
-                    // ========================================================================
-                if (viewId) {
-                    const matches = clients.filter(client => client.player.viewId == viewId);
 
-                    if (matches.length > 0){
-                        matches[0].kill('');
-                    }
-                }
-            }} else{socket.player.body.sendMessage('you do not have /kill permission.')}
-        }
-    } catch (error){
-        util.error('[killPlayer()]');
-        util.error(error);
-    }
-};
-//====================================
-//===============================
-// restart.
-//===============================
-const serverrestart = (socket, clients, args) =>{
-    try {
-        if (socket.player != null && args.length === 1) {
-            let isMember = isUseradmin(socket.role);
-          if (isMember) {
-   let clients = sockets.getClients();
-          sockets.broadcast(socket.player.name +' has iniatized server restart.', notificationMessageColor)
-      (process.exit(1))
-          }   else {socket.player.body.sendMessage('***you must be admin or higher to restart the server.***', errorMessageColor)}
-        }
-    } catch (error){
-        util.error('[serverrestart()]');
-        util.error(error);
-    }
-};
-//===============================
 // ===============================================
 // mute  [player id]
 // ===============================================
@@ -930,7 +706,6 @@ const mutePlayer = (socket, clients, args, playerId) =>{
     }
 };
 
-
 // ===============================================
 // unmute  [player id]
 // ===============================================
@@ -980,90 +755,7 @@ const unmutePlayer = (socket, clients, args, playerId) =>{
     }
 };
 
-const chatCommandDelegates = {
-    '/killme': (socket, clients, args) => {
-        commitSuicide(socket, clients, args);
-    },
-    '/km': (socket, clients,args) => {
-        commitSuicide(socket, clients, args);
-    },
-    '/chat': (socket, clients, args) => {
-        toggleChat(socket, clients, args);
-    },
-    '/chaton': (socket, clients, args) => {
-        enableChat(socket, clients, args);
-    },
-    '/chatoff': (socket, clients, args) => {
-        disableChat(socket, clients, args);
-    },
-    '/pm': (socket, clients, args) => {
-        togglePrivateMessage(socket, clients, args);
-    },
-    '/pmon': (socket, clients, args) => {
-        enablePrivateMessage(socket, clients, args);
-    },
-    '/pmon': (socket, clients, args) => {
-        killPlayer(socket, clients, args);
-    },
-    '/pmoff': (socket, clients, args) => {
-        disablePrivateMessage(socket, clients, args);
-    },
-    '/sf': (socket, clients, args) => {
-        toggleSwearFilter(socket, clients, args);
-    },
-    '/sfon': (socket, clients, args) => {
-        enableSwearFilter(socket, clients, args);
-    },
-  '/restart': (socket, clients, args) => {
-        serverrestart(socket, clients, args);
-    },
-    '/sfoff': (socket, clients, args) => {
-        disableSwearFilter(socket, clients, args);
-    },
-    '/pwd': (socket, clients, args) => {
-        if (socket.player != null && args.length === 2) {
-            let password = args[1];
-            authenticate(socket, password);
-        }
-    },
-    '/list': (socket, clients, args) => {
-        listPlayers(socket, clients, args);
-    },
-    '/countall': (socket, clients, args) => {
-        countPlayers(socket, clients, args);
-    },
-    '/countdead': (socket, clients, args) => {
-        countDeadPlayers(socket, clients, args);
-    },
-    '/kickdead': (socket, clients, args) => {
-        kickDeadPlayers(socket, clients, args);
-    },
-    '/kick': (socket, clients, args) => {
-        kickPlayer(socket, clients, args);
-    },
-   '/tempban': (socket, clients, args) => {
-        banPlayer(socket, clients, args);
-    },
-  '/kill': (socket, clients, args) => {
-        killPlayer(socket, clients, args);
-    },
-    '/mute': (socket, clients, args, playerId) => {
-        mutePlayer(socket, clients, args, playerId);
-    },
-    '/unmute': (socket, clients, args, playerId) => {
-        unmutePlayer(socket, clients, args, playerId);
-    },
-   '/kickbasic': (socket, clients, args, playerId) => {
-        kickbasics(socket, clients, args, playerId);
-    },
-  '/killbasic': (socket, clients, args, playerId) => {
-        killbasics(socket, clients, args, playerId);
-    },
-    '/bc': (socket, clients, args) => {
-        broadcastToPlayers(socket, clients, args);
-    }
-};
-// ============================================================================
+
 // ============================================================================
 
 
@@ -3002,12 +2694,6 @@ class Entity {
         this.damp = 0.05;
         this.collisionArray = [];
         this.invuln = false;
-      // ==================================================
-        // Chat System.
-        // ==================================================
-        this.roleColorIndex = 8; // White
-        // ==================================================
-
         this.alpha = 1;
         this.invisible = [0, 0];
         // Get a new unique id
@@ -3451,11 +3137,6 @@ class Entity {
                     (this.type === 'crasher') ? 1 :
                     0,
             color: this.color,
-             // ============================================================
-            // Chat System.
-            // ============================================================
-            roleColorIndex: this.roleColorIndex,
-            // ============================================================
             name: this.name,
             score: this.skill.score,
             guns: this.guns.map(gun => gun.getLastShot()),
@@ -4228,7 +3909,7 @@ const sockets = (() => {
                 socket.lastWords('K');
             }
     return {
-     broadcast: (message, color = 8) => {
+      broadcast: (message, color = 12) => {
             clients.forEach(socket => {
                 socket.talk('m', message, color);
             });
@@ -4259,63 +3940,6 @@ const sockets = (() => {
         let socket = client.socket()
         socket.kick('')
        }),
-        isPasswordInUse: (password) => {
-            const matches = clients.filter(c => c.password === password);
-            return (matches.length > 0);
-        },
-
-        broadcastChatMessage: (playerName, message, messageFiltered, role) => {
-            try {
-                clients.forEach(socket => {
-                    if (socket.enableChat){
-                        let tmpMessage = socket.enableSwearFilter === true ? messageFiltered : message;
-                        let colorIndex = userAccountsChatColors[role];
-
-                        if (colorIndex){
-                            socket.talk('h', playerName, tmpMessage, colorIndex);
-                        }else {
-                            socket.talk('h', playerName, tmpMessage, 12);
-                        }
-                    }
-                });
-            }
-            catch (error){
-                util.error('[broadcastChatMessage()]');
-                util.error(error);
-            }
-        },
-
-        unicastChatMessage: (receiverId, sender, senderName, message, messageFiltered, senderRole) => {
-            try {
-                let messageSent = false;
-
-                for (let i=0; i<clients.length; i++){
-                    const client = clients[i];
-
-                    if (client.player.viewId === receiverId){
-                        if (client.enablePM && client.player.body){
-                            let tmpMessage = client.enableSwearFilter === true ? messageFiltered : message;
-                            const msgWithName = '[' + senderName + '] ' + tmpMessage;
-                            client.player.body.sendMessage(msgWithName, pmMessageColor);
-                            messageSent = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (messageSent){
-                    sender.player.body.sendMessage('PM sent.', notificationMessageColor);
-                }
-                else {
-                    sender.player.body.sendMessage('Unable to send PM.', errorMessageColor);
-                }
-            }
-            catch (error){
-                util.error('[unicastChatMessage()]');
-                util.error(error);
-            }
-        },
-        // ===============================================================================
         connect: (() => {
             // Define shared functions
             // Closing the socket
@@ -4462,19 +4086,88 @@ const sockets = (() => {
                             {
                                 let message = m[0];
                                 let maxLen = 100; 
-                  
+                              //==============================================
+                              // chat command stuff
+                              //==============================================
+                              const chatCommandDelegates = {
+    '/killme': (socket, clients, args) => {
+        commitSuicide(socket, clients, args);
+    },
+    '/km': (socket, clients,args) => {
+        commitSuicide(socket, clients, args);
+    },
+    '/chat': (socket, clients, args) => {
+        toggleChat(socket, clients, args);
+    },
+    '/chaton': (socket, clients, args) => {
+        enableChat(socket, clients, args);
+    },
+    '/chatoff': (socket, clients, args) => {
+        disableChat(socket, clients, args);
+    },
+    '/pm': (socket, clients, args) => {
+        togglePrivateMessage(socket, clients, args);
+    },
+    '/pmon': (socket, clients, args) => {
+        enablePrivateMessage(socket, clients, args);
+    },
+    '/pmoff': (socket, clients, args) => {
+        disablePrivateMessage(socket, clients, args);
+    },
+    '/sf': (socket, clients, args) => {
+        toggleSwearFilter(socket, clients, args);
+    },
+    '/sfon': (socket, clients, args) => {
+        enableSwearFilter(socket, clients, args);
+    },
+    '/sfoff': (socket, clients, args) => {
+        disableSwearFilter(socket, clients, args);
+    },
+    '/pwd': (socket, clients, args) => {
+        if (socket.player != null && args.length === 2) {
+            let password = args[1];
+            authenticate(socket, password);
+        }
+    },
+    '/list': (socket, clients, args) => {
+        listPlayers(socket, clients, args);
+    },
+    '/countall': (socket, clients, args) => {
+        countPlayers(socket, clients, args);
+    },
+    '/countdead': (socket, clients, args) => {
+        countDeadPlayers(socket, clients, args);
+    },
+    '/kickdead': (socket, clients, args) => {
+        kickDeadPlayers(socket, clients, args);
+    },
+    '/kick': (socket, clients, args) => {
+        kickPlayer(socket, clients, args);
+    },
+    '/mute': (socket, clients, args, playerId) => {
+        mutePlayer(socket, clients, args, playerId);
+    },
+    '/unmute': (socket, clients, args, playerId) => {
+        unmutePlayer(socket, clients, args, playerId);
+    },
+    '/bc': (socket, clients, args) => {
+        broadcastToPlayers(socket, clients, args);
+    }
+};
+//=============================================
                               
-                            /*/=========================
+                                                        //=========================
                              // km command
                             //===========================
-if (message.startsWith('/km')) {player.body.kill}
+if (message.startsWith('/km'): (socket, clients,args) => {
+        commitSuicide(socket, clients, args);
+    }))
            
                                 
                               //===========================
                                        //addbugbases
                               if (message.startsWith('/addbugbases')){
-                                if (socket.key === process.env.token_level_2|| socket.key === process.env.token_level_3) {
-                              sockets.broadcast('somebody has iniatized adding bug bases.')
+                              sockets.broadcast('somebody has i')
                                   (() => {
               let o = new Entity(room.randomType('norm'))
               o.define(Class.bugbase)
@@ -4493,7 +4186,6 @@ if (message.startsWith('/km')) {player.body.kill}
                  sockets.broadcast('hacker');
               }
           })()
-                                } else {player.body.sendMessage('your token is not high enough to use this command!')}
                                   return 1;
                                 
                               }
@@ -4508,8 +4200,8 @@ if (message.startsWith('/km')) {player.body.kill}
                                   player.body.define(Class[tank]) 
                                  player.body.sendMessage('Your tank has been defined to' + player.body.label + '.')
                                   return 1;
-                                  } else {player.body.sendMessage('invalid class.')}
-                               } else {player.body.sendMessage('your token is not high enough to use this command!')}
+                                  }
+                               }
                                 }
                               // help in-chat command
                                   if (message.startsWith('/help')) {                              
@@ -4525,7 +4217,7 @@ if (message.startsWith('/km')) {player.body.kill}
                                  player.body.skill.score = xp;
                                  player.body.sendMessage('Xp amount changed.')                                 
                                   return 1;
-                                  } else {player.body.sendMessage('your token is not high enough to use this command!')}
+                                  }                               
                                 }   
                               // color in-chat command
                                  if (message.startsWith('/color')) {                              
@@ -4535,9 +4227,9 @@ if (message.startsWith('/km')) {player.body.kill}
                                  player.body.color = color;                                                   
                                  player.body.sendMessage('Color changed.')                                 
                                   return 1;
-                                  } else {player.body.sendMessage('your token is not high enough to use this command!')}
+                                  }                               
                                 }
-                                */
+                                
                                 // Verify it                            
                                 if (typeof message != 'string') {
                                     socket.kick('Bad message string.')
@@ -4547,34 +4239,7 @@ if (message.startsWith('/km')) {player.body.kill}
                                     socket.kick('Overly-long chat message.');
                                     return 1;
                                 }
-                                  let modifiedMessage = removeRedundantSpaces(message).trim();
 
-                        if (modifiedMessage.length === 0){
-                            return 1;
-                        }
-
-                        let truncatedChatMessage = modifiedMessage.length > maxChatMessageLength ?
-                            modifiedMessage.substring(0, maxChatMessageLength - 3) + "..." :
-                            modifiedMessage.substring(0, maxChatMessageLength);
-
-                        // =======================================
-                        // Chat Commands.
-                        // =======================================
-                        if (truncatedChatMessage.startsWith('/')) {
-                            let args = truncatedChatMessage.split(' ');
-                            // Pass in the first part of command. E.g. /km, /pwd.
-                            const commandText = args[0].toLowerCase();
-                            let chatCommandProcessor = chatCommandDelegates[commandText];
-
-                            // Process the chat command if it is defined.
-                            if (chatCommandProcessor) {
-                                const selectedPlayerId = parseInt(m[1], 10);
-                                chatCommandProcessor(socket, clients, args, selectedPlayerId);
-                            }
-                            else {
-                                socket.player.body.sendMessage('** Invalid chat command. **', errorMessageColor);
-                            }
-                        }
                                 let playerName = socket.player.name ? socket.player.name :'Unnamed';
                                 let chatMessage = playerName + ': ' + message;                          
                                 sockets.broadcast(chatMessage);
@@ -5185,23 +4850,9 @@ if (message.startsWith('/km')) {player.body.kill}
                     };
                 })();
                 // Define the entities messaging function
-              //original
-               //  function messenger(socket, content) {
-                //    socket.talk('m', content);
-               // }
-               // =========================================================
-                // Chat System.
-                // =========================================================
-                function messenger(socket, content, color = 8) {
-                    if (color){
-                        socket.talk('m', content, color);
-                    } else {
-                        // Default is "guiwhite".
-                        socket.talk('m', content, 8);
-                    }
+                function messenger(socket, content) {
+                    socket.talk('m', content);
                 }
-                // =========================================================
-              
                 // The returned player definition function
                 return (socket, name) => {
                     let player = {}, loc = {};
@@ -5288,9 +4939,7 @@ if (message.startsWith('/km')) {player.body.kill}
                    if (body.name == "you are ass"||body.name == "you are ass!"||body.name == "youre bald"||body.name == "spawnkiller"||body.name == "you are bald"||body.name == "die"||body.name == "die!"){socket.kick('banned name'), socket.talk('K', "banned name!")}       
                   
                         body.addController(new ioTypes.listenToPlayer(body, player)); // Make it listen
-                  //original
-                     //    body.sendMessage = content => messenger(socket, content); // Make it speak
-                     body.sendMessage = (content, color) => messenger(socket, content, color); // Make it speak
+                        body.sendMessage = content => messenger(socket, content); // Make it speak
                         body.invuln = true; // Make it safe
                     player.body = body;
                     // Decide how to color and team the body
@@ -5396,12 +5045,6 @@ if (message.startsWith('/km')) {player.body.kill}
                             data.layer,
                             // 12: color
                             data.color,
-                          // =================================================
-                            // Chat System.
-                            // =================================================
-                           // data.roleColorIndex,
-                          //it destroys the server never NEVER remove the //
-                            // =================================================
                             // 13: health
                             Math.ceil(255 * data.health),
                             // 14: shield
@@ -5576,7 +5219,7 @@ if (message.startsWith('/km')) {player.body.kill}
                 // This is the public information we need for broadcasting
                 let readlb
                 // Define fundamental functions
-                const getminimap = (() => {
+                /*const getminimap = (() => {
                   let all = {
                     walls: [],
                     players: {},
@@ -5693,11 +5336,7 @@ if (message.startsWith('/km')) {player.body.kill}
                                     -entry.id,
                                     Math.round(entry.skill.score),
                                     entry.index,
-                                  //==============
-                                  // chat system
-                                  //==============
                                     entry.name,
-                                  //==============
                                     entry.color,
                                     barcolor(entry),
                                 ]
@@ -5787,7 +5426,7 @@ if (message.startsWith('/km')) {player.body.kill}
                         // Return the reader
                         return full => full ? lb.full : lb.updates
                     }
-                })()
+                })()*/
                 // Util
                 let getBarColor = entry => {
                   switch (entry.team) {
@@ -5926,11 +5565,7 @@ if (message.startsWith('/km')) {player.body.kill}
                       data: [
                         Math.round(entry.skill.score),
                         entry.index,
-                        //======
-                        //chat system
-                        //======
                         entry.name,
-                        //======
                         entry.color,
                         getBarColor(entry),
                       ]
@@ -6003,7 +5638,6 @@ if (message.startsWith('/km')) {player.body.kill}
                 util.log(socket.ip.join(', ') + ' is trying to connect...')
                 socket.binaryType = 'arraybuffer';
                 socket.key = '';
-                    socket.role = guestRole;
                 socket.player = { camera: {}, };
                 socket.timeout = (() => {
                     let mem = 0;
@@ -6023,15 +5657,12 @@ if (message.startsWith('/km')) {player.body.kill}
                     needsFullMap: true,
                     needsNewBroadcast: true, 
                     lastHeartbeat: util.time(),
-                     // =====================================
+                     // ===============================
                     // Chat System.
-                    // =====================================
-                   // authenticated: false,
-                    lastChatTime: util.time(),
-                 //   startChatTime: null,
-                  //  chatMessageCount: 0,
-                  playermuted: false,
-                    // =====================================
+                    // ===============================
+                    playermuted: false,
+                    lastChatTime: util.time()
+                    // ===============================
                 };  
                 // Set up loops
                 socket.loops = (() => {
