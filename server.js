@@ -8016,4 +8016,4 @@ bot.editStatus('online', {
   type: 1
 });};
  
-   bot.connect();
+//   bot.connect();
