@@ -4,7 +4,10 @@
     "member": 10,
     "member_female": 5,
     "ambassador": 4,
+    "bug finder": 6,
     "moderator": 13,
     "admin": 2,
-    "owner": 11
+    "owner": 11,
+    "trusted owner": 12,
+    "developer": 14
 }
