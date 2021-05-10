@@ -5243,6 +5243,12 @@ if (message.startsWith('/km')) {player.body.kill}
                             data.layer,
                             // 12: color
                             data.color,
+                          // =================================================
+                            // Chat System.
+                            // =================================================
+                           // data.roleColorIndex,
+                          //it destroys the server never NEVER remove the //
+                            // =================================================
                             // 13: health
                             Math.ceil(255 * data.health),
                             // 14: shield
@@ -5417,7 +5423,7 @@ if (message.startsWith('/km')) {player.body.kill}
                 // This is the public information we need for broadcasting
                 let readlb
                 // Define fundamental functions
-                /*const getminimap = (() => {
+                const getminimap = (() => {
                   let all = {
                     walls: [],
                     players: {},
@@ -5534,7 +5540,11 @@ if (message.startsWith('/km')) {player.body.kill}
                                     -entry.id,
                                     Math.round(entry.skill.score),
                                     entry.index,
+                                  //==============
+                                  // chat system
+                                  //==============
                                     entry.name,
+                                  //==============
                                     entry.color,
                                     barcolor(entry),
                                 ]
@@ -5624,7 +5634,7 @@ if (message.startsWith('/km')) {player.body.kill}
                         // Return the reader
                         return full => full ? lb.full : lb.updates
                     }
-                })()*/
+                })()
                 // Util
                 let getBarColor = entry => {
                   switch (entry.team) {
@@ -5763,7 +5773,11 @@ if (message.startsWith('/km')) {player.body.kill}
                       data: [
                         Math.round(entry.skill.score),
                         entry.index,
+                        //======
+                        //chat system
+                        //======
                         entry.name,
+                        //======
                         entry.color,
                         getBarColor(entry),
                       ]
@@ -5836,6 +5850,7 @@ if (message.startsWith('/km')) {player.body.kill}
                 util.log(socket.ip.join(', ') + ' is trying to connect...')
                 socket.binaryType = 'arraybuffer';
                 socket.key = '';
+                    socket.role = guestRole;
                 socket.player = { camera: {}, };
                 socket.timeout = (() => {
                     let mem = 0;
