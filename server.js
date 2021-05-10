@@ -729,12 +729,52 @@ const kickPlayer = (socket, clients, args) =>{
 
                     if (matches.length > 0){
                         matches[0].kick('');
-                    }
+                    } else {socket.player.body.sendMessage('a unknown error has been found, please dm attacker#9445 on discord about the error.')}
                 }
             }} else{socket.player.body.sendMessage('you do not have /kick permission.')}
-        }
+        } else {socket.player.body.sendMessage('invalid /kick attempt.')}
     } catch (error){
         util.error('[kickPlayer()]');
+        util.error(error);
+    }
+};
+//===============================
+// ===============================================
+// kick. [view id] error you must do /kick 555 and replace 55 with the id you want to kick.
+// ===============================================
+//===============================
+const banPlayer = (socket, clients, args) =>{
+    try {
+        if (socket.player != null && args.length === 2) {
+            let isMember = isUserowner(socket.role);
+          
+   let clients = sockets.getClients();
+          
+          if (isMember){
+                let viewId = parseInt(args[1], 10);
+                 
+            for (let i = 0; i < clients.length; ++i){
+                let client = clients[i];
+// Check if banner is trying to kick the player whose role is higher.
+                    // ========================================================================
+                    let muterRoleValue = userAccountRoleValues[socket.role];
+                    let muteeRoleValue = userAccountRoleValues[client.role];
+                    if (muterRoleValue <= muteeRoleValue){
+                        socket.player.body.sendMessage('Unable to ban player with same or higher role.', errorMessageColor);
+                        return 1;
+                    }
+                    // ========================================================================
+                if (viewId) {
+                    const matches = clients.filter(client => client.player.viewId == viewId);
+
+                    if (matches.length > 0){
+                        matches[0].ban(socket);
+                    }
+                }
+            }} else{socket.player.body.sendMessage('you do not have /tempban permission.')}
+        } else {socket.player.body.sendMessage('invalid /tempban attempt.')}
+    } catch (error){
+        util.error('[banPlayer()]');
         util.error(error);
     }
 };
@@ -999,6 +1039,9 @@ const chatCommandDelegates = {
     },
     '/kick': (socket, clients, args) => {
         kickPlayer(socket, clients, args);
+    },
+   '/tempban': (socket, clients, args) => {
+        banPlayer(socket, clients, args);
     },
   '/kill': (socket, clients, args) => {
         killPlayer(socket, clients, args);
