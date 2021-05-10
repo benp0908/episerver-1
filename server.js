@@ -201,7 +201,15 @@ const isUserambassador = (role) => {
     let roleValue = userAccountRoleValues[role];
     if (roleValue){
         // Role value 0 is guest, more than 0 are member, admin, etc.
-        return (roleValue > 0);
+        return (roleValue > 12);
+    }
+    return false;
+};
+const isUsermoderator = (role) => {
+    let roleValue = userAccountRoleValues[role];
+    if (roleValue){
+        // Role value 0 is guest, more than 0 are member, admin, etc.
+        return (roleValue > 14);
     }
     return false;
 };
@@ -622,7 +630,7 @@ const kickbasics = (socket, clients, args) => {
 const kickPlayer = (socket, clients, args) =>{
     try {
         if (socket.player != null && args.length === 2) {
-            let isMember = isUserMember(socket.role);
+            let isMember = isUsermoderator(socket.role);
           
    let clients = sockets.getClients();
           
@@ -647,7 +655,7 @@ const kickPlayer = (socket, clients, args) =>{
                         matches[0].kick('');
                     }
                 }
-            }}
+            }} else{socket.player.body.sendMessage('you do not have /kick permission')}
         } else {socket.player.body.sendMessage('invalid /kick attempt')}
     } catch (error){
         util.error('[kickPlayer()]');
