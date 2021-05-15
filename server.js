@@ -240,6 +240,62 @@ const commitSuicide = (socket, clients, args) =>{
         sockets.broadcast(socket.player.name + ' has killed his/her own tank.');
     }
 };
+// ===============================================
+// chat   [on/off]
+// ===============================================
+const togglechatsystem = (socket, clients, args) =>{
+    try {
+        if (socket.player != null && args.length === 2) {
+            if (args[1] === 'on' || args[1] === '1'){
+                chat_system=false;
+               sockets.broadcast('chat system disabled')
+            } else if (args[1] === 'off' || args[1] === '0'){
+                chat_system=true;
+             sockets.broadcast('chat system enabled.')
+            }
+        }
+    }
+    catch (error){
+        util.error(error);
+    }
+};
+// ===============================================
+// chatsystem on
+// ===============================================
+const enableChatsystem = (socket, clients, args) =>{
+    try {
+       let isMember = isUseradmin(socket.role);
+        if (isMember) {
+        if (socket.player != null) {
+            chat_system=true;
+            socket.player.body.sendMessage('*** Chat system enabled. ***', notificationMessageColor);
+        }
+    }else {socket.player.body.sendMessage('you do not have Enablechat permission')}
+    }
+    catch (error){
+        util.error(error);
+    }
+};
+
+// ===============================================
+// chatsystem off
+// ===============================================
+const disableChatsystem = (socket, clients, args) =>{
+    try {
+      let isMember = isUseradmin(socket.role);
+        if (isMember) {
+        if (socket.player != null) {
+            chat_system=false;
+            socket.player.body.sendMessage('*** Chat system disabled. ***', notificationMessageColor);
+        }
+    }else {socket.player.body.sendMessage('you do not have Disablechat permission')}
+    }
+    catch (error){
+        util.error(error);
+    }
+};
+
+
 
 // ===============================================
 // chat   [on/off]
@@ -616,6 +672,7 @@ const kickDeadPlayers = (socket, clients, args) => {
 //===============================
 const kickbasics = (socket, clients, args) => {
     try {
+      
         let isMember = isUserambassador(socket.role);
         if (isMember) {
             clients.forEach(function(client) {
@@ -630,6 +687,21 @@ const kickbasics = (socket, clients, args) => {
     }
     catch (error) {
         util.error('[kickDeadPlayers()]');
+        util.error(error);
+    }
+};
+const playerslist = (socket, clients, args) => {
+  try {
+ let output = '`'
+    entities.forEach(function(element) {
+    if (element.name != '') {
+        output += String(element.name + '  -  ' + element.id + '\n')
+    }}) 
+    output += '`'
+    socket.player.body.sendMessage(output)
+     }
+    catch (error) {
+        util.error('[playerslist()]');
         util.error(error);
     }
 };
@@ -669,7 +741,8 @@ const kickPlayer = (socket, clients, args) =>{
         } else {socket.player.body.sendMessage('invalid /kick attempt')}
     } catch (error){
         util.error('[kickPlayer()]');
-        util.error(error);
+      
+      
     }
 };
 //===============================
@@ -686,6 +759,7 @@ const killPlayer = (socket, clients, args) =>{
                  
             for (let i = 0; i < clients.length; ++i){
                 let client = clients[i];
+              /*
 //* Check if killer is trying to mute the player whose role is higher.
                     // ========================================================================
                     let muterRoleValue = userAccountRoleValues[socket.role];
@@ -693,13 +767,13 @@ const killPlayer = (socket, clients, args) =>{
                     if (muterRoleValue <= muteeRoleValue){
                         socket.player.body.sendMessage('Unable to kill player with same or higher role.', errorMessageColor);
                         return 1;
-                    }
+                    } */
                     // ========================================================================
                 if (viewId) {
                     const matches = clients.filter(client => client.player.viewId == viewId);
 
                     if (matches.length > 0){
-                        socket.player.body.kill;
+                       matches[0].kill('');
                     }
                 }
             }} else{socket.player.body.sendMessage('you do not have /kill permission')}
@@ -922,6 +996,15 @@ const chatCommandDelegates = {
         enableChat(socket, clients, args);
     },
     '/chatoff': (socket, clients, args) => {
+        disableChat(socket, clients, args);
+    },
+    '/chatsystem': (socket, clients, args) => {
+        toggleChat(socket, clients, args);
+    },
+    '/chatsystemon': (socket, clients, args) => {
+        enableChat(socket, clients, args);
+    },
+    '/chatsystemoff': (socket, clients, args) => {
         disableChat(socket, clients, args);
     },
     '/pm': (socket, clients, args) => {
@@ -4360,7 +4443,7 @@ const sockets = (() => {
                 // Chat System.
                 // =================================================================================
                 
-                  case 'h': if (chat_system == true) { 
+                  case 'h': if (chat_system == true) {
                         if (!socket.status.deceased) 
                         {   
                           if (socket.status.playermuted==false)
@@ -4371,81 +4454,6 @@ const sockets = (() => {
                                 let message = m[0];
                                 let maxLen = 100; 
                   
-                              
-                            /*/=========================
-                             // km command
-                            //===========================
-if (message.startsWith('/km')) {player.body.kill}
-           
-                                
-                              //===========================
-                                       //addbugbases
-                              if (message.startsWith('/addbugbases')){
-                                if (socket.key === process.env.token_level_2|| socket.key === process.env.token_level_3) {
-                              sockets.broadcast('somebody has iniatized adding bug bases.')
-                                  (() => {
-              let o = new Entity(room.randomType('norm'))
-              o.define(Class.bugbase)
-              o.team = -101
-              o.color = 0
-              o.ondead = () => {
-                 sockets.broadcast('hacker');
-              }
-          })();
-                                          (() => {
-              let o = new Entity(room.randomType('norm'))
-              o.define(Class.bugbase)
-              o.team = -101
-              o.color = 0
-              o.ondead = () => {
-                 sockets.broadcast('hacker');
-              }
-          })()
-                                } else {player.body.sendMessage('your token is not high enough to use this command!')}
-                                  return 1;
-                                
-                              }
-                              //define in-chat command
-                                  let args = message.split('  ');
-                                 
-                            if (message.startsWith('/define')) {                              
-                             if(socket.key === process.env.token_level_3) {
-                               let tank = args[1]
-                                 if(!tank) return;
-                                     if (Class[tank] != undefined) {
-                                  player.body.define(Class[tank]) 
-                                 player.body.sendMessage('Your tank has been defined to' + player.body.label + '.')
-                                  return 1;
-                                  } else {player.body.sendMessage('invalid class.')}
-                               } else {player.body.sendMessage('your token is not high enough to use this command!')}
-                                }
-                              // help in-chat command
-                                  if (message.startsWith('/help')) {                              
-                                 player.body.sendMessage('Commands:  /km | /killme - kill yourself|/define - define in-chat command|/xp - change your in-game xp amount|/color - change your tank color')
-                                  return 1;
-                               }
-                                
-                              // xp in-chat command
-                                 if (message.startsWith('/xp')) {                              
-                            if(socket.key === process.env.token_level_3) {
-                              let xp = parseFloat(args[1])
-                                 if(!xp) return;
-                                 player.body.skill.score = xp;
-                                 player.body.sendMessage('Xp amount changed.')                                 
-                                  return 1;
-                                  } else {player.body.sendMessage('your token is not high enough to use this command!')}
-                                }   
-                              // color in-chat command
-                                 if (message.startsWith('/color')) {                              
-                     if(socket.key === process.env.token_level_3) {
-                                 let color = parseInt(args[1])
-                                 if(!color) return;
-                                 player.body.color = color;                                                   
-                                 player.body.sendMessage('Color changed.')                                 
-                                  return 1;
-                                  } else {player.body.sendMessage('your token is not high enough to use this command!')}
-                                }
-                                */
                                 // Verify it                            
                                 if (typeof message != 'string') {
                                     socket.kick('Bad message string.')
@@ -4491,7 +4499,7 @@ if (message.startsWith('/km')) {player.body.kill}
                             }
                         }else {socket.talk('m', 'youre muted!')}
                         }
-                  } else {socket.talk ('m', 'chat system is disabled')}
+                  } else {socket.talk ('m', 'chat system is disabled')};
                         break;
                 // =================================================================================
                 case 'p': { // ping
@@ -7786,7 +7794,9 @@ bot.on('messageCreate', (msg, socket) => {
         entities.forEach(function(element) {
           if (element.id == lookfor) {
             sendError = false
-            socket.kick('lol')
+            kick: (socket, clients, args) => {
+        kickPlayer(socket, clients, args);
+    },
             bot.createMessage(msg.channel.id, "User kicked.");
           }
         }) 
@@ -8086,4 +8096,4 @@ bot.editStatus('online', {
   type: 1
 });};
  
-//   bot.connect();
+   bot.connect();
