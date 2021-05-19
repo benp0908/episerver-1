@@ -4467,7 +4467,6 @@ const sockets = (() => {
                         // =======================================
                         // Chat Commands.
                         // =======================================
-                              const command_system = []
                                    let args = message.split(' ')
                       if (message.startsWith('/')) {
                      
@@ -4484,9 +4483,12 @@ const sockets = (() => {
                                 socket.player.body.sendMessage('** Invalid chat command. **', errorMessageColor);
                             }
                         };
+                                if (message.startsWith('/')) {player.body.sendMessage('command done.')}
+                              if(message == command_system) {} else {
                                 let playerName = socket.player.name ? socket.player.name :'Unnamed';
                                 let chatMessage = playerName + ': ' + message;  
-                              if (message = command_system) {} else {
+                             
+                            
                                 sockets.broadcast(chatMessage);
                                 // Basic chat spam control.
                                 socket.status.lastChatTime = util.time();
@@ -5096,9 +5098,11 @@ const sockets = (() => {
                     };
                 })();
                 // Define the entities messaging function
+            //  original
                 function messenger(socket, content) {
                     socket.talk('m', content);
                 }
+                
                 // The returned player definition function
                 return (socket, name) => {
                     let player = {}, loc = {};
@@ -5178,14 +5182,21 @@ const sockets = (() => {
                         body.name = name; // Define the name
                         // anti bad name security
           if (body.name == "hacker"){socket.kick('banned name'), socket.talk('K', "banned name!")}
-                   if (body.name == "fuck"){socket.kick('banned name'), socket.talk('K', "banned name!")}
+                   if (body.name == "fuck"){socket.kick('banned name'), socket.talk('K', "you are realy bald!")}
                   if (body.name == "fck"){socket.kick(socket), socket.talk('K', "banned name!")}if (body.name == "ass"){socket.kick(socket), socket.talk('K', "banned name!")}
                      if (body.name == "free_food"||body.name == "freefood"||body.name == "im free_food"||body.name == "im freefood"||body.name == "free food"||body.name == "im free food"||body.name == "bot"){socket.kick('banned name'), socket.talk('K', "banned name!")}       
                    if (body.name == "fck you"||body.name == "fuck you"||body.name == "fuck you!"||body.name == "fck you!"||body.name == "fucker"||body.name == "u heq"||body.name == "coolbot"){socket.kick('banned name'), socket.talk('K', "banned name!")}       
                    if (body.name == "you are ass"||body.name == "you are ass!"||body.name == "youre bald"||body.name == "spawnkiller"||body.name == "you are bald"||body.name == "die"||body.name == "die!"){socket.kick('banned name'), socket.talk('K', "banned name!")}       
                   
                         body.addController(new ioTypes.listenToPlayer(body, player)); // Make it listen
+                //  original
                         body.sendMessage = content => messenger(socket, content); // Make it speak
+                    // ====================================================
+                        // Chat System.
+                        // ====================================================
+                  //      body.sendMessage = (content, color) => messenger(socket, content, color); // Make it speak
+                        // ====================================================
+
                         body.invuln = true; // Make it safe
                     player.body = body;
                     // Decide how to color and team the body
