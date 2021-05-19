@@ -4463,21 +4463,13 @@ const sockets = (() => {
                                     socket.kick('Overly-long chat message.');
                                     return 1;
                                 }
-                                  let modifiedMessage = removeRedundantSpaces(message).trim();
-
-                        if (modifiedMessage.length === 0){
-                            return 1;
-                        }
-
-                        let truncatedChatMessage = modifiedMessage.length > maxChatMessageLength ?
-                            modifiedMessage.substring(0, maxChatMessageLength - 3) + "..." :
-                            modifiedMessage.substring(0, maxChatMessageLength);
-
+                             
                         // =======================================
                         // Chat Commands.
                         // =======================================
-                        if (truncatedChatMessage.startsWith('/')) {
-                            let args = truncatedChatMessage.split(' ');
+                                   let args = message.split(' ');
+                      if (message.startsWith('/')) {
+                     
                             // Pass in the first part of command. E.g. /km, /pwd.
                             const commandText = args[0].toLowerCase();
                             let chatCommandProcessor = chatCommandDelegates[commandText];
