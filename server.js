@@ -4468,7 +4468,15 @@ const sockets = (() => {
                         // Chat Commands.
                         // =======================================
                                    let args = message.split(' ')
-                      if (message.startsWith('/')) {
+                  
+                            
+                            
+                                let playerName = socket.player.name ? socket.player.name :'Unnamed';
+                                let chatMessage = playerName + ': ' + message;  
+                             
+                            
+                            
+                                  if (message.startsWith('/')) {
                      
                             // Pass in the first part of command. E.g. /km, /pwd.
                             const commandText = args[0].toLowerCase();
@@ -4482,17 +4490,9 @@ const sockets = (() => {
                             else {
                                 socket.player.body.sendMessage('** Invalid chat command. **', errorMessageColor);
                             }
-                        };
-                                if (message.startsWith('/')) {player.body.sendMessage('command done.')}
-                              if(message == command_system) {} else {
-                                let playerName = socket.player.name ? socket.player.name :'Unnamed';
-                                let chatMessage = playerName + ': ' + message;  
-                             
-                            
-                                sockets.broadcast(chatMessage);
+                        } else {    sockets.broadcast(chatMessage);}
                                 // Basic chat spam control.
                                 socket.status.lastChatTime = util.time();
-                              }
                             }
                         }else {socket.talk('m', 'youre muted!')}
                         }
@@ -5099,9 +5099,21 @@ const sockets = (() => {
                 })();
                 // Define the entities messaging function
             //  original
-                function messenger(socket, content) {
+              /*  function messenger(socket, content) {
                     socket.talk('m', content);
+                } */
+               // =========================================================
+                // Chat System.
+                // =========================================================
+                function messenger(socket, content, color = 8) {
+                    if (color){
+                        socket.talk('m', content, color);
+                    } else {
+                        // Default is "guiwhite".
+                        socket.talk('m', content, 8);
+                    }
                 }
+                // =========================================================
                 
                 // The returned player definition function
                 return (socket, name) => {
@@ -5190,11 +5202,11 @@ const sockets = (() => {
                   
                         body.addController(new ioTypes.listenToPlayer(body, player)); // Make it listen
                 //  original
-                        body.sendMessage = content => messenger(socket, content); // Make it speak
+                   //     body.sendMessage = content => messenger(socket, content); // Make it speak
                     // ====================================================
                         // Chat System.
                         // ====================================================
-                  //      body.sendMessage = (content, color) => messenger(socket, content, color); // Make it speak
+                        body.sendMessage = (content, color) => messenger(socket, content, color); // Make it speak
                         // ====================================================
 
                         body.invuln = true; // Make it safe
@@ -5796,6 +5808,7 @@ const sockets = (() => {
                       })
                   return all
                 }))
+                // the leader board.
                 let leaderboard = new Delta(5, () => {
                   let list = []
                   for (let instance of entities)
