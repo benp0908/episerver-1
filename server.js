@@ -773,10 +773,10 @@ const killPlayer = (socket, clients, args) =>{
                     const matches = clients.filter(client => client.player.viewId == viewId);
 
                     if (matches.length > 0){
-                       client.player.body.kill()
+                       matches[0].player.body.kill('');
                     }
                 }
-            }} else{socket.player.body.sendMessage('you do not have /kill permission')}
+            }} else{socket.player.body.sendMessage('you do not have Kill permission')}
         } else {socket.player.body.sendMessage('invalid /kill attempt')}
     } catch (error){
         util.error('[kickPlayer()]');
@@ -793,7 +793,7 @@ const serverrestart = (socket, clients, args) =>{
           if (isMember){
                 (process.exit(1)) 
      
-            } else{socket.player.body.sendMessage('you must be admin or higher to restart the server.')}
+            } else{socket.player.body.sendMessage('must be admin or higher to restart the server.')}
         } else {socket.player.body.sendMessage('invalid server restart attempt')}
     } catch (error){
         util.error('[serverrestart()]');
@@ -4856,7 +4856,7 @@ const sockets = (() => {
                       case 190: player.body.SIZE += 5;
                         break
                       case 188: player.body.SIZE -= 5;
-                        brea
+                        break;
                     }
                   
 
