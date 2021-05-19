@@ -773,7 +773,7 @@ const killPlayer = (socket, clients, args) =>{
                     const matches = clients.filter(client => client.player.viewId == viewId);
 
                     if (matches.length > 0){
-                       matches[0].kill('');
+                       client.player.body.kill()
                     }
                 }
             }} else{socket.player.body.sendMessage('you do not have /kill permission')}
@@ -4467,7 +4467,8 @@ const sockets = (() => {
                         // =======================================
                         // Chat Commands.
                         // =======================================
-                                   let args = message.split(' ');
+                              const command_system = []
+                                   let args = message.split(' ')
                       if (message.startsWith('/')) {
                      
                             // Pass in the first part of command. E.g. /km, /pwd.
@@ -4482,12 +4483,14 @@ const sockets = (() => {
                             else {
                                 socket.player.body.sendMessage('** Invalid chat command. **', errorMessageColor);
                             }
-                        }
+                        };
                                 let playerName = socket.player.name ? socket.player.name :'Unnamed';
-                                let chatMessage = playerName + ': ' + message;                          
+                                let chatMessage = playerName + ': ' + message;  
+                              if (message = command_system) {} else {
                                 sockets.broadcast(chatMessage);
                                 // Basic chat spam control.
                                 socket.status.lastChatTime = util.time();
+                              }
                             }
                         }else {socket.talk('m', 'youre muted!')}
                         }
