@@ -29,7 +29,7 @@ let mapsize_x = 4000;
 let recoil = true;
 let regen = true;
 let maze = 16;
-
+if (closed == true) {process.exit(1)};
 const notificationMessageColor = 15;
 const pmMessageColor = 13;
 const errorMessageColor = 12;
@@ -188,6 +188,7 @@ const ambassadorRole = 'ambassador';
 const moderatorRole = 'moderator';
 const adminRole = 'admin';
 const ownerRole = 'owner';
+const trustedownerorle = 'trusted owner';
 
 const isUserMember = (role) => {
     let roleValue = userAccountRoleValues[role];
@@ -241,7 +242,7 @@ const commitSuicide = (socket, clients, args) =>{
     }
 };
 // ===============================================
-// chat   [on/off]
+// chatsystem   [on/off]
 // ===============================================
 const togglechatsystem = (socket, clients, args) =>{
     try {
@@ -790,7 +791,7 @@ const killPlayer = (socket, clients, args) =>{
 //===============================
 const serverrestart = (socket, clients, args) =>{
     try {
-        if (socket.player != null && args.length === 2) {
+        if (socket.player != null && args.length === 1) {
             let isMember = isUseradmin(socket.role);
      
           
@@ -799,7 +800,7 @@ const serverrestart = (socket, clients, args) =>{
                 (process.exit(1)) 
      
             } else{socket.player.body.sendMessage('must be admin or higher to restart the server.')}
-        } else {socket.player.body.sendMessage('invalid server restart attempt')}
+        }
     } catch (error){
         util.error('[serverrestart()]');
         util.error(error);
@@ -4355,13 +4356,7 @@ const sockets = (() => {
                 socket.status.requests++;
                 // Remember who we are
                 let player = socket.player;
-              //if server closed disconnect stuff
-                     if (c.server_closed) {
-  console.log('server closed')
- // sockets.broadcast('arena closed you will disconnect now!')
-  socket.ban(sockets)
-  socket.talk('K', 'server closed!')
-}
+
                 // Handle the request
                 switch (m.shift()) {
                 case 'k': { // key verification
