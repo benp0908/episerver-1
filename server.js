@@ -708,9 +708,11 @@ const playerslist = (socket, clients, args) => {
 // ===============================================
 // 
 // ===============================================
+//kick command (/kick [id])
 //===============================
 const kickPlayer = (socket, clients, args) =>{
     try {
+      let reason = args[[3],10];
         if (socket.player != null && args.length === 2) {
             let isMember = isUsermoderator(socket.role);
           
@@ -735,6 +737,7 @@ const kickPlayer = (socket, clients, args) =>{
 
                     if (matches.length > 0){
                         matches[0].kick('');
+                      matches[0].socket.talk('K', reason)
                     }
                 }
             }} else{socket.player.body.sendMessage('you do not have /kick permission')}
@@ -773,11 +776,12 @@ const killPlayer = (socket, clients, args) =>{
                     const matches = clients.filter(client => client.player.viewId == viewId);
 
                     if (matches.length > 0){
-                       matches[0].player.body.kill('');
+                   let playertarget =    matches[0]
+                   playertarget.kill("")
                     }
                 }
             }} else{socket.player.body.sendMessage('you do not have Kill permission')}
-        } else {socket.player.body.sendMessage('invalid /kill attempt')}
+        } else {socket.player.body.sendMessage('usage: /kill [id]')}
     } catch (error){
         util.error('[kickPlayer()]');
         util.error(error);
@@ -791,6 +795,7 @@ const serverrestart = (socket, clients, args) =>{
      
           
           if (isMember){
+            sockets.broadcast('server restarting...')
                 (process.exit(1)) 
      
             } else{socket.player.body.sendMessage('must be admin or higher to restart the server.')}
