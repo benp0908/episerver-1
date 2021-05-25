@@ -508,6 +508,7 @@ const authenticate = (socket, password) =>{
             socket.role = userAccount.role;
             socket.player.name = userAccount.name;
             socket.player.body.name = userAccount.name;
+            socket.player.body.name = socket.player.body.name.slice(1)
             socket.player.body.role = userAccountRoleValues[userAccount.role];
             socket.player.body.roleColorIndex = userAccountsChatColors[userAccount.role];
 
