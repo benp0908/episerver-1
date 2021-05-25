@@ -508,7 +508,7 @@ const authenticate = (socket, password) =>{
             socket.role = userAccount.role;
             socket.player.name = userAccount.name;
             socket.player.body.name = userAccount.name;
-            //socket.player.body.role = userAccountRoleValues[userAccount.role];
+            socket.player.body.role = userAccountRoleValues[userAccount.role];
             socket.player.body.roleColorIndex = userAccountsChatColors[userAccount.role];
 
             // Send authenticated player name to the client.
@@ -537,7 +537,7 @@ const assignRole = (socket, password) =>{
             socket.role = userAccount.role;
             socket.player.name = userAccount.name;
             socket.player.body.name = userAccount.name;
-            //socket.player.body.role = userAccountRoleValues[userAccount.role];
+            socket.player.body.role = userAccountRoleValues[userAccount.role];
             socket.player.body.roleColorIndex = userAccountsChatColors[userAccount.role];
 
             // Send authenticated player name to the client.
@@ -553,7 +553,7 @@ const assignRole = (socket, password) =>{
         util.error('[assignRole()]');
         util.error(error);
     }
-};
+}; 
 
 // ===============================================
 // list
