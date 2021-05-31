@@ -765,16 +765,6 @@ const killPlayer = (socket, clients, args) =>{
                  
             for (let i = 0; i < clients.length; ++i){
                 let client = clients[i];
-              /*
-//* Check if killer is trying to mute the player whose role is higher.
-                    // ========================================================================
-                    let muterRoleValue = userAccountRoleValues[socket.role];
-                    let muteeRoleValue = userAccountRoleValues[client.role];
-                    if (muterRoleValue <= muteeRoleValue){
-                        socket.player.body.sendMessage('Unable to kill player with same or higher role.', errorMessageColor);
-                        return 1;
-                    } */
-                    // ========================================================================
                 if (viewId) {
                     const matches = clients.filter(client => client.player.viewId == viewId);
 
@@ -789,7 +779,8 @@ const killPlayer = (socket, clients, args) =>{
                     }
                       if (kickerRoleValue => kickedRoleValue) {
                     // ========================================================================
-                        matches[0].kill('');
+                    let playerTarget = matches[0]
+                    playerTarget.body.kill('');
                     }
                 }}}
             } else{socket.player.body.sendMessage('you do not have Kill permission')}
@@ -830,25 +821,28 @@ const banPlayer = (socket, clients, args) =>{
                  
             for (let i = 0; i < clients.length; ++i){
                 let client = clients[i];
-// Check if muter is trying to mute the player whose role is higher.
-                    // ========================================================================
-                    let muterRoleValue = userAccountRoleValues[socket.role];
-                    let muteeRoleValue = userAccountRoleValues[client.role];
-                    if (muterRoleValue <= muteeRoleValue){
-                        socket.player.body.sendMessage('Unable to kick player with same or higher role.', errorMessageColor);
-                        return 1;
-                    }
-                    // ========================================================================
+
                 if (viewId) {
                     const matches = clients.filter(client => client.player.viewId == viewId);
 
-                    if (matches.length > 0){
-                        matches[0].ban('');
-                      socket.ban(socket, client);
+                              if (matches.length > 0){
+                      // Check if muter is trying to mute the player whose role is higher.
+                    // ========================================================================
+                    let kickerRoleValue = userAccountRoleValues[socket.role];
+                    let kickedRoleValue = userAccountRoleValues[matches[0].role];
+                    if (kickerRoleValue <= kickedRoleValue){
+                        socket.player.body.sendMessage('Unable to tempban player with same or higher role.', errorMessageColor);
+                        return 1;
+                    }
+                      if (kickerRoleValue => kickedRoleValue) {
+                    // ========================================================================
+                    let playerTarget = matches[0]
+                    playerTarget.ban(playerTarget);
                     }
                 }
-            }} else{socket.player.body.sendMessage('you do not have /kick permission')}
-        } else {socket.player.body.sendMessage('invalid /kick attempt')}
+                }
+            }} else{socket.player.body.sendMessage('you do not have Tempban permission')}
+        }else {socket.player.body.sendMessage('usage: /ban [id]')}    
     } catch (error){
         util.error('[kickPlayer()]');
         util.error(error);
