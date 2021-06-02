@@ -555,48 +555,23 @@ const assignRole = (socket, password) =>{
         util.error(error);
     }
 }; 
-const logout = (socket, password) =>{
+//============================
+//logout.
+//============================
+const logout = (socket) =>{
     try {
         if (socket.status.authenticated == false){
             socket.player.body.sendMessage('*** you are not authenticated. ***', notificationMessageColor);
             return;
         }
 
-        let shaString = sha256(password).toUpperCase();
-
-        if (sockets.isPasswordInUse(shaString)){
-            socket.player.body.sendMessage('*** Password is already in use by another player. ***', notificationMessageColor);
-            return;
-        }
-
-        let userAccount = userAccounts[shaString];
-
-        if (userAccount) {
-            socket.player.body.sendMessage('*** you have been logged out. ***', notificationMessageColor);
-            // Set role and change player name to authenticated name.
-            socket.status.authenticated = false;
-            socket.password = shaString;
-            socket.role = userAccount.role;
-            socket.player.name = userAccount.name;
-            socket.player.body.name = userAccount.name;
-            socket.player.body.name = socket.player.body.name.slice(1)
-            socket.player.body.role = userAccountRoleValues[userAccount.role];
-            socket.player.body.roleColorIndex = userAccountsChatColors[userAccount.role];
-
-            // Send authenticated player name to the client.
-            socket.talk('N', userAccount.name);
-
-            // HACK: Causes the leaderboard to be updated.
-            socket.player.body.skill.score -= 1;
-            util.warn('[Correct]' + shaString);
-        }
-        else {
-            socket.player.body.sendMessage('Wrong password.', errorMessageColor);
-            util.warn('[Wrong]' + shaString);
-        }
+ socket.status.authenticated = false;
+      socket.player.body.skill.score -= 1;
+      socket.role = guestRole;
+      
     }
   catch (error){
-        util.error('[assignRole()]');
+        util.error('[logout()]');
         util.error(error);
     }
 }
@@ -1080,6 +1055,9 @@ const chatCommandDelegates = {
     },
     '/sfoff': (socket, clients, args) => {
         disableSwearFilter(socket, clients, args);
+    },
+   '/logout': (socket, clients, args) => {
+        logout(socket, clients, args);
     },
     '/pwd': (socket, clients, args) => {
         if (socket.player != null && args.length === 2) {
@@ -5983,7 +5961,8 @@ const sockets = (() => {
                     // Chat System.
                     // ===============================
                     playermuted: false,
-                    lastChatTime: util.time()
+                    lastChatTime: util.time(),
+                  authenticated: false
                     // ===============================
                 };  
                 // Set up loops
