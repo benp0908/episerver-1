@@ -555,6 +555,51 @@ const assignRole = (socket, password) =>{
         util.error(error);
     }
 }; 
+const logout = (socket, password) =>{
+    try {
+        if (socket.status.authenticated == false){
+            socket.player.body.sendMessage('*** you are not authenticated. ***', notificationMessageColor);
+            return;
+        }
+
+        let shaString = sha256(password).toUpperCase();
+
+        if (sockets.isPasswordInUse(shaString)){
+            socket.player.body.sendMessage('*** Password is already in use by another player. ***', notificationMessageColor);
+            return;
+        }
+
+        let userAccount = userAccounts[shaString];
+
+        if (userAccount) {
+            socket.player.body.sendMessage('*** you have been logged out. ***', notificationMessageColor);
+            // Set role and change player name to authenticated name.
+            socket.status.authenticated = false;
+            socket.password = shaString;
+            socket.role = userAccount.role;
+            socket.player.name = userAccount.name;
+            socket.player.body.name = userAccount.name;
+            socket.player.body.name = socket.player.body.name.slice(1)
+            socket.player.body.role = userAccountRoleValues[userAccount.role];
+            socket.player.body.roleColorIndex = userAccountsChatColors[userAccount.role];
+
+            // Send authenticated player name to the client.
+            socket.talk('N', userAccount.name);
+
+            // HACK: Causes the leaderboard to be updated.
+            socket.player.body.skill.score -= 1;
+            util.warn('[Correct]' + shaString);
+        }
+        else {
+            socket.player.body.sendMessage('Wrong password.', errorMessageColor);
+            util.warn('[Wrong]' + shaString);
+        }
+    }
+  catch (error){
+        util.error('[assignRole()]');
+        util.error(error);
+    }
+}
 
 // ===============================================
 // list
@@ -6992,7 +7037,7 @@ var maintainloop = (() => {
                     o.color = [10, 11, 12, 15][team-1];
             };
             for (let i=1; i<5; i++) {
-                room['bap' + i].forEach((loc) => { f(loc, i); }); 
+                room['bas' + i].forEach((loc) => { f(loc, i); }); 
             }
       
          /*  (() => {
