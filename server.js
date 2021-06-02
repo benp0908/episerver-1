@@ -774,11 +774,10 @@ const kickPlayer = (socket, clients, args) =>{
     }
 };
 //===============================
-//===============================
-const killPlayer = (socket, clients, args, entities) =>{
+const killPlayer = (socket, clients, args) =>{
     try {
         if (socket.player != null && args.length === 2) {
-            let isMember = isUserambassador(socket.role);
+            let isMember = isUsermoderator(socket.role);
           
    let clients = sockets.getClients();
           
@@ -787,12 +786,14 @@ const killPlayer = (socket, clients, args, entities) =>{
                  
             for (let i = 0; i < clients.length; ++i){
                 let client = clients[i];
+
                 if (viewId) {
                     const matches = clients.filter(client => client.player.viewId == viewId);
 
-                                      if (matches.length > 0){
+                    if (matches.length > 0){
                       // Check if muter is trying to mute the player whose role is higher.
                     // ========================================================================
+                      
                     let kickerRoleValue = userAccountRoleValues[socket.role];
                     let kickedRoleValue = userAccountRoleValues[matches[0].role];
                     if (kickerRoleValue <= kickedRoleValue){
@@ -800,18 +801,23 @@ const killPlayer = (socket, clients, args, entities) =>{
                         return 1;
                     }
                       if (kickerRoleValue => kickedRoleValue) {
+                      
                     // ========================================================================
-                    let playerTarget = matches[0]
-                     ('')
+                        sockets.broadcast(socket.player.name + ' killed '+matches[0].player.body.name)
+                        matches[0].player.body.destroy('');
+                      }
                     }
-                }}}
-            } else{socket.player.body.sendMessage('you do not have Kill permission')}
+                }
+            }} else{socket.player.body.sendMessage('you do not have /kill permission')}
         } else {socket.player.body.sendMessage('usage: /kill [id]')}
     } catch (error){
         util.error('[killPlayer()]');
-        util.error(error);
+      
+      
     }
 };
+
+
 //===============================
 const serverrestart = (socket, clients, args) =>{
     try {
