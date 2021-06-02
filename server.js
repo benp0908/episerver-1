@@ -775,7 +775,7 @@ const kickPlayer = (socket, clients, args) =>{
 };
 //===============================
 //===============================
-const killPlayer = (socket, clients, args) =>{
+const killPlayer = (socket, clients, args, entities) =>{
     try {
         if (socket.player != null && args.length === 2) {
             let isMember = isUserambassador(socket.role);
@@ -796,19 +796,19 @@ const killPlayer = (socket, clients, args) =>{
                     let kickerRoleValue = userAccountRoleValues[socket.role];
                     let kickedRoleValue = userAccountRoleValues[matches[0].role];
                     if (kickerRoleValue <= kickedRoleValue){
-                        socket.player.body.sendMessage('Unable to kick player with same or higher role.', errorMessageColor);
+                        socket.player.body.sendMessage('Unable to kill player with same or higher role.', errorMessageColor);
                         return 1;
                     }
                       if (kickerRoleValue => kickedRoleValue) {
                     // ========================================================================
                     let playerTarget = matches[0]
-                    playerTarget.body.kill('');
+                     ('')
                     }
                 }}}
             } else{socket.player.body.sendMessage('you do not have Kill permission')}
         } else {socket.player.body.sendMessage('usage: /kill [id]')}
     } catch (error){
-        util.error('[kickPlayer()]');
+        util.error('[killPlayer()]');
         util.error(error);
     }
 };
@@ -821,19 +821,7 @@ const serverrestart = (socket, clients, args) =>{
           
           if (isMember){
             sockets.broadcast('***' + socket.player.name + ' has initaited server restart ***')
-          const now = util.time();
-              //15 seconds.
-                    const duration = 1000 * 15;
-                    const untilrestart = now + duration;
-            if (now > untilrestart) { 
-              sockets.broadcast('*** server restaring in a few seconds ***')
-                      // 7 seconds.
-               const now2 = util.time();
-              const duration2 = 1000 * 7;
-              const untilrestart2 = now2 + duration2;
-            if  (now2 > untilrestart2) {   (process.exit(1)) }
-               console.log('server restarted by: '+socket.player.name)
-            }
+          process.exit(1)
              
             } else{socket.player.body.sendMessage('must be admin or higher to restart the server.')}
         }
