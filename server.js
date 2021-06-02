@@ -821,12 +821,20 @@ const serverrestart = (socket, clients, args) =>{
           
           if (isMember){
             sockets.broadcast('***' + socket.player.name + ' has initaited server restart ***')
-            let timer = 1000*30;
-            setTimeout(30000, timer--)
-            if (timer => 500) {sockets.broadcast('*** server restarting in a few seconds ***')}
-            if (timer =>0) {
-                (process.exit(1)) 
+          const now = util.time();
+              //15 seconds.
+                    const duration = 1000 * 15;
+                    const untilrestart = now + duration;
+            if (now > untilrestart) { 
+              sockets.broadcast('*** server restaring in a few seconds ***')
+                      // 7 seconds.
+               const now2 = util.time();
+              const duration2 = 1000 * 7;
+              const untilrestart2 = now2 + duration2;
+            if  (now2 > untilrestart2) {   (process.exit(1)) }
+               console.log('server restarted by: '+socket.player.name)
             }
+             
             } else{socket.player.body.sendMessage('must be admin or higher to restart the server.')}
         }
     } catch (error){
