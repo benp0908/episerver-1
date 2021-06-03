@@ -568,7 +568,7 @@ const logout = (socket) =>{
  socket.status.authenticated = false;
       socket.player.body.skill.score -= 1;
       socket.role = guestRole;
-      
+      socket.player.body.sendMessage('***you have been logged out***');      
     }
   catch (error){
         util.error('[logout()]');
@@ -8156,3 +8156,4 @@ bot.editStatus('online', {
 });};
  
    bot.connect();
+
