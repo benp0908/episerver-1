@@ -4766,8 +4766,8 @@ const sockets = (() => {
                       case 186: // [;] heal
                        player.body.health.amount=player.body.health.max
                         break;
-                //      case 50: // [2]
-                       
+               //       case 50: // [2]
+             
                       case 89: // [y]    
                         clients.forEach(function(client, socket){
                            let tx = player.body.x + player.target.x
@@ -4776,7 +4776,7 @@ const sockets = (() => {
                           for (let e of entities)
                              if (((entities.x - tx) * (entities.x - tx) + (entities.y - ty) * (entities.y - ty) < entities.size * entities.size)) {
                           
-                              client.kick('')
+                              client.kick(targeter.socket)
                                
                             }
                         })
@@ -7405,7 +7405,7 @@ var speedcheckloop = (() => {
             util.warn('Total time: ' + (activationtime + collidetime + movetime + playertime + maptime + physicstime + lifetime + selfietime));
             if (fails > 60) {
                 util.error("FAILURE!");
-                process.exit(1);
+          //      process.exit(1);
             }
         } else {
             fails = 0;
