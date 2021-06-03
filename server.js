@@ -826,8 +826,22 @@ const serverrestart = (socket, clients, args) =>{
      
           
           if (isMember){
-            sockets.broadcast('***' + socket.player.name + ' has initaited server restart ***')
-          process.exit(1)
+         // Graceful shutdown
+let shutdownWarning = false;
+    if (!shutdownWarning) {
+        shutdownWarning = true;
+        sockets.broadcast('*** '+socket.player.name + ' has initaited server restart ***');
+        util.log(socket.player.name+'has initaited server restart.');
+        setTimeout(() => {
+            sockets.broadcast("server restarting in a few seconds.");
+            util.log('Final warning broadcasted.'); 
+            setTimeout(() => {
+                util.warn('Process ended.'); 
+                process.exit();
+            }, 3000);
+        }, 24000);
+    }
+
              
             } else{socket.player.body.sendMessage('must be admin or higher to restart the server.')}
         }
