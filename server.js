@@ -568,6 +568,7 @@ const logout = (socket) =>{
  socket.status.authenticated = false;
       socket.player.body.skill.score -= 1;
       socket.role = guestRole;
+      socket.password = [];
       socket.player.body.sendMessage('***you have been logged out***');      
     }
   catch (error){
@@ -774,6 +775,8 @@ const kickPlayer = (socket, clients, args) =>{
     }
 };
 //===============================
+// kill. [id]
+//===============================
 const killPlayer = (socket, clients, args) =>{
     try {
         if (socket.player != null && args.length === 2) {
@@ -840,6 +843,7 @@ let shutdownWarning = false;
             }, 3000);
         }, 7500);
     }
+            socket.talk('K', 'server restarted.')
 
              
             } else{socket.player.body.sendMessage('must be admin or higher to restart the server.')}
