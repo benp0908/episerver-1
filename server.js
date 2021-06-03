@@ -831,15 +831,14 @@ let shutdownWarning = false;
     if (!shutdownWarning) {
         shutdownWarning = true;
         sockets.broadcast('*** '+socket.player.name + ' has initaited server restart ***');
-        util.log(socket.player.name+'has initaited server restart.');
+        util.log(socket.player.name+' has initaited server restart.');
+              setTimeout(() => { sockets.broadcast("server restarting in a few seconds.");}, 6000)
         setTimeout(() => {
-            sockets.broadcast("server restarting in a few seconds.");
-            util.log('Final warning broadcasted.'); 
             setTimeout(() => {
                 util.warn('Process ended.'); 
                 process.exit();
             }, 3000);
-        }, 24000);
+        }, 7500);
     }
 
              
