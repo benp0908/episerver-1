@@ -691,7 +691,7 @@ const kickDeadPlayers = (socket, clients, args) => {
     }
 };
 //===============================
-//kickspecs
+//kicksbasics
 //===============================
 const kickbasics = (socket, clients, args) => {
     try {
@@ -714,23 +714,23 @@ const kickbasics = (socket, clients, args) => {
     }
 };
 //test 1
-const playerslist = (socket, clients, args) => {
-  try {
- let output = '`'
-    entities.forEach(function(element) {
-    if (element.name != '') {
-        output += String(element.name + '  -  ' + element.id + '\n')
-    }}) 
-    output += '`'
-    socket.player.body.sendMessage(output)
-     }
+
+// ===============================================
+// //===============================
+//kickspecs
+//===============================
+const helplist = (socket, clients, args) => {
+    try {
+      
+        socket.player.body.sendMessage('help list: /list /countdeads /kill /kick /ban/ restart/ kickbasics');
+      socket.player.body.sendMessage('page 2: /logout /countplayers /kickdead /pwd [password]')
+        
+    }
     catch (error) {
-        util.error('[playerslist()]');
+        util.error('[helplist()]');
         util.error(error);
     }
 };
-// ===============================================
-// 
 // ===============================================
 //kick command (/kick [id])
 //===============================
@@ -887,7 +887,7 @@ const banPlayer = (socket, clients, args) =>{
                 }
                 }
             }} else{socket.player.body.sendMessage('you do not have Tempban permission')}
-        }else {socket.player.body.sendMessage('usage: /ban [id]')}    
+        }else {socket.player.body.sendMessage('usage: /ban [id]' && 'usage: /tempban [id]')}    
     } catch (error){
         util.error('[kickPlayer()]');
         util.error(error);
@@ -1113,6 +1113,9 @@ const chatCommandDelegates = {
     },
   '/ban': (socket, clients, args) => {
         banPlayer(socket, clients, args);
+    },
+  '/help': (socket, clients) => {
+        helplist(socket, clients);
     },
     '/mute': (socket, clients, args, playerId) => {
         mutePlayer(socket, clients, args, playerId);
