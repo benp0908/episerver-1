@@ -690,30 +690,7 @@ const kickDeadPlayers = (socket, clients, args) => {
         util.error(error);
     }
 };
-//===============================
-//kicksbasics
-//===============================
-const kickbasics = (socket, clients, args) => {
-    try {
-      
-        let isMember = isUserambassador(socket.role);
-        if (isMember) {
-            clients.forEach(function(client) {
-           if    (Class.basic) {client.kick('you where kicked by '+ socket.player.body.name)}
-            });
-        }
-        else {
-            setTimeout(() => {
-                socket.player.body.sendMessage('*** Unauthorized. ***', notificationMessageColor);
-            }, 200);
-        }
-    }
-    catch (error) {
-        util.error('[kickbasics()]');
-        util.error(error);
-    }
-};
-//test 1
+
 
 // ===============================================
 // //===============================
@@ -723,7 +700,7 @@ const helplist = (socket, clients, args) => {
     try {
       
         socket.player.body.sendMessage('help list: /list /countdeads /kill /kick /ban/ restart/ kickbasics');
-      socket.player.body.sendMessage('page 2: /logout /countplayers /kickdead /pwd [password]')
+      socket.player.body.sendMessage('page 2: /logout /countplayers /kickdead /pwd [password] /countall')
         
     }
     catch (error) {
@@ -889,7 +866,7 @@ const banPlayer = (socket, clients, args) =>{
             }} else{socket.player.body.sendMessage('you do not have Tempban permission')}
         }else {socket.player.body.sendMessage('usage: /ban [id]' && 'usage: /tempban [id]')}    
     } catch (error){
-        util.error('[kickPlayer()]');
+        util.error('[banplayer()]');
         util.error(error);
     }
 };
