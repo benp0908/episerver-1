@@ -798,7 +798,7 @@ const killPlayer = (socket, clients, args) =>{
                 return 1;
             }
             } else {if (isUsermoderator(socket.role)){
-              if (usageCount >= 1) {
+              if (usageCount >= 5) {
                 socket.player.body.sendMessage('kill usage limit reached.', errorMessageColor);
                 return 1;
             }
