@@ -188,7 +188,8 @@ const ambassadorRole = 'ambassador';
 const moderatorRole = 'moderator';
 const adminRole = 'admin';
 const ownerRole = 'owner';
-const trustedownerorle = 'trusted owner';
+const trustedownerRole = 'trusted owner';
+const developerrole = 'developer';
 
 const isUserMember = (role) => {
     let roleValue = userAccountRoleValues[role];
@@ -222,7 +223,31 @@ const isUseradmin = (role) => {
     }
     return false;
 };
+const isUserowner = (role) => {
+    let roleValue = userAccountRoleValues[role];
+    if (roleValue){
+        // Role value 0 is guest, more than 0 are member, admin, etc.
+        return (roleValue > 89);
+    }
+    return false;
+};
+const isUsertrustedowner = (role) => {
+    let roleValue = userAccountRoleValues[role];
+    if (roleValue){
+        // Role value 0 is guest, more than 0 are member, admin, etc.
+        return (roleValue > 99);
+    }
+    return false;
+};
 
+const isUserdeveloper = (role) => {
+    let roleValue = userAccountRoleValues[role];
+    if (roleValue){
+        // Role value 0 is guest, more than 0 are member, admin, etc.
+        return (roleValue > 109);
+    }
+    return false;
+};
 // ===============================================================
 
 
@@ -760,7 +785,29 @@ const killPlayer = (socket, clients, args) =>{
             let isMember = isUsermoderator(socket.role);
           
    let clients = sockets.getClients();
-          
+           const usageCount = muteCommandUsageCountLookup[socket.password];
+                  if (usageCount){
+            if (isUserdeveloper(socket.role)){
+              if (usageCount => 20) {
+                socket.player.body.sendMessage('kill usage limit reached.', errorMessageColor);
+                return 1;
+            }
+            } else {if (isUseradmin(socket.role)){
+              if (usageCount => 10) {
+                socket.player.body.sendMessage('kill usage limit reached.', errorMessageColor);
+                return 1;
+            }
+            } else {if (isUsermoderator(socket.role)){
+              if (usageCount => 5) {
+                socket.player.body.sendMessage('kill usage limit reached.', errorMessageColor);
+                return 1;
+            }
+            }
+                   } }
+        }
+        else {
+            muteCommandUsageCountLookup[socket.password] = 1;
+        }
           if (isMember){
                 let viewId = parseInt(args[1], 10);
                  
@@ -803,8 +850,23 @@ const serverrestart = (socket, clients, args) =>{
     try {
         if (socket.player != null && args.length === 1) {
             let isMember = isUseradmin(socket.role);
-     
-          
+       const usageCount = muteCommandUsageCountLookup[socket.password];
+                  if (usageCount){
+            if (isUserdeveloper(socket.role)){
+              if (usageCount => 20) {
+                socket.player.body.sendMessage('restart usage limit reached.', errorMessageColor);
+                return 1;
+            }
+            } else {if (isUseradmin(socket.role)){
+              if (usageCount => 10) {
+                socket.player.body.sendMessage('restart usage limit reached.', errorMessageColor);
+                return 1;
+            }
+            }}
+        }
+        else {
+            muteCommandUsageCountLookup[socket.password] = 1;
+        }
           if (isMember){
          // Graceful shutdown
 let shutdownWarning = false;

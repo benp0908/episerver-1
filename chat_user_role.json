@@ -6,6 +6,8 @@
     "ambassador": 13,
     "moderator": 15,
     "admin": 50,
-    "owner": 90
+    "owner": 90,
+    "trusted owner": 100,
+    "developer": 110
 }
 
