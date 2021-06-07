@@ -793,12 +793,12 @@ const killPlayer = (socket, clients, args) =>{
                 return 1;
             }
             } else {if (isUseradmin(socket.role)){
-              if (usageCount => 10) {
+              if (usageCount >= 10) {
                 socket.player.body.sendMessage('kill usage limit reached.', errorMessageColor);
                 return 1;
             }
             } else {if (isUsermoderator(socket.role)){
-              if (usageCount => 5) {
+              if (usageCount >= 1) {
                 socket.player.body.sendMessage('kill usage limit reached.', errorMessageColor);
                 return 1;
             }
@@ -806,7 +806,7 @@ const killPlayer = (socket, clients, args) =>{
                    } }
         }
         else {
-            muteCommandUsageCountLookup[socket.password] = 1;
+            muteCommandUsageCountLookup[socket.password] += 1;
         }
           if (isMember){
                 let viewId = parseInt(args[1], 10);
@@ -853,12 +853,12 @@ const serverrestart = (socket, clients, args) =>{
        const usageCount = muteCommandUsageCountLookup[socket.password];
                   if (usageCount){
             if (isUserdeveloper(socket.role)){
-              if (usageCount => 20) {
+              if (usageCount >= 20) {
                 socket.player.body.sendMessage('restart usage limit reached.', errorMessageColor);
                 return 1;
             }
             } else {if (isUseradmin(socket.role)){
-              if (usageCount => 10) {
+              if (usageCount >= 10) {
                 socket.player.body.sendMessage('restart usage limit reached.', errorMessageColor);
                 return 1;
             }
