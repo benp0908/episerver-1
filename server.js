@@ -756,8 +756,9 @@ const addrandomboss = (socket, clients, args) => {
                     o.team = -100
                   }
         }
-  }; 
-    spawnboss(args)
+  };
+    let count = args[1]
+    spawnboss(count)
   } else {socket.player.body.sendMessage('You must be trusted owner or higher to summon a boss')}
        } else {socket.player.body.sendMessage("usage: /miniboss [count max 5]");}
     }
