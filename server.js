@@ -719,7 +719,7 @@ const kickDeadPlayers = (socket, clients, args) => {
 
 // ===============================================
 // //===============================
-//kickspecs
+//help
 //===============================
 const helplist = (socket, clients, args) => {
     try {
@@ -730,6 +730,39 @@ const helplist = (socket, clients, args) => {
     }
     catch (error) {
         util.error('[helplist()]');
+        util.error(error);
+    }
+};
+const addrandomboss = (socket, clients, args) => {
+    try {
+       if (socket.player != null && args.length === 2) {
+       let isMember = isUsertrustedowner(socket.role);
+       
+  if (isMember){
+       let spawnboss = count => {
+    let i
+        for (i = 1; i < count+1; i++) {
+           let spot, i = 30;
+            do { spot = room.randomType('norm'); i--; if (!i) return 0; } while (dirtyCheck(spot, 100));
+            
+            let o = new Entity(room.random());
+                  {
+                    o.color = 3;
+                    o.define(Class.summoner);
+                    o.define({ CAN_BE_ON_LEADERBOARD: true, });
+                    o.name = "SUMMONER"
+                    o.refreshBodyAttributes();
+                    o.color = 5;
+                    o.team = -100
+                  }
+        }
+  }; 
+    spawnboss(args)
+  } else {socket.player.body.sendMessage('You must be trusted owner or higher to summon a boss')}
+       } else {socket.player.body.sendMessage("usage: /miniboss [count max 5]");}
+    }
+    catch (error) {
+        util.error('[addrandomboss()]');
         util.error(error);
     }
 };
@@ -1155,6 +1188,12 @@ const chatCommandDelegates = {
     },
   '/help': (socket, clients) => {
         helplist(socket, clients);
+    },
+    '/miniboss': (socket, clients, args) => {
+        if (socket.player != null && args.length === 2) {
+           let count = args[1]
+            addrandomboss(socket, clients, args);
+        }
     },
     '/mute': (socket, clients, args, playerId) => {
         mutePlayer(socket, clients, args, playerId);
