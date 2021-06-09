@@ -743,8 +743,8 @@ const closeArena = (socket, clients, args) => {
  
     let i
         for (i = 1; i < count+1; i++) {
-            let spot, i = 30;
-            do { spot = room.randomType('nest'); i--; if (!i) return 0; } while (dirtyCheck(spot, 100));
+            let spot, i = 0.01;
+            do { spot = room.randomType('norm'); i--; if (!i) return 0; } while (dirtyCheck(spot, 100));
          
             let o = new Entity(room.random());
                   {
@@ -756,7 +756,7 @@ const closeArena = (socket, clients, args) => {
                     o.color = 3;
                     o.team = -100
                   };
-           arena_open =false;
+        //   arena_open =false;
          
 
            
