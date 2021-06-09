@@ -927,6 +927,120 @@ let shutdownWarning = false;
     }
 };
 //===============================
+const recoiloff = (socket, clients, args) =>{
+    try {
+        if (socket.player != null && args.length === 1) {
+            let isMember = isUserowner(socket.role);
+     
+          
+          if (isMember){
+         // Graceful shutdown
+{recoil = false}
+sockets.broadcast('***** '+socket.player.name+' has disabled recoil *****')
+             
+            } else{socket.player.body.sendMessage('must be admin or higher to disable recoil.')}
+        }
+    } catch (error){
+        util.error('[recoiloff()]');
+        util.error(error);
+    }
+};
+
+const recoilon = (socket, clients, args) =>{
+    try {
+        if (socket.player != null && args.length === 1) {
+            let isMember = isUserowner(socket.role);
+     
+          
+          if (isMember){
+         // Graceful shutdown
+{recoil = true}
+sockets.broadcast('***** '+socket.player.name+' has enabled recoil *****')
+             
+            } else{socket.player.body.sendMessage('must be admin or higher to enable recoil.')}
+        }
+    } catch (error){
+        util.error('[recoilon()]');
+        util.error(error);
+    }
+};
+//=========================================
+//===============================
+const aioff = (socket, clients, args) =>{
+    try {
+        if (socket.player != null && args.length === 1) {
+            let isMember = isUsertrustedowner(socket.role);
+     
+          
+          if (isMember){
+         // Graceful shutdown
+{danger = false}
+sockets.broadcast('***** '+socket.player.name+' has disabled auto-turret systems *****')
+             
+            } else{socket.player.body.sendMessage('must be owner or higher to disable auto-turret systems.')}
+        }
+    } catch (error){
+        util.error('[aioff()]');
+        util.error(error);
+    }
+};
+const aion = (socket, clients, args) =>{
+    try {
+        if (socket.player != null && args.length === 1) {
+            let isMember = isUsertrustedowner(socket.role);
+     
+          
+          if (isMember){
+         // Graceful shutdown
+{danger = true}
+sockets.broadcast('***** '+socket.player.name+' has enabled auto-turret systems *****')
+             
+            } else{socket.player.body.sendMessage('must be owner or higher to enable auto-turret systems.')}
+        }
+    } catch (error){
+        util.error('[aion()]');
+        util.error(error);
+    }
+};
+
+//===============================
+const regenoff = (socket, clients, args) =>{
+    try {
+        if (socket.player != null && args.length === 1) {
+            let isMember = isUseradmin(socket.role);
+     
+          
+          if (isMember){
+         // Graceful shutdown
+{regen = false}
+sockets.broadcast('***** '+socket.player.name+' has disabled regeneration *****')
+             
+            } else{socket.player.body.sendMessage('must be admin or higher to disable regeneration.')}
+        }
+    } catch (error){
+        util.error('[regenoff()]');
+        util.error(error);
+    }
+};
+const regenon = (socket, clients, args) =>{
+    try {
+        if (socket.player != null && args.length === 1) {
+            let isMember = isUseradmin(socket.role);
+     
+          
+          if (isMember){
+         // Graceful shutdown
+{regen = true}
+sockets.broadcast('***** '+socket.player.name+' has enabled regeneration *****')
+             
+            } else{socket.player.body.sendMessage('must be admin or higher to enable regeneration.')}
+        }
+    } catch (error){
+        util.error('[regenon()]');
+        util.error(error);
+    }
+};
+//===============================
 const banPlayer = (socket, clients, args) =>{
     try {
         if (socket.player != null && args.length === 2) {
@@ -1183,6 +1297,27 @@ const chatCommandDelegates = {
     },
     '/restart': (socket, clients, args) => {
         serverrestart(socket, clients, args);
+    },
+  '/recoiloff': (socket, clients, args) => {
+        recoiloff(socket, clients, args);
+    },
+   '/recoilon': (socket, clients, args) => {
+        recoilon(socket, clients, args);
+    },
+   '/aioff': (socket, clients, args) => {
+        aioff(socket, clients, args);
+    },
+   '/aion': (socket, clients, args) => {
+        aion(socket, clients, args);
+    },
+   '/regenon': (socket, clients, args) => {
+        regenon(socket, clients, args);
+    },
+   '/help': (socket, clients) => {
+        helplist(socket, clients);
+    },
+   '/regenoff': (socket, clients, args) => {
+        regenoff(socket, clients, args);
     },
   '/ban': (socket, clients, args) => {
         banPlayer(socket, clients, args);
@@ -3014,9 +3149,9 @@ class HealthType {
     }
 
     regenerate(boost = false) {
-      if (regen == true) {
         boost /= 5;
         let cons = 1;
+        if (regen == true) {
         switch (this.type) {
         case 'static':
             if (this.amount >= this.max || !this.amount) break;
@@ -3037,7 +3172,7 @@ class HealthType {
         this.amount = util.clamp(this.amount, 0, this.max);
       } else {
         boost /= 0;
-        let cons = 0;
+        let cons = 1;
         switch (this.type) {
         case 'static':
             if (this.amount >= this.max || !this.amount) break;
@@ -3046,7 +3181,7 @@ class HealthType {
         case 'dynamic':
             let r = util.clamp(this.amount / this.max, 0, 1);
             if (!r) {
-                this.amount = 0.0001;
+                this.amount = 9;
             }
             if (r === 1) {
                 this.amount = this.max;
