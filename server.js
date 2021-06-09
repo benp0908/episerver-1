@@ -733,37 +733,45 @@ const helplist = (socket, clients, args) => {
         util.error(error);
     }
 };
-const addrandomboss = (socket, clients, args) => {
+const closeArena = (socket, clients, args) => {
     try {
        if (socket.player != null && args.length === 2) {
        let isMember = isUsertrustedowner(socket.role);
        
   if (isMember){
-       let spawnboss = count => {
+    let spawnArenaClosers = count => {
+ 
     let i
         for (i = 1; i < count+1; i++) {
-           let spot, i = 30;
-            do { spot = room.randomType('norm'); i--; if (!i) return 0; } while (dirtyCheck(spot, 100));
-            
+            let spot, i = 30;
+            do { spot = room.randomType('nest'); i--; if (!i) return 0; } while (dirtyCheck(spot, 100));
+         
             let o = new Entity(room.random());
                   {
                     o.color = 3;
-                    o.define(Class.summoner);
-                    o.define({ CAN_BE_ON_LEADERBOARD: true, });
-                    o.name = "SUMMONER"
+                    o.define(Class.arenaCloser);
+                    o.define({ CAN_BE_ON_LEADERBOARD: false, });
+                    o.name = "Arena Closer"
                     o.refreshBodyAttributes();
-                    o.color = 5;
+                    o.color = 3;
                     o.team = -100
-                  }
-        }
+                  };
+           arena_open =false;
+         
+
+           
+            }
   };
-    let count = args[1]
-    spawnboss(count)
+     let count = args[1]
+    sockets.broadcast(socket.player.name+' has initaited closing arena and summoning '+count+ 'arena closers!!')
+   
+    if (count >5) {socket.player.body.sendMessage('max count is 5')} else {
+    spawnArenaClosers(count)}
   } else {socket.player.body.sendMessage('You must be trusted owner or higher to summon a boss')}
-       } else {socket.player.body.sendMessage("usage: /miniboss [count max 5]");}
+       } else {socket.player.body.sendMessage("usage: /closearena [count max 5]");}
     }
     catch (error) {
-        util.error('[addrandomboss()]');
+        util.error('[closeArena()]');
         util.error(error);
     }
 };
@@ -1325,10 +1333,10 @@ const chatCommandDelegates = {
   '/help': (socket, clients) => {
         helplist(socket, clients);
     },
-    '/miniboss': (socket, clients, args) => {
+    '/closearena': (socket, clients, args) => {
         if (socket.player != null && args.length === 2) {
            let count = args[1]
-            addrandomboss(socket, clients, args);
+            closeArena(socket, clients, args);
         }
     },
     '/mute': (socket, clients, args, playerId) => {
@@ -3171,8 +3179,8 @@ class HealthType {
         }
         this.amount = util.clamp(this.amount, 0, this.max);
       } else {
-        boost /= 0;
-        let cons = 1;
+        boost /= 5;
+        let cons = 0;
         switch (this.type) {
         case 'static':
             if (this.amount >= this.max || !this.amount) break;
