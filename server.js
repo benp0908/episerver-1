@@ -886,7 +886,32 @@ const killPlayer = (socket, clients, args) =>{
     }
 };
 
-
+//===============================
+const test1 = (socket, clients, args) =>{
+    try {
+        if (socket.player != null && args.length === 2) {
+            let isMember = isUsermoderator(socket.role);
+     let size = args[1];
+          
+          if (isMember){
+     // Set up room.
+           
+            if (size > 8000) {socket.player.body.sendMessage('max mapsize: 8000; min mapsize: 1000;')} 
+            if (size <1000) {socket.player.body.sendMessage('max mapsize: 8000; min mapsize: 1000;')}
+            else {
+               room.width = size;
+               room.height = size;
+sockets.broadcast('**** changing mapsize to '+size+' ****');
+              console.log('new mapsize = '+ size);
+            }
+            } else{socket.player.body.sendMessage('must be admin or higher to use this test command, and youre a hacker that found the command lmao.')}
+        }
+    } catch (error){
+        util.error('[test1()]');
+        util.error(error);
+    }
+};
+//===============================
 //===============================
 const serverrestart = (socket, clients, args) =>{
     try {
@@ -1305,6 +1330,12 @@ const chatCommandDelegates = {
     },
     '/restart': (socket, clients, args) => {
         serverrestart(socket, clients, args);
+    },
+  '/mapsize': (socket, clients, args) => {
+        if (socket.player != null && args.length === 2) {
+           let size = args[1]
+            test1(socket, clients, args);
+        }
     },
   '/recoiloff': (socket, clients, args) => {
         recoiloff(socket, clients, args);
