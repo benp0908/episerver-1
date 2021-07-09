@@ -4,7 +4,6 @@
 /*global goog, Map, let */
 "use strict";
 
-// General requiresdddw
 require('google-closure-library');
 goog.require('goog.structs.PriorityQueue');
 goog.require('goog.structs.QuadTree');
@@ -39,7 +38,6 @@ const errorMessageColor = 12;
 // https://github.com/lance-gg/spaaace
 // written and released to the public domain by drow <drow@bin.sh>
 // http://creativecommons.org/publicdomain/zero/1.0/
-const nameGenerator = require('./lib/NameGenerator');
 
 const maxChatLettersPerSecond = 7;
 const maxChatMessageLength = 100;
@@ -50,9 +48,9 @@ let mutedPlayers = [];
 let muteCommandUsageCountLookup = {};
 
 // Authentication.
-let userAccounts = require('./chat_user.json');
-let userAccountsChatColors = require('./chat_user_role_color.json');
-let userAccountRoleValues = require('./chat_user_role.json');
+let userAccounts = require('./chat/chat_user.json');
+let userAccountsChatColors = require('./chat/chat_user_role_color.json');
+let userAccountRoleValues = require('./chat/chat_user_role.json');
 // =====================================================================
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
@@ -700,6 +698,8 @@ const room = {
     room.findType('tbll');
     room.findType('norm');
     room.findType('bas1');
+    room.findType('dom1');
+    room.findType('dom2');
     room.findType('bas2');
     room.findType('mot1');
     room.findType('mot2');
@@ -6083,11 +6083,72 @@ var gameloop = (() => {
         purgeEntities();
         room.lastCycle = util.time();
     };
-    //let expected = 1000 / c.gameSpeed / 30;
-    //let alphaFactor = (delta > expected) ? expected / delta : 1;
-    //roomSpeed = c.gameSpeed * alphaFactor;
-    //setTimeout(moveloop, 1000 / roomSpeed / 30 - delta); 
+  //let expected = 1000 / c.gameSpeed / 30;
+  //let alphaFactor = (delta > expected) ? expected / delta : 1;
+  //roomSpeed = c.gameSpeed * alphaFactor;
+  //setTimeout(moveloop, 1000 / roomSpeed / 30 - delta); 
 })();
+
+function teamWon(team) {
+  sockets.broadcast(team + " has won the game!");
+  setTimeout(process.exit, 1e3)
+}
+
+let assault = {
+  bases: [0, 0], // sanctuaries, total greens
+  spawnLocs: [],
+  timer: null,
+  time: 16 * 60,
+  timerFunction: function() {
+    assault.time --;
+    if (assault.time > 59 && assault.time % 60 === 0) sockets.broadcast(assault.time / 60 + " minute(s) until GREEN wins!");
+    else if (assault.time < 60 && assault.time % 5 === 0) sockets.broadcast(assault.time + " seconds until GREEN wins!");
+    if (assault.time <= 0) clearInterval(assault.timer), teamWon("GREEN", 11);
+  },
+  base: function(loc, team, type, sanctuary) {
+    if (sanctuary) assault.spawnLocs.push(loc), assault.bases[0] ++;
+    if (team === -2) assault.bases[1] ++;
+    let o = new Entity(loc);
+    o.define(team === -1 ? Class.dominator : sanctuary ? Class.gunnerDominator : type);
+    o.team = team;
+    o.color = [10, 11][-team - 1];
+    o.SIZE = 75;
+    o.ondead = () => {
+      assault.spawnLocs = assault.spawnLocs.filter(r => r !== loc);
+      if (team === -2) {
+        if (sanctuary) assault.bases[0] --;
+        if (assault.bases[0] === 0) teamWon("BLUE", 10);
+        assault.bases[1] --;
+        if (assault.bases[1] === 2) sockets.broadcast("GREEN bases are down."), clearInterval(assault.timer);
+      } else if (assault.bases[1] + 1 === 3) assault.timer = setInterval(assault.timerFunction, 1e3), assault.time = 8 * 60;
+      let newTeam = team === -1 ? -2 : -1;
+      let msg = team === -2 ? "A GREEN base has been destroyed!" : "A GREEN base has been repaired!";
+      sockets.broadcast(msg);
+      room.setType(["dom2", "dom1"][-o.team - 1], loc);
+      assault.base(loc, newTeam, type, false);
+    }
+  },
+  spawnBot: function() {
+    if (assault.spawnLocs.length === 0) return;
+    let o = new Entity(ran.choose(assault.spawnLocs));
+    o.define(Class.bot);
+    o.define(Class.basic);
+    o.team = -2;
+    o.color = 11;
+    o.skill.score = 23500;
+    o.skill.set([7, 7, 7, 7, 7, 7, 7, 7, 7, 7]);
+    o.ondead = () => setTimeout(assault.spawnBot, 3000);
+  },
+  init: function() {
+    for (let loc of room.dom2) assault.base(loc, -2, ran.choose([Class.gunnerDominator]), true);
+    for (let i = 0; i < 15; i ++) assault.spawnBot();
+    assault.timer = setInterval(assault.timerFunction, 1e3);
+  }
+};
+
+assault.init();
+
+
 // A less important loop. Runs at an actual 5Hz regardless of game speed.
 var maintainloop = (() => {
     // Place obstacles
