@@ -3684,6 +3684,7 @@ var logs = (() => {
 var http = require('http'),
     url = require('url'),
     WebSocket = require('ws'),
+    path = require('path'),
     xssFilters= require('xss-filters'),
     fs = require('fs'),
     mockupJsonData = (() => { 
@@ -3940,69 +3941,32 @@ var http = require('http'),
 // Websocket behavior
 const sockets = (() => {
     const protocol = require('./lib/fasttalk');
-  var clients = [], players = [], connectedIPs=[], suspiciousIPs=[], bannedIPs=[];
- 
-
-
-       // Banning
-            function ban(socket) {
-                if (bannedIPs.findIndex(ip => { return ip === socket.ip; }) === -1) {
-                    bannedIPs.push(socket.ip);
-                }
-              // No need for duplicates
-                socket.terminate('banned hahahaha')
-                util.warn(socket.ip + ' banned!');
-            }
- 
-  
-            // Being kicked 
-            function kick(socket, reason = 'No reason given.') {
-                let n = suspiciousIPs.findIndex(n => { return n.ip === socket.ip; });
-                if (n === -1) {
-                    suspiciousIPs.push({ ip: socket.ip, warns: 1, });
-                    util.warn(reason + ' Kicking. 1 warning.');
-                } else {
-                    suspiciousIPs[n].warns++;
-                    util.warn(reason + ' Kicking. ' + suspiciousIPs[n].warns + ' warnings.');
-                    if (suspiciousIPs[n].warns >= c.socketWarningLimit) {
-                      socket.ban(socket)
-                    }
-                }
-                socket.lastWords('K');
-            }
+    let clients = [], players = [], bannedIPs = [], suspiciousIPs = [], connectedIPs = [],
+        bannedNames = [
+            'FREE_FOOD_LUCARIO',
+            'FREE FOOD'
+        ];
     return {
-     broadcast: (message, color = 8) => {
+        // Original.
+        // broadcast: message => {
+        //     clients.forEach(socket => {
+        //         socket.talk('m', message);
+        //     });
+        // },
+
+        // ===============================================================================
+        // Chat System.
+        // ===============================================================================
+        broadcast: (message, color = 8) => {
             clients.forEach(socket => {
                 socket.talk('m', message, color);
             });
         },
-      return_ip: () => {
-        function return_ip(socket) {return socket.ip}
-      return_ip();
-      },
-    
-      "plugins": [
-    "security-node"
-],
-"extends": [
-    "plugin:security-node/recommended"
-],
+
         getClients: () => {
             return clients;
         },
-      
-        
-      player: () => {
-      function playerlol(socket) {
-        var player = socket.player
-      }},
-      
-      kick: (() => {
-     let clients =   sockets.getClients;//killler
-        let client =    clients.forEach(function(client){})
-        let socket = client.socket()
-        socket.kick('')
-       }),
+
         isPasswordInUse: (password) => {
             const matches = clients.filter(c => c.password === password);
             return (matches.length > 0);
@@ -4059,8 +4023,8 @@ const sockets = (() => {
                 util.error(error);
             }
         },
-      
         // ===============================================================================
+
         connect: (() => {
             // Define shared functions
             // Closing the socket
@@ -6275,6 +6239,37 @@ var gameloop = (() => {
 })();
 // A less important loop. Runs at an actual 5Hz regardless of game speed.
 var maintainloop = (() => {
+    // =========================================================
+    // Chat System.
+    // =========================================================
+    // Load RegEx filter file.
+    let RegExFileLoader = class {
+        run() {
+            const regexDir = path.join(__dirname, '../../');
+            let filePath = regexDir + 'chat_filter_regex.txt';
+            let rawData = fs.readFileSync(filePath).toString();
+            let lines = rawData.split(/\r?\n/);
+
+            for (let i=0; i<lines.length; ++i){
+                if (lines[0].length >= 2){
+                    regExList.push(new RegExp(lines[i], 'gi'));
+                }
+            }
+
+            util.log('*** [RegEx] Loaded ' + lines.length + ' entries. ***');
+            return this;
+        }
+    }
+
+    try {
+        new RegExFileLoader().run();
+    }
+    catch (error){
+        util.error('[new RegExFileLoader().run()]');
+        util.error(error);
+    }
+    // ===============================================================
+
     // Place obstacles
     function placeRoids() {
         function placeRoid(type, entityClass) {
