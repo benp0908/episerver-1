@@ -16,22 +16,7 @@ const c = require('./config.json');
 const util = require('./lib/util');
 const ran = require('./lib/random');
 const hshg = require('./lib/hshg');
-let restarttime = require('./lib/restart')
-let closed = false;
-let doms = true;
-let arena_open = true;
-let danger = true;
-let chat_system = true;
-let bot_count = 10;
-let mapsize_y = 4000;
-let mapsize_x = 4000;
-let recoil = true;
-let regen = true;
-let maze = 16;
-if (closed == true) {process.exit(1)};
-const notificationMessageColor = 15;
-const pmMessageColor = 13;
-const errorMessageColor = 12;
+
 // ============================================================================
 // Chat System.
 // ============================================================================
@@ -632,7 +617,6 @@ const chatCommandDelegates = {
         broadcastToPlayers(socket, clients, args);
     }
 };
-// ============================================================================
 
 
 // Let's get a cheaper array rem oval thing
@@ -646,33 +630,37 @@ Array.prototype.remove = index => {
     }
 };
 
+let chat_system = true;
+var arenaclosed = 1;
+var donothing=0;
+var domtdm=-100;
+var countdown=0;
+var randomtank=0;
 
 // Set up room.
 global.fps = "Unknown";
 var roomSpeed = c.gameSpeed;
 const room = {
-    lastCycle: undefined,
-    cycleSpeed: 1000 / roomSpeed / 30,
-    width: mapsize_x,
-    height: mapsize_y,
-    setup: c.ROOM_SETUP,
-    xgrid: c.X_GRID,
-    ygrid: c.Y_GRID,
-    xgridWidth: c.WIDTH / c.ROOM_SETUP[0].length,
-    ygridHeight: c.HEIGHT / c.ROOM_SETUP.length,
-    gameMode: c.MODE,
-    skillBoost: c.SKILL_BOOST,
-    scale: {
-        square: c.WIDTH * c.HEIGHT / 100000000,
-        linear: Math.sqrt(c.WIDTH * c.HEIGHT / 100000000),
-    },
-    maxFood: c.WIDTH * c.HEIGHT / 20000 * c.FOOD_AMOUNT,
-    isInRoom: location => {
-        return location.x >= 0 && location.x <= c.WIDTH && location.y >= 0 && location.y <= c.HEIGHT
-    },    
-    topPlayerID: -1,
+  lastCycle: undefined,
+  cycleSpeed: 1000 / roomSpeed / 30,
+  width: c.WIDTH,
+  height: c.HEIGHT,
+  setup: c.ROOM_SETUP,
+  xgrid: c.X_GRID,
+  ygrid: c.Y_GRID,
+  gameMode: c.MODE,
+  skillBoost: c.SKILL_BOOST,
+  scale: {
+    square: c.WIDTH * c.HEIGHT / 100000000,
+    linear: Math.sqrt(c.WIDTH * c.HEIGHT / 100000000),
+  },
+  maxFood: c.WIDTH * c.HEIGHT / 20000 * c.FOOD_AMOUNT,
+  isInRoom: location => {
+    return location.x >= 0 && location.x <= c.WIDTH && location.y >= 0 && location.y <= c.HEIGHT
+  },
+  topPlayerID: -1,
 };
-    room.findType = type => {
+room.findType = type => {
         let output = [];
         let j = 0;
         room.setup.forEach(row => { 
@@ -2014,134 +2002,113 @@ class Gun {
         }
     }
     
-  recoil() {
-      if (recoil == true) {
-        if (this.motion || this.position) {
-            // Simulate recoil
-            this.motion -= 0.25 * this.position / roomSpeed;
-            this.position += this.motion;
-            if (this.position < 0) { // Bouncing off the back
-                this.position = 0;
-                this.motion = -this.motion;
-            }
-            if (this.motion > 0) {
-                this.motion *= 0.75;
-            }
-        }   
-        if (this.canShoot && !this.body.settings.hasNoRecoil) {
-            // Apply recoil to motion
-            if (this.motion > 0) {
-                let recoilForce = -this.position * this.trueRecoil * 0.045 / roomSpeed;
-                this.body.accel.x += recoilForce * Math.cos(this.body.facing + this.angle);
-                this.body.accel.y += recoilForce * Math.sin(this.body.facing + this.angle);
-            }      
-        }} else
-        { if (this.motion || this.position) {
-            // Simulate recoil
-            this.motion -= 0 * this.position / roomSpeed;
-            this.position += this.motion;
-            if (this.position < 0) { // Bouncing off the back
-                this.position = 0;
-                this.motion = -this.motion;
-            }
-            if (this.motion > 0) {
-                this.motion *= 0;
-            }
-        }   
-        if (this.canShoot && !this.body.settings.hasNoRecoil) {
-            // Apply recoil to motion
-            if (this.motion > 0) {
-                let recoilForce = -this.position * this.trueRecoil * 0 / roomSpeed;
-                this.body.accel.x += recoilForce * Math.cos(this.body.facing + this.angle);
-                this.body.accel.y += recoilForce * Math.sin(this.body.facing + this.angle);
-            }      
-        }}
+    recoil() {
+    if (this.motion || this.position) {
+      // Simulate recoil
+      this.motion -= 0.25 * this.position / roomSpeed;
+      this.position += this.motion;
+      if (this.position < 0) { // Bouncing off the back
+        this.position = 0;
+        this.motion = -this.motion;
+      }
+      if (this.motion > 0) {
+        this.motion *= 0.75;
+      }
     }
-
-    getSkillRaw() { 
-        if (this.bulletStats === 'master') {
-            return [
-                this.body.skill.raw[0],
-                this.body.skill.raw[1],
-                this.body.skill.raw[2],
-                this.body.skill.raw[3],
-                this.body.skill.raw[4],
-                0, 0, 0, 0, 0, 
-            ];
-        } 
-        return this.bulletStats.raw;
+    if (this.canShoot && !this.body.settings.hasNoRecoil) {
+      // Apply recoil to motion
+      if (this.motion > 0) {
+        let recoilForce = -this.position * this.trueRecoil * 0.045 / roomSpeed;
+        this.body.accel.x += recoilForce * Math.cos(this.body.facing + this.angle);
+        this.body.accel.y += recoilForce * Math.sin(this.body.facing + this.angle);
+      }
     }
+  }
 
-    getLastShot() {
-        return this.lastShot;
+  getSkillRaw() {
+    if (this.bulletStats === 'master') {
+      return [
+        this.body.skill.raw[0],
+        this.body.skill.raw[1],
+        this.body.skill.raw[2],
+        this.body.skill.raw[3],
+        this.body.skill.raw[4],
+        0, 0, 0, 0, 0,
+      ];
     }
+    return this.bulletStats.raw;
+  }
 
-    live() {
-        // Do 
-        this.recoil();
-        // Dummies ignore this
-        if (this.canShoot) {
-            // Find the proper skillset for shooting
-            let sk = (this.bulletStats === 'master') ? this.body.skill : this.bulletStats;
-            // Decides what to do based on child-counting settings
-            let shootPermission = (this.countsOwnKids) ?
-                    this.countsOwnKids > this.children.length * ((this.calculator == 'necro') ? sk.rld : 1)
-                : (this.body.maxChildren) ?
-                    this.body.maxChildren > this.body.children.length * ((this.calculator == 'necro') ? sk.rld : 1)
-                : true;                
-            // Override in invuln
-            if (this.body.master.invuln) {
-                shootPermission = false;
-            }
-            // Cycle up if we should
-            if (shootPermission || !this.waitToCycle) {
-                if (this.cycle < 1) {
-                    this.cycle += 1 / this.settings.reload / roomSpeed / ((this.calculator == 'necro' || this.calculator == 'fixed reload') ? 1 : sk.rld);
-                } 
-            } 
-            // Firing routines
-            if (shootPermission && (this.autofire || ((this.altFire) ? this.body.control.alt : this.body.control.fire))) {
-                if (this.cycle >= 1) {
-                    // Find the end of the gun barrel
-                    let gx = 
-                        this.offset * Math.cos(this.direction + this.angle + this.body.facing) +
-                        (1.5 * this.length - this.width * this.settings.size / 2) * Math.cos(this.angle + this.body.facing);
-                    let gy = 
-                        this.offset * Math.sin(this.direction + this.angle + this.body.facing) +
-                        (1.5 * this.length - this.width * this.settings.size / 2) * Math.sin(this.angle + this.body.facing); 
-                    // Shoot, multiple times in a tick if needed
-                    while (shootPermission && this.cycle >= 1) {
-                        this.fire(gx, gy, sk);   
-                        // Figure out if we may still shoot
-                        shootPermission = (this.countsOwnKids) ?
-                            this.countsOwnKids > this.children.length
-                        : (this.body.maxChildren) ?
-                            this.body.maxChildren > this.body.children.length
-                        : true; 
-                        // Cycle down
-                        this.cycle -= 1;
-                    }
-                }  // If we're not shooting, only cycle up to where we'll have the proper firing delay
-            } else if (this.cycle > !this.waitToCycle - this.delay) {
-                this.cycle = !this.waitToCycle - this.delay;
-            } 
+  getLastShot() {
+    return this.lastShot;
+  }
+
+  live() {
+    // Do 
+    this.recoil();
+    // Dummies ignore this
+    if (this.canShoot) {
+      // Find the proper skillset for shooting
+      let sk = (this.bulletStats === 'master') ? this.body.skill : this.bulletStats;
+      // Decides what to do based on child-counting settings
+      let shootPermission = (this.countsOwnKids) ?
+        this.countsOwnKids > this.children.length * ((this.calculator == 'necro') ? sk.rld : 1) :
+        (this.body.maxChildren) ?
+        this.body.maxChildren > this.body.children.length * ((this.calculator == 'necro') ? sk.rld : 1) :
+        true;
+      // Override in invuln
+      if (this.body.master.invuln) {
+        shootPermission = false;
+      }
+      // Cycle up if we should
+      if (shootPermission || !this.waitToCycle) {
+        if (this.cycle < 1) {
+          this.cycle += 1 / this.settings.reload / roomSpeed / ((this.calculator == 'necro' || this.calculator == 'fixed reload') ? 1 : sk.rld);
         }
+      }
+      // Firing routines
+      if (shootPermission && (this.autofire || ((this.altFire) ? this.body.control.alt : this.body.control.fire))) {
+        if (this.cycle >= 1) {
+          // Find the end of the gun barrel
+          let gx =
+            this.offset * Math.cos(this.direction + this.angle + this.body.facing) +
+            (1.5 * this.length - this.width * this.settings.size / 2) * Math.cos(this.angle + this.body.facing);
+          let gy =
+            this.offset * Math.sin(this.direction + this.angle + this.body.facing) +
+            (1.5 * this.length - this.width * this.settings.size / 2) * Math.sin(this.angle + this.body.facing);
+          // Shoot, multiple times in a tick if needed
+          while (shootPermission && this.cycle >= 1) {
+            this.fire(gx, gy, sk);
+            // Figure out if we may still shoot
+            shootPermission = (this.countsOwnKids) ?
+              this.countsOwnKids > this.children.length :
+              (this.body.maxChildren) ?
+              this.body.maxChildren > this.body.children.length :
+              true;
+            // Cycle down
+            this.cycle -= 1;
+          }
+        } // If we're not shooting, only cycle up to where we'll have the proper firing delay
+      } else if (this.cycle > !this.waitToCycle - this.delay) {
+        this.cycle = !this.waitToCycle - this.delay;
+      }
     }
+  }
 
-    syncChildren() {
-        if (this.syncsSkills) {
-            let self = this;
-            this.children.forEach(function(o) {
-                o.define({
-                    BODY: self.interpret(), 
-                    SKILL: self.getSkillRaw(),
-                });
-                o.refreshBodyAttributes();
-            });
-        }
+  syncChildren() {
+    if (this.syncsSkills) {
+      let self = this;
+      this.children.forEach(function(o) {
+        o.define({
+          BODY: self.interpret(),
+          SKILL: self.getSkillRaw(),
+        });
+        o.refreshBodyAttributes();
+      });
     }
+  }
 
-    fire(gx, gy, sk) {
+  fire(gx, gy, sk) {
         // Recoil
         this.lastShot.time = util.time();
         this.lastShot.power = 3 * Math.log(Math.sqrt(sk.spd) + this.trueRecoil + 1) + 1;
@@ -2440,52 +2407,30 @@ class HealthType {
         }            
     }
 
-    regenerate(boost = false) {
-        boost /= 5;
-        let cons = 1;
-        if (regen == true) {
-        switch (this.type) {
-        case 'static':
-            if (this.amount >= this.max || !this.amount) break;
-            this.amount += cons * (this.max / 10 / 60 / 2.5 + boost);
-            break;
-        case 'dynamic':
-            let r = util.clamp(this.amount / this.max, 0, 1);
-            if (!r) {
-                this.amount = 0.0001;
-            }
-            if (r === 1) {
-                this.amount = this.max;
-            } else {
-                this.amount += cons * (this.regen * Math.exp(-50 * Math.pow(Math.sqrt(0.5 * r) - 0.4, 2)) / 3 + r * this.max / 10 / 15 + boost);
-            }
-        break; 
+  regenerate(boost = false) {
+    boost /= 2;
+    let cons = 5;
+    switch (this.type) {
+      case 'static':
+        if (this.amount >= this.max || !this.amount) break;
+        this.amount += cons * (this.max / 10 / 60 / 2.5 + boost);
+        break;
+      case 'dynamic':
+        let r = util.clamp(this.amount / this.max, 0, 1);
+        if (!r) {
+          this.amount = 0.0001;
         }
-        this.amount = util.clamp(this.amount, 0, this.max);
-      } else {
-        boost /= 5;
-        let cons = 0;
-        switch (this.type) {
-        case 'static':
-            if (this.amount >= this.max || !this.amount) break;
-            this.amount += cons * (this.max / 10 / 60 / 2.5 + boost);
-            break;
-        case 'dynamic':
-            let r = util.clamp(this.amount / this.max, 0, 1);
-            if (!r) {
-                this.amount = 9;
-            }
-            if (r === 1) {
-                this.amount = this.max;
-            } else {
-                this.amount += cons * (this.regen * Math.exp(-50 * Math.pow(Math.sqrt(0.5 * r) - 0.4, 2)) / 3 + r * this.max / 10 / 15 + boost);
-            }
-        break; 
+        if (r === 1) {
+          this.amount = this.max;
+        } else {
+          this.amount += cons * (this.regen * Math.exp(-50 * Math.pow(Math.sqrt(0.5 * r) - 0.4, 2)) / 3 + r * this.max / 10 / 15 + boost);
         }
-        this.amount = util.clamp(this.amount, 0, this.max);}
+        break;
     }
+    this.amount = util.clamp(this.amount, 0, this.max);
+  }
 
-    get permeability() {
+  get permeability() {
         switch(this.type) {
         case 'static': return 1;
         case 'dynamic': return (this.max) ? util.clamp(this.amount / this.max, 0, 1) : 0;
@@ -3232,33 +3177,139 @@ class Entity {
         }
     }
 
-    confinementToTheseEarthlyShackles() {
-        if (this.x == null || this.x == null) {
-            util.error('Void Error!');
-            util.error(this.collisionArray);
-            util.error(this.label);
-            util.error(this);
-            nullVector(this.accel); nullVector(this.velocity);
-            return 0;
-        }
-        if (!this.settings.canGoOutsideRoom) {
+  confinementToTheseEarthlyShackles() {
+    if (this.x == null || this.x == null) {
+      util.error('Void Error!');
+      util.error(this.collisionArray);
+      util.error(this.label);
+      util.error(this);
+      nullVector(this.accel);
+      nullVector(this.velocity);
+      return 0;
+    }
+       if (!this.settings.canGoOutsideRoom) {
             this.accel.x -= Math.min(this.x - this.realSize + 50, 0) * c.ROOM_BOUND_FORCE / roomSpeed;
             this.accel.x -= Math.max(this.x + this.realSize - room.width - 50, 0) * c.ROOM_BOUND_FORCE / roomSpeed;
             this.accel.y -= Math.min(this.y - this.realSize + 50, 0) * c.ROOM_BOUND_FORCE / roomSpeed;
             this.accel.y -= Math.max(this.y + this.realSize - room.height - 50, 0) * c.ROOM_BOUND_FORCE / roomSpeed;
         }
-        if (room.gameMode.endsWith('tdm') && this.type !== 'food') { 
-         let loc =    { x: this.x, y: this.y, };
-            if (
-                (this.team !== -1 && room.isIn('bas1', loc)) ||
-                (this.team !== -2 && room.isIn('bas2', loc)) ||
-                (this.team !== -3 && room.isIn('bas3', loc)) ||
-                (this.team !== -4 && room.isIn('bas4', loc)) ||
-                (this.team !== -1 && room.isIn('mot1', loc))||
-                (this.team !== -2 && room.isIn('mot2', loc)) 
-            ) { this.kill(); }
-        }
+       if (room.gameMode === 'tdm' && this.type !== 'food') { 
+            let loc = { x: this.x, y: this.y, };
+          if (this.label !=='Arena Closer'){ //This way arena closers don't die inside base
+          if (this.label !=='Spectator'){   // Spectators can't die
+          if (this.label !=='Arena Closer Bullet'){  //This way arena closer bullets don't disappear
+          if (this.team !==-100){if (
+                (this.team !== -4 && room.isIn('bas4', loc))
+
+            ) {this.invuln = false;
+            this.kill(); }}
+        }}}}
+       if (this.label==="Kill tank"){
+         this.invuln = false;
+         this.kill();
+         this.sendMessage('LOL you killed yourself.');}
+      
+    function killme(){
+     donothing+=1;
     }
+   if (this.label==='Random Tank'){
+     randomtank(this);
+   }
+    if ((this.label==="Pistol Picture")){
+      arenaclosed=0;  domtdm=-100;
+      if(this.label==="Pistol Picture"){this.define(Class.pistol);}      
+   }
+    if ((this.label==="Dual Picture")){
+      arenaclosed=0;  domtdm=-100;
+      if(this.label==="Dual Picture"){this.define(Class.dual);}    
+   }
+    if ((this.label==="Stone Picture")){
+      arenaclosed=0;  domtdm=-100;
+      if(this.label==="Stone Picture"){this.define(Class.stone);}         
+      
+      // If Arena Closer doesn't kill you then this will
+      if (((this.label!=='Arena Closer')&&(this.label!=='Dominator')&&(donothing>10))||(this.label==='Base')){
+      if(this.label!=='Arena Closer Bullet'){this.invuln=false;
+      this.kill();
+      }}
+      if ((donothing>10000)){
+        sockets.broadcast('You cannot live forever.');
+        this.invuln=false;
+        this.kill();
+        process.exit(1);
+    }
+        }
+        if (this.team === -1 || this.team === -2 || this.team === -3 || this.team === -4 || this.team === -5) {
+            let loc = { x: this.x, y: this.y, };
+            if (room.isIn('ctf1', loc) || room.isIn('ctf2', loc) || room.isIn('ctf3', loc) || room.isIn('ctf4', loc) || room.isIn('ctf5', loc) || room.isIn('ctfX', loc)) {
+                room.repIsIn('ctf' + (-this.team), loc);
+            }
+        }
+        if (this.type === 'food' || this.type === 'bullet' || this.type === 'trap') { 
+            let loc = { x: this.x, y: this.y, };
+            if (room.isIn('watr', loc)) {this.health.amount -= 0}
+        }
+        if (this.type != 'food') { 
+            let loc = { x: this.x, y: this.y, };
+            if (room.isIn('lava', loc)) {this.health.amount -= 1}
+        }
+        if (this.type === 'tank') { 
+            let loc = { x: this.x, y: this.y, };
+            if (
+                (room.isIn('watr', loc))
+            ) { this.health.amount += 0}
+        }
+      if (this.type === 'tank') { 
+            let loc = { x: this.x, y: this.y, };
+            if (
+                (room.isIn('lava', loc))
+            ) { this.health.amount -= 0.5}
+        }
+       if (this.type === 'tank') { 
+            let loc = { x: this.x, y: this.y, };
+            if (
+                (room.isIn('lava', loc))
+            ) { this.shield.amount -= 2}
+        }
+        if (this.type === 'tank') { 
+            let loc = { x: this.x, y: this.y, };
+            if (
+                (room.isIn('heal', loc))
+            ) { this.health.amount += 1}
+        }
+      if (this.type === 'tank') {
+        let loc = { x: this.x, y: this.y, };
+        if (
+          (room.isIn('grow', loc))
+          ) { this.SIZE += 0.10}
+        }
+      if (this.type === 'tank') {
+        let loc = { x: this.x, y: this.y, };
+        if (
+          (room.isIn('test', loc))
+          ) { this.dam += 1}
+        }
+        if (this.type === 'tank') { 
+            let loc = { x: this.x, y: this.y, };
+            if (
+                (room.isIn('snow', loc))
+            ) { this.health.amount -= 0.08}
+        }
+        if (this.type === 'tank' || this.type === 'bullet' || this.type === 'trap') { 
+            let loc = { x: this.x, y: this.y, };
+            if (
+                (room.isIn('watr', loc))
+            ) { (this.WATER_SLOW === false) ? this.maxSpeed -= 1 : this.maxSpeed -= 0;
+              this.WATER_SLOW = true}
+        }
+        if (true === true) {
+            let loc = { x: this.x, y: this.y, };
+            if (
+                !(room.isIn('watr', loc))
+            ) {(this.WATER_SLOW === true) ? this.maxSpeed += 1 : this.maxSpeed += 0;
+              this.WATER_SLOW = false}
+        }
+        }
 
     contemplationOfMortality() {
         if (this.invuln) {
@@ -3936,7 +3987,6 @@ const sockets = (() => {
                 } break;
                     
                 case 's': { // spawn request
-                  if (arena_open==true) {
                     if (!socket.status.deceased) { socket.kick('Trying to spawn while already alive.'); return 1; }
                     if (m.length !== 2) { socket.kick('Ill-sized spawn request.'); return 1; }
                     // Get data
@@ -3970,7 +4020,7 @@ const sockets = (() => {
                     socket.update(0);  
                     // Log it    
                     util.log('[INFO] ' + (m[0]) + (needsRoom !== -1 ? ' joined' : ' rejoined') + ' the game! Players: ' + players.length);   
-                } break;};   
+                } break;   
                 case 'S': { // clock syncing
                     if (m.length !== 1) { socket.kick('Ill-sized sync packet.'); return 1; }
                     // Get data
