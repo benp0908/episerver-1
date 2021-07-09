@@ -17,22 +17,13 @@ const util = require('./lib/util');
 const ran = require('./lib/random');
 const hshg = require('./lib/hshg');
 
-// ============================================================================
-// Chat System.
-// ============================================================================
-// https://github.com/lance-gg/spaaace
-// written and released to the public domain by drow <drow@bin.sh>
-// http://creativecommons.org/publicdomain/zero/1.0/
-
 const maxChatLettersPerSecond = 7;
 const maxChatMessageLength = 100;
 
 let regExList = [];
-// Muted players for chat system.
 let mutedPlayers = [];
 let muteCommandUsageCountLookup = {};
 
-// Authentication.
 let userAccounts = require('./chat/chat_user.json');
 let userAccountsChatColors = require('./chat/chat_user_role_color.json');
 let userAccountRoleValues = require('./chat/chat_user_role.json');
@@ -61,7 +52,6 @@ const removeRedundantSpaces = (str) => {
 	return tmpStr;
 };
 
-// https://geraintluff.github.io/sha256/
 const sha256 = function sha256(ascii) {
 	function rightRotate(value, amount) {
 		return (value >>> amount) | (value << (32 - amount));
@@ -75,18 +65,9 @@ const sha256 = function sha256(ascii) {
 
 	let words = [];
 	let asciiBitLength = ascii[lengthProperty] * 8;
-
-	//* caching results is optional - remove/add slash from front of this line to toggle
-	// Initial hash value: first 32 bits of the fractional parts of the square roots of the first 8 primes
-	// (we actually calculate the first 64, but extra values are just ignored)
 	let hash = sha256.h = sha256.h || [];
-	// Round constants: first 32 bits of the fractional parts of the cube roots of the first 64 primes
 	let k = sha256.k = sha256.k || [];
 	let primeCounter = k[lengthProperty];
-	/*/
-	var hash = [], k = [];
-	var primeCounter = 0;
-	//*/
 
 	let isComposite = {};
 	for (let candidate = 2; primeCounter < 64; candidate++) {
@@ -165,9 +146,6 @@ const sha256 = function sha256(ascii) {
 	return result;
 };
 
-// ===============================================================
-// User Accounts.
-// ===============================================================
 const blacklistRole = 'blacklist';
 const guestRole = 'guest';
 const memberRole = 'member';
@@ -186,30 +164,16 @@ const isUserMember = (role) => {
 	return false;
 };
 
-// ===============================================================
-
 const notificationMessageColor = 15;
 const pmMessageColor = 13;
 const errorMessageColor = 12;
-
-// ===============================================================
-// Chat commands.
-// ===============================================================
-
-// ===============================================
-// killme, km
-// ===============================================
 const commitSuicide = (socket, clients, args) => {
 	if (socket.player != null && socket.player.body != null) {
 		socket.player.body.invuln = false;
 		socket.player.body.health.amount = 0;
-		sockets.broadcast(socket.player.name + ' has killed his/her own tank.');
 	}
 };
 
-// ===============================================
-// chat   [on/off]
-// ===============================================
 const toggleChat = (socket, clients, args) => {
 	try {
 		if (socket.player != null && args.length === 2) {
@@ -226,9 +190,6 @@ const toggleChat = (socket, clients, args) => {
 	}
 };
 
-// ===============================================
-// chaton
-// ===============================================
 const enableChat = (socket, clients, args) => {
 	try {
 		if (socket.player != null) {
@@ -240,9 +201,6 @@ const enableChat = (socket, clients, args) => {
 	}
 };
 
-// ===============================================
-// chatoff
-// ===============================================
 const disableChat = (socket, clients, args) => {
 	try {
 		if (socket.player != null) {
@@ -254,10 +212,6 @@ const disableChat = (socket, clients, args) => {
 	}
 };
 
-
-// ===============================================
-// pm   [on/off] - Private message on/off
-// ===============================================
 const togglePrivateMessage = (socket, clients, args) => {
 	try {
 		if (socket.player != null && args.length === 2) {
@@ -274,9 +228,6 @@ const togglePrivateMessage = (socket, clients, args) => {
 	}
 };
 
-// ===============================================
-// pmon - Private message on
-// ===============================================
 const enablePrivateMessage = (socket, clients, args) => {
 	try {
 		if (socket.player != null) {
@@ -288,9 +239,6 @@ const enablePrivateMessage = (socket, clients, args) => {
 	}
 };
 
-// ===============================================
-// pmoff - Private message off
-// ===============================================
 const disablePrivateMessage = (socket, clients, args) => {
 	try {
 		if (socket.player != null) {
@@ -302,10 +250,6 @@ const disablePrivateMessage = (socket, clients, args) => {
 	}
 };
 
-
-// ===============================================
-// sf   [on/off] - Swear filter on/off
-// ===============================================
 const toggleSwearFilter = (socket, clients, args) => {
 	try {
 		if (socket.player != null && args.length === 2) {
@@ -322,9 +266,6 @@ const toggleSwearFilter = (socket, clients, args) => {
 	}
 };
 
-// ===============================================
-// sfon - Swear filter on
-// ===============================================
 const enableSwearFilter = (socket, clients, args) => {
 	try {
 		if (socket.player != null) {
@@ -336,9 +277,6 @@ const enableSwearFilter = (socket, clients, args) => {
 	}
 };
 
-// ===============================================
-// sfoff - Swear filter off
-// ===============================================
 const disableSwearFilter = (socket, clients, args) => {
 	try {
 		if (socket.player != null) {
@@ -350,9 +288,6 @@ const disableSwearFilter = (socket, clients, args) => {
 	}
 };
 
-// ===============================================
-// broadcast  [message]
-// ===============================================
 const broadcastToPlayers = (socket, clients, args) => {
 	try {
 		if (socket.player != null && args.length >= 2) {
@@ -360,8 +295,6 @@ const broadcastToPlayers = (socket, clients, args) => {
 
 			if (isMember) {
 				let a, rest;
-				// a is the command "/broadcast" (args[0]).
-				// ...rest is the rest of arguments (args[1] to args[n-1]).
 				[a, ...rest] = args;
 
 				// Construct message from the rest of the args which is an array.
@@ -369,7 +302,7 @@ const broadcastToPlayers = (socket, clients, args) => {
 					return (accumulator + ' ' + currentValue);
 				}, '');
 
-				let msgAnnounce = '[Announcement]: ' + msg;
+				let msgAnnounce = msg;
 				sockets.broadcast(msgAnnounce, 12);
 			}
 		}
@@ -378,9 +311,6 @@ const broadcastToPlayers = (socket, clients, args) => {
 	}
 };
 
-// ===============================================
-// pwd  [password]
-// ===============================================
 const authenticate = (socket, password) => {
 	try {
 		if (socket.status.authenticated) {
@@ -559,9 +489,6 @@ const kickDeadPlayers = (socket, clients, args) => {
 	}
 };
 
-// ===============================================
-// kick  [view id]. Untested.
-// ===============================================
 const kickPlayer = (socket, clients, args) => {
 	try {
 		if (socket.player != null && args.length === 2) {
@@ -585,10 +512,6 @@ const kickPlayer = (socket, clients, args) => {
 	}
 };
 
-
-// ===============================================
-// mute  [player id]
-// ===============================================
 const mutePlayer = (socket, clients, args, playerId) => {
 	try {
 		let isMember = isUserMember(socket.role);
@@ -620,15 +543,12 @@ const mutePlayer = (socket, clients, args, playerId) => {
 				let client = clients[i];
 
 				if (client.player.viewId === playerId) {
-					// Check if muter is trying to mute the player whose role is higher.
-					// ========================================================================
 					let muterRoleValue = userAccountRoleValues[socket.role];
 					let muteeRoleValue = userAccountRoleValues[client.role];
 					if (muterRoleValue <= muteeRoleValue) {
 						socket.player.body.sendMessage('Unable to mute player with same or higher role.', errorMessageColor);
 						return 1;
 					}
-					// ========================================================================
 
 					// 5 minutes
 					const duration = 1000 * 60 * 5;
@@ -676,9 +596,6 @@ const mutePlayer = (socket, clients, args, playerId) => {
 	}
 };
 
-// ===============================================
-// unmute  [player id]
-// ===============================================
 const unmutePlayer = (socket, clients, args, playerId) => {
 	try {
 		let isMember = isUserMember(socket.role);
