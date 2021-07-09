@@ -13,9 +13,9 @@ const security_node = require('eslint-plugin-security-node')
 const c = require('./config.json');
 
 // Import utilities.
-const util = require('./lib/util');
-const ran = require('./lib/random');
-const hshg = require('./lib/hshg');
+const util = require('./game/collisions');
+const ran = require('./game/botNames');
+const hshg = require('./game/drawBackground');
 
 const maxChatLettersPerSecond = 7;
 const maxChatMessageLength = 100;
@@ -898,7 +898,7 @@ function nullVector(v) {
 
 // Get class definitions and index them
 var Class = (() => {
-	let def = require('./lib/definitions'),
+	let def = require('./game/entities'),
 		i = 0;
 	for (let k in def) {
 		if (!def.hasOwnProperty(k)) continue;
@@ -4111,7 +4111,7 @@ var http = require('http'),
 
 // Websocket behavior
 const sockets = (() => {
-	const protocol = require('./lib/fasttalk');
+	const protocol = require('./game/protocol');
 	var clients = [],
 		players = [],
 		connectedIPs = [],
@@ -7843,11 +7843,6 @@ let server = http.createServer((req, res) => {
 			res.writeHead(200)
 			res.end(`<!DOCTYPE html><h3>Arras</h3><button onclick="location.href = 'http://arras.io/#host=' + location.host">Open</button>`)
 			break
-		case '/secret/totally-secret-file/classified/definitions.js':
-			res.writeHead(200)
-			res.end(fs.readFileSync('lib/definitions.js'))
-			console.log('definitions.js completed')
-			break
 		case '/mockups.json':
 			res.setHeader('Access-Control-Allow-Origin', '*')
 			res.writeHead(200)
@@ -8586,27 +8581,6 @@ bot.on('messageCreate', (msg, socket) => {
 			console.log('done!');
 			bot.createMessage(msg.channel.id, 'total count is: ' + count);
 		};
-		/*   if (msg.content.startsWith(prefix + 'define ')) {
-		  let printerror = true
-		  let command = parse(msg.content)
-		  let inputid = command[1]
-		  let inputclass = command[2]
-		  if (msg.author.id == owner_id, owner_id2) {
-		  if (Class[inputclass] != undefined) {
-		    entities.filter(r => r.id == inputid)[0].define(Class[inputclass])
-		    printerror = false
-		    bot.createMessage(msg.channel.id, 'Defined user as Class.' + inputclass);
-		  } else {
-		    bot.createMessage(msg.channel.id, inputclass + ' is not a valid tank');
-		    printerror = false
-		  }
-		  if (printerror) {
-		    bot.createMessage(msg.channel.id, "Couldn't find any users by the id: " + inputid);
-		  }
-		  } else {
-		    bot.createMessage(msg.channel.id, unauth(3));
-		  }
-		} */
 	} catch (err) { // log the error in chat
 		bot.createMessage(msg.channel.id, String(err));
 	}
