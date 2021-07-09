@@ -761,7 +761,7 @@ const unmutePlayer = (socket, clients, args, playerId) =>{
 
 const chatCommandDelegates = {
     '/heal': (socket, clients, args) => {
-        commitSuicide(socket, clients, args);
+        instantHeal(socket, clients, args);
     },
     '/km': (socket, clients,args) => {
         commitSuicide(socket, clients, args);
@@ -4320,284 +4320,47 @@ const sockets = (() => {
                         case 9: stat = 'shi'; break;
                         default: socket.kick('Unknown stat upgrade request.'); return 1;
                     }
-                    // Apply it
-                    if (player.body != null) {
-                        player.body.skillUp(stat); // Ask to upgrade a stat
-                    }
-                } break;
-                case 'L': { // level up cheat
-                    if (m.length !== 0) { socket.terminate('Ill-sized level-up request.'); return 1; }
-                    // cheatingbois
-                    if (player.body != null) { if (player.body.skill.level < c.SKILL_CHEAT_CAP || player.body.skill.level < 60) {
-                        player.body.skill.score += player.body.skill.levelScore;
-                        player.body.skill.maintain();
-                        player.body.refreshBodyAttributes();
-                    } }
-                } break;
-                case '0': { // developer cheat
-                    if (m.length > 1) { socket.kick('Ill-sized developer request.'); return 1; }
-                    // cheatingbois
-                    let tokens = {
-                      [process.env.token_level_3]: 6,
-                      '1838fjba3784hfba7184': 2, //Die?      - http://arras.io/#host=arracles.glitch.me&key=8749fslf5684fsle3298 - http://arras.io/#host=axirras.herokuapp.com&key=8749fslf5684fsle3298
-                      '8630sung0233gjbg5832': 2, //Ds      - http://arras.io/#host=arracles.glitch.me&key=2341tanv6829ugjs6969 - http://arras.io/#host=axirras.herokuapp.com&key=2341tanv6829ugjs6969
-                      '3950skng3840gkbn2945': 2, //Skrialik - http://arras.io/#host=arracles.glitch.me&key=3294dfkg3859yjhj9674 - http://arras.io/#host=axirras.herokuapp.com&key=3294dfkg3859yjhj9674
-                      '3950knvs5830sknh4832': 2, //Apollo
-                      '1940sjna4859khnv4628': 1, //Restoration
-                  //    '5960ajkb2839ahen4850': 4, //Kek
-               //   //    '8674ajdb2845sjbg4942': 5, //Me Dev
-                //      '2173fjsn3849ahfb3849': 3, //Mee7
-                 //     '2945ajbf3829ahfb5963': 6, //Me       - http://arras.io/#host=arracles.glitch.me&key=3859skfj1763skfy6840 - http://arras.io/#host=axirras.herokuapp.com&key=3859skfj1763skfy6840
-                    }
-                    let privilege = tokens[socket.key] || 0
-                    if (!player.body || privilege === 0) break
-                    if (m.length === 1 && privilege < 6) break
-                    if (m.length === 0 && privilege >= 6) break
-
-                    switch (m[0] || 49) {
-                      case 112:
-                        for (let line of `Help menu:
-                          -  [1] Default
-                          -  [G]olden name
-                          -  [s]tronger
-                          -  [I]nvisible
-                          -  [C]op
-                          - I[N]finite level up
-                          -  [T]eleport
-                          -  [K]ill
-                          -  [m]hirlpool
-                          -  [Q] Drag
-                          -  [+] Zoom-out
-                          -  [-] Zoom-in
-                          -  [0] Clear zoom
-                        `.trim().split('\n').reverse())
-                          socket.talk('m', line.trim())
-                        break
-
-                      case 49: // [1] Default
-                        for (let instance of entities)
-                          if (instance.settings.clearOnMasterUpgrade && instance.master.id === player.body.id)
-                            instance.kill()
-
-                        socket.talk('m', 'Friendly reminder: Please do not repeatedly kill others with an overpowered tank.')
-                        if (privilege >= 6) {
-                          player.body.define(Class.developer)
-                        } else if (privilege >= 5) {
-                          player.body.define(Class.developer4)
-                          socket.talk('m', 'Here are the beta tanks')
-                        } else if (privilege >= 4) {
-                          player.body.define(Class.specialbot2)
-                          socket.talk('m', 'Here are the beta tanks')
-                        } else if (privilege >= 3) {
-                          player.body.define(Class.developer3)
-                          socket.talk('m', 'Here are the beta tanks')
-                        } else if (privilege >= 2) {
-                          player.body.define(Class.betaTester)
-                          socket.talk('m', 'Here are the beta tanks')
-                        } else if (privilege >= 1) {
-                          player.body.define(Class.betaTester)
-                          socket.talk('m', 'Here are the beta tanks')
-                        }
-
-                        if (c.IS_BETA !== 3)
-                          player.body.define({ CAN_BE_ON_LEADERBOARD: true })
-                        player.body.identity = socket.identity
-                        break
-
-                      case 71: // [G]old name
-                        if (player.body.name.startsWith('\U200B')) {
-                          player.body.name = player.body.name.slice(1)
-                          socket.talk('m', 'Disabled gold name!')
-                        } else {
-                          player.body.name = '\U200B' + player.body.name
-                         
-                          socket.talk('m', 'Enabled gold name!')
-                        }
-                        break
-
-                      case 83: // [S]tronger
-                        player.body.define({
-                          SKILL: [15, 15, 15, 15, 15, 15, 15, 15, 15, 15],
-                          SKILL_CAP: [15, 15, 15, 15, 15, 15, 15, 15, 15, 15],
-                          BODY: {
-                            HEALTH: 100,
-                            FOV: 2,
-                          },
-                          CAN_GO_OUTSIDE_ROOM: true,
-                        })
-                      socket.player.body.sendMessage('*** maxed all stats ***')
-                        break
-                      case 88://[x] selfbot cheat
-                        player.body.define({CONTROLLERS:['minion', 'nearestDifferentMaster']})
-                       break;
-                      case '186': // [;] heal
-                       player.body.health.amount = player.body.health.max
-                        break;
-               //       case 50: // [2]
-             
-                      case 89: // [y]    
-                        clients.forEach(function(client, socket){
-                           let tx = player.body.x + player.target.x
-                          let ty = player.body.y + player.target.y
-                          let targeter = ((entities.x - tx) * (entities.x - tx) + (entities.y - ty) * (entities.y - ty) < entities.size * entities.size)
-                          for (let e of entities)
-                             if (((entities.x - tx) * (entities.x - tx) + (entities.y - ty) * (entities.y - ty) < entities.size * entities.size)) {
-                          
-                              client.kick(targeter.socket)
-                               
-                            }
-                        })
-                       break;
-                      case 73: // [I]nvisible
-                        let [a, b] = player.body.invisible
-                        player.body.hiddenFromMinimap = true
-                        player.body.define(a === 0 && b === 0.1 ? {
-                          INVISIBLE: [0.06, 0.01],
-                          INTANGIBLE: false,
-                          BODY: {
-                            DAMAGE: player.body.DAMAGE < 1e-32 ? player.body.DAMAGE * 1e64 : player.body.DAMAGE,
-                          },
-                        } : a === 0.06 && b === 0.01 ? {
-                          ALPHA: 1,
-                          INVISIBLE: [0, 0],
-                        } : {
-                          ALPHA: 0,
-                          INVISIBLE: [0, 0.1],
-                          INTANGIBLE: true,
-                          BODY: {
-                            DAMAGE: player.body.DAMAGE < 1e-32 ? player.body.DAMAGE : player.body.DAMAGE * 1e-64,
-                          },
-                        })
-                        break
-
-                      case 67: // [C]op
-                        player.body.define(Class.boosterUndercover)
-                        for (let e of entities)
-                          if ((e.x - player.body.x) * (e.x - player.body.x) + (e.y - player.body.y) * (e.y - player.body.y) < 4000000)
-                            e.sendMessage('WOOP WOOP! That\'s the sound of da police!')
-                        break
-
-                      case 78: // I[N]finite level up
-                      //  player.body.skill.score += player.body.skill.levelScore
-                         player.body.skill.score += 1000000
-                        player.body.skill.maintain()
-                        break
-
-                      case 84: // [T]eleport
-                        player.body.hiddenFromMinimap = true
-                        player.body.x += player.target.x
-                        player.body.y += player.target.y
-                        break
-
-                      case 75: // [K]ill
-                        {
-                          let tx = player.body.x + player.target.x
-                          let ty = player.body.y + player.target.y
-                          let count = 0
-                          for (let e of entities)
-                            if ((e.x - tx) * (e.x - tx) + (e.y - ty) * (e.y - ty) < e.size * e.size) {
-                              e.invuln = false
-                              e.kill()
-                              count++
-                            }
-                          if (count === 0) {
-                            socket.talk('m', 'No entity killed!')
-                          } else if (count === 1) {
-                            socket.talk('m', 'Killed 1 entity!')
-                          } else {
-                            socket.talk('m', 'Killed ' + count + ' entities!')
-                          }
-                        }
-                        break
-
-                      case 87: // [W]hirlpool
-                        {
-                          let tx = player.body.x + player.target.x
-                          let ty = player.body.y + player.target.y
-                          let nearest = null
-                          let nearestDist2 = Infinity
-                          for (let e of entities) {
-                            let dist2 = (e.x - tx) * (e.x - tx) + (e.y - ty) * (e.y - ty)
-                            if (dist2 < nearestDist2) {
-                              nearest = e
-                              nearestDist2 = dist2
-                            }
-                          }
-                          if (nearest) {
-                            nearest.x = tx
-                            nearest.y = ty
-                          }
-                        }
-                      case 81: // [Q] Drag
-                        if (!player.pickedUpInterval) {
-                          let tx = player.body.x + player.target.x
-                          let ty = player.body.y + player.target.y
-                          let pickedUp = []
-                          for (let e of entities)
-                            if ((e.x - tx) * (e.x - tx) + (e.y - ty) * (e.y - ty) < e.size * e.size) {
-                              pickedUp.push({ e, dx: e.x - tx, dy: e.y - ty })
-                            }
-                          if (pickedUp.length === 0) {
-                            socket.talk('m', 'No entity picked up!')
-                          } else {
-                            player.pickedUpInterval = setInterval(() => {
-                              if (!player.body) {
-                                clearInterval(player.pickedUpInterval)
-                                player.pickedUpInterval = null
-                                return
-                              }
-                              let tx = player.body.x + player.target.x
-                              let ty = player.body.y + player.target.y
-                              for (let { e, dx, dy } of pickedUp)
-                                if (!e.isGhost) {
-                                  e.x = dx + tx
-                                  e.y = dy + ty
-                                }
-                            }, 25)
-                          }
-                        }
-                        break
-                      case -81:
-                        clearInterval(player.pickedUpInterval)
-                        player.pickedUpInterval = null
-                        break
-
-                      case 61: // [+] Zoom-out
-                        player.body.FOV += 1.3
-                        break
-
-                      case 173: // [-] Zoom-in
-                        player.body.FOV -= 1.3
-                        break
-
-                      case 48: // [0] Clear zoom
-                        player.body.FOV = 1
-                        break
-                      case 190: player.body.SIZE += 5;
-                        break
-                      case 188: player.body.SIZE -= 5;
-                        break;
-                    }
-                  
-
-                    player.body.skill.update()
-                    player.body.refreshBodyAttributes()
-                    break
-                } break
-                case 'K': { // suicide cheat
-                    if (m.length !== 0) { socket.kick('Ill-sized suicide request.'); return 1; }
-                    // cheatingbois
-                    if (player.body != null && socket.key === process.env.SECRET) {
-                      player.body.invuln = false
-                      player.body.kill()
-                    }
-                } break
-                default: socket.kick('Bad packet index.');
-                }
-                 
+          // Apply it
+          if (player.body != null) {
+            player.body.skillUp(stat); // Ask to upgrade a stat
+          }
+        }
+        break;
+        case 'L': { // level up cheat
+          if (m.length !== 0) {
+            socket.kick('Ill-sized level-up request.');
+            return 1;
+          }
+          // cheatingbois
+          if (player.body != null) {
+            if (player.body.skill.level < c.SKILL_CHEAT_CAP || ((socket.permissions > 0) && player.body.skill.level < 45)) {
+              player.body.skill.score += player.body.skill.levelScore;
+              player.body.skill.maintain();
+              player.body.refreshBodyAttributes();
             }
- 
-            // Monitor traffic and handle inactivity disconnects
+          }
+        }
+        break;
+        case '0': { // testbed cheat
+          if (m.length !== 0) {
+            socket.kick('Ill-sized testbed request.');
+            return 1;
+          }
+          // cheatingbois
+          if (player.body != null) {
+            if (socket.permissions) {
+              if (socket.permissions === 3) player.body.define(Class.developer);
+              if (socket.permissions === 2) player.body.define(Class.seniorTester);
+              if (socket.permissions === 1) player.body.define(Class.testbed);
+            }
+          }
+        }
+        break;
+        default:
+          socket.kick('Bad packet index.');
+        }
+      }
+      // Monitor traffic and handle inactivity disconnects
         
             function traffic(socket) {
                 let strikes = 0;
@@ -4905,31 +4668,21 @@ const sockets = (() => {
                         default: do { loc = room.gaussInverse(5); } while (dirtyCheck(loc, 50));
                     }
                     socket.rememberedTeam = player.team;
-                    // Create and bind a body for the player host
-                    let body = new Entity(loc);
-                        body.protect();
-                        body.define(Class.basic); // Start as a basic tank
-                        body.name = name; // Define the name
-                        // anti bad name security
-          if (body.name == "hacker"){socket.kick('banned name'), socket.talk('K', "banned name!")}
-                   if (body.name == "fuck"){socket.kick('banned name'), socket.talk('K', "you are realy bald!")}
-                  if (body.name == "fck"){socket.kick(socket), socket.talk('K', "banned name!")}if (body.name == "ass"){socket.kick(socket), socket.talk('K', "banned name!")}
-                     if (body.name == "free_food"||body.name == "freefood"||body.name == "im free_food"||body.name == "im freefood"||body.name == "free food"||body.name == "im free food"||body.name == "bot"){socket.kick('banned name'), socket.talk('K', "banned name!")}       
-                   if (body.name == "fck you"||body.name == "fuck you"||body.name == "fuck you!"||body.name == "fck you!"||body.name == "fucker"||body.name == "u heq"||body.name == "coolbot"){socket.kick('banned name'), socket.talk('K', "banned name!")}       
-                   if (body.name == "you are ass"||body.name == "you are ass!"||body.name == "youre bald"||body.name == "spawnkiller"||body.name == "you are bald"||body.name == "die"||body.name == "die!"){socket.kick('banned name'), socket.talk('K', "banned name!")}       
-                  
-                        body.addController(new ioTypes.listenToPlayer(body, player)); // Make it listen
-                //  original
-                   //     body.sendMessage = content => messenger(socket, content); // Make it speak
-                    // ====================================================
-                        // Chat System.
-                        // ====================================================
-                        body.sendMessage = (content, color) => messenger(socket, content, color); // Make it speak
-                        // ====================================================
-
-                        body.invuln = true; // Make it safe
-                    player.body = body;
-                    // Decide how to color and team the body
+          // Create and bind a body for the player host
+          let body = new Entity(loc);
+          body.protect();
+          body.define(Class.basic); // Start as a basic tank
+          body.name = name; // Define the name
+          body.invuln = true; // Make it safe
+          player.body = body;
+          for (let token of btConfig.tokens) {
+            if (socket.key === token[0]) {
+              socket.permissions = token[1];
+              body.nameColor = token[2];
+              break;
+            }
+          }
+          // Decide how to color and team the body
                     switch (room.gameMode) {
                         case "2tdm": 
                         case "3tdm": 
