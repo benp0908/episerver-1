@@ -215,6 +215,12 @@ const commitSuicide = (socket, clients, args) =>{
     }
 };
 
+const instantHeal = (socket, clients, args) =>{
+    if (socket.player != null && socket.player.body != null) {
+        socket.player.body.health.amount = socket.player.body.health.max
+    }
+};
+
 // ===============================================
 // chat   [on/off]
 // ===============================================
@@ -754,7 +760,7 @@ const unmutePlayer = (socket, clients, args, playerId) =>{
 };
 
 const chatCommandDelegates = {
-    '/killme': (socket, clients, args) => {
+    '/heal': (socket, clients, args) => {
         commitSuicide(socket, clients, args);
     },
     '/km': (socket, clients,args) => {
