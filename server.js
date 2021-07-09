@@ -810,7 +810,7 @@ const kickPlayer = (socket, clients, args) =>{
                       }
                     }
                 }
-            }} else{socket.player.body.sendMessage('you do not have /kick permission')}
+            }} else{socket.player.body.sendMessage('Error: Not enough permissions')}
         } else {socket.player.body.sendMessage('usage: /kick [id]')}
     } catch (error){
         util.error('[kickPlayer()]');
@@ -4782,7 +4782,7 @@ const sockets = (() => {
                   
                             
                             
-                                let playerName = socket.player.name ? socket.player.name :'Unnamed';
+                                let playerName = socket.player.name ? socket.player.name :'Player';
                                 let chatMessage = playerName + ': ' + message;  
                              
                             
