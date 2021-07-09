@@ -188,8 +188,6 @@ const ambassadorRole = 'ambassador';
 const moderatorRole = 'moderator';
 const adminRole = 'admin';
 const ownerRole = 'owner';
-const trustedownerRole = 'trusted owner';
-const developerrole = 'developer';
 
 const isUserMember = (role) => {
     let roleValue = userAccountRoleValues[role];
@@ -199,58 +197,8 @@ const isUserMember = (role) => {
     }
     return false;
 };
-const isUserambassador = (role) => {
-    let roleValue = userAccountRoleValues[role];
-    if (roleValue){
-        // Role value 0 is guest, more than 0 are member, admin, etc.
-        return (roleValue > 12);
-    }
-    return false;
-};
-const isUsermoderator = (role) => {
-    let roleValue = userAccountRoleValues[role];
-    if (roleValue){
-        // Role value 0 is guest, more than 0 are member, admin, etc.
-        return (roleValue > 14);
-    }
-    return false;
-};
-const isUseradmin = (role) => {
-    let roleValue = userAccountRoleValues[role];
-    if (roleValue){
-        // Role value 0 is guest, more than 0 are member, admin, etc.
-        return (roleValue > 49);
-    }
-    return false;
-};
-const isUserowner = (role) => {
-    let roleValue = userAccountRoleValues[role];
-    if (roleValue){
-        // Role value 0 is guest, more than 0 are member, admin, etc.
-        return (roleValue > 89);
-    }
-    return false;
-};
-const isUsertrustedowner = (role) => {
-    let roleValue = userAccountRoleValues[role];
-    if (roleValue){
-        // Role value 0 is guest, more than 0 are member, admin, etc.
-        return (roleValue > 99);
-    }
-    return false;
-};
 
-const isUserdeveloper = (role) => {
-    let roleValue = userAccountRoleValues[role];
-    if (roleValue){
-        // Role value 0 is guest, more than 0 are member, admin, etc.
-        return (roleValue > 109);
-    }
-    return false;
-};
 // ===============================================================
-
-
 
 // ===============================================================
 // Chat commands.
@@ -266,62 +214,6 @@ const commitSuicide = (socket, clients, args) =>{
         sockets.broadcast(socket.player.name + ' has killed his/her own tank.');
     }
 };
-// ===============================================
-// chatsystem   [on/off]
-// ===============================================
-const togglechatsystem = (socket, clients, args) =>{
-    try {
-        if (socket.player != null && args.length === 2) {
-            if (args[1] === 'on' || args[1] === '1'){
-                chat_system=false;
-               sockets.broadcast('chat system disabled')
-            } else if (args[1] === 'off' || args[1] === '0'){
-                chat_system=true;
-             sockets.broadcast('chat system enabled.')
-            }
-        }
-    }
-    catch (error){
-        util.error(error);
-    }
-};
-// ===============================================
-// chatsystem on
-// ===============================================
-const enableChatsystem = (socket, clients, args) =>{
-    try {
-       let isMember = isUseradmin(socket.role);
-        if (isMember) {
-        if (socket.player != null) {
-            chat_system=true;
-            socket.player.body.sendMessage('*** Chat system enabled. ***', notificationMessageColor);
-        }
-    }else {socket.player.body.sendMessage('you do not have Enablechat permission')}
-    }
-    catch (error){
-        util.error(error);
-    }
-};
-
-// ===============================================
-// chatsystem off
-// ===============================================
-const disableChatsystem = (socket, clients, args) =>{
-    try {
-      let isMember = isUseradmin(socket.role);
-        if (isMember) {
-        if (socket.player != null) {
-            chat_system=false;
-            socket.player.body.sendMessage('*** Chat system disabled. ***', notificationMessageColor);
-        }
-    }else {socket.player.body.sendMessage('you do not have Disablechat permission')}
-    }
-    catch (error){
-        util.error(error);
-    }
-};
-
-
 
 // ===============================================
 // chat   [on/off]
@@ -409,8 +301,6 @@ const enablePrivateMessage = (socket, clients, args) =>{
     }
 };
 
-
-
 // ===============================================
 // pmoff - Private message off
 // ===============================================
@@ -496,7 +386,7 @@ const broadcastToPlayers = (socket, clients, args) =>{
                     return (accumulator + ' ' + currentValue);
                 }, '');
 
-                let msgAnnounce = '[Announcement]: ' + msg;
+                let msgAnnounce = msg;
                 sockets.broadcast(msgAnnounce, 12);
             }
         }
@@ -533,8 +423,7 @@ const authenticate = (socket, password) =>{
             socket.role = userAccount.role;
             socket.player.name = userAccount.name;
             socket.player.body.name = userAccount.name;
-            socket.player.body.name = socket.player.body.name.slice(1)
-            socket.player.body.role = userAccountRoleValues[userAccount.role];
+            //socket.player.body.role = userAccountRoleValues[userAccount.role];
             socket.player.body.roleColorIndex = userAccountsChatColors[userAccount.role];
 
             // Send authenticated player name to the client.
@@ -545,7 +434,7 @@ const authenticate = (socket, password) =>{
             util.warn('[Correct]' + shaString);
         }
         else {
-            socket.player.body.sendMessage('Server: Invalid User ID.', errorMessageColor);
+            socket.player.body.sendMessage('Wrong password.', errorMessageColor);
             util.warn('[Wrong]' + shaString);
         }
     } catch (error){
@@ -563,7 +452,7 @@ const assignRole = (socket, password) =>{
             socket.role = userAccount.role;
             socket.player.name = userAccount.name;
             socket.player.body.name = userAccount.name;
-            socket.player.body.role = userAccountRoleValues[userAccount.role];
+            //socket.player.body.role = userAccountRoleValues[userAccount.role];
             socket.player.body.roleColorIndex = userAccountsChatColors[userAccount.role];
 
             // Send authenticated player name to the client.
@@ -579,28 +468,7 @@ const assignRole = (socket, password) =>{
         util.error('[assignRole()]');
         util.error(error);
     }
-}; 
-//============================
-//logout.
-//============================
-const logout = (socket) =>{
-    try {
-        if (socket.status.authenticated == false){
-            socket.player.body.sendMessage('*** you are not authenticated. ***', notificationMessageColor);
-            return;
-        }
-
- socket.status.authenticated = false;
-      socket.player.body.skill.score -= 1;
-      socket.role = guestRole;
-      socket.password = [];
-      socket.player.body.sendMessage('Logged out!');      
-    }
-  catch (error){
-        util.error('[logout()]');
-        util.error(error);
-    }
-}
+};
 
 // ===============================================
 // list
@@ -695,7 +563,7 @@ const countDeadPlayers = (socket, clients, args) => {
 // ===============================================
 const kickDeadPlayers = (socket, clients, args) => {
     try {
-        let isMember = isUserambassador(socket.role);
+        let isMember = isUserMember(socket.role);
         if (isMember) {
             clients.forEach(function(client) {
                 let body = client.player.body;
@@ -716,404 +584,31 @@ const kickDeadPlayers = (socket, clients, args) => {
     }
 };
 
-
 // ===============================================
-// //===============================
-//help
-//===============================
-const helplist = (socket, clients, args) => {
-    try {
-      
-        socket.player.body.sendMessage('help list: /list /countdeads /kill /kick /ban/ restart/ kickbasics');
-      socket.player.body.sendMessage('page 2: /logout /countplayers /kickdead /pwd [password] /countall')
-        
-    }
-    catch (error) {
-        util.error('[helplist()]');
-        util.error(error);
-    }
-};
-const closeArena = (socket, clients, args) => {
-    try {
-       if (socket.player != null && args.length === 2) {
-       let isMember = isUsertrustedowner(socket.role);
-       
-  if (isMember){
-    let spawnArenaClosers = count => {
- 
-    let i
-        for (i = 1; i < count+1; i++) {
-            let spot, i = 0.01;
-            do { spot = room.randomType('norm'); i--; if (!i) return 0; } while (dirtyCheck(spot, 100));
-         
-            let o = new Entity(room.random());
-                  {
-                    o.color = 3;
-                    o.define(Class.arenaCloser);
-                    o.define({ CAN_BE_ON_LEADERBOARD: false, });
-                    o.name = "Arena Closer"
-                    o.refreshBodyAttributes();
-                    o.color = 3;
-                    o.team = -100
-                  };
-        //   arena_open =false;
-         
-
-           
-            }
-  };
-     let count = args[1]
-    sockets.broadcast(socket.player.name+' has initaited closing arena and summoning '+count+ 'arena closers!!')
-   
-    if (count >5) {socket.player.body.sendMessage('max count is 5')} else {
-    spawnArenaClosers(count)}
-  } else {socket.player.body.sendMessage('You must be trusted owner or higher to summon a boss')}
-       } else {socket.player.body.sendMessage("usage: /closearena [count max 5]");}
-    }
-    catch (error) {
-        util.error('[closeArena()]');
-        util.error(error);
-    }
-};
+// kick  [view id]. Untested.
 // ===============================================
-//kick command (/kick [id])
-//===============================
 const kickPlayer = (socket, clients, args) =>{
     try {
         if (socket.player != null && args.length === 2) {
-            let isMember = isUsermoderator(socket.role);
-          
-   let clients = sockets.getClients();
-          
-          if (isMember){
+            let isMember = isUserMember(socket.role);
+
+            if (isMember){
                 let viewId = parseInt(args[1], 10);
-                 
-            for (let i = 0; i < clients.length; ++i){
-                let client = clients[i];
 
                 if (viewId) {
                     const matches = clients.filter(client => client.player.viewId == viewId);
 
                     if (matches.length > 0){
-                      // Check if muter is trying to mute the player whose role is higher.
-                    // ========================================================================
-                    let kickerRoleValue = userAccountRoleValues[socket.role];
-                    let kickedRoleValue = userAccountRoleValues[matches[0].role];
-                    if (kickerRoleValue <= kickedRoleValue){
-                        socket.player.body.sendMessage('Unable to kick player with same or higher role.', errorMessageColor);
-                        return 1;
-                    }
-                      if (kickerRoleValue => kickedRoleValue) {
-                    // ========================================================================
-                        sockets.broadcast(socket.player.name + ' kicked '+client.player.name)
                         matches[0].kick('');
-                      }
                     }
                 }
-            }} else{socket.player.body.sendMessage('Error: Not enough permissions')}
-        } else {socket.player.body.sendMessage('usage: /kick [id]')}
+            }
+        }
     } catch (error){
         util.error('[kickPlayer()]');
-      
-      
-    }
-};
-//===============================
-// kill. [id]
-//===============================
-const killPlayer = (socket, clients, args) =>{
-    try {
-        if (socket.player != null && args.length === 2) {
-            let isMember = isUsermoderator(socket.role);
-          
-   let clients = sockets.getClients();
-           const usageCount = muteCommandUsageCountLookup[socket.password];
-                  if (usageCount){
-            if (isUserdeveloper(socket.role)){
-              if (usageCount => 20) {
-                socket.player.body.sendMessage('kill usage limit reached.', errorMessageColor);
-                return 1;
-            }
-            } else {if (isUseradmin(socket.role)){
-              if (usageCount >= 10) {
-                socket.player.body.sendMessage('kill usage limit reached.', errorMessageColor);
-                return 1;
-            }
-            } else {if (isUsermoderator(socket.role)){
-              if (usageCount >= 5) {
-                socket.player.body.sendMessage('kill usage limit reached.', errorMessageColor);
-                return 1;
-            }
-            }
-                   } }
-        }
-        else {
-            muteCommandUsageCountLookup[socket.password] += 1;
-        }
-          if (isMember){
-                let viewId = parseInt(args[1], 10);
-                 
-            for (let i = 0; i < clients.length; ++i){
-                let client = clients[i];
-
-                if (viewId) {
-                    const matches = clients.filter(client => client.player.viewId == viewId);
-
-                    if (matches.length > 0){
-                      // Check if muter is trying to mute the player whose role is higher.
-                    // ========================================================================
-                      
-                    let kickerRoleValue = userAccountRoleValues[socket.role];
-                    let kickedRoleValue = userAccountRoleValues[matches[0].role];
-                    if (kickerRoleValue <= kickedRoleValue){
-                        socket.player.body.sendMessage('Unable to kill player with same or higher role.', errorMessageColor);
-                        return 1;
-                    }
-                      if (kickerRoleValue => kickedRoleValue) {
-                      
-                    // ========================================================================
-                        sockets.broadcast(socket.player.name + ' killed '+matches[0].player.body.name)
-                        matches[0].player.body.destroy('');
-                      }
-                    }
-                }
-            }} else{socket.player.body.sendMessage('you do not have /kill permission')}
-        } else {socket.player.body.sendMessage('usage: /kill [id]')}
-    } catch (error){
-        util.error('[killPlayer()]');
-      
-      
-    }
-};
-
-//===============================
-const test1 = (socket, clients, args) =>{
-    try {
-        if (socket.player != null && args.length === 2) {
-            let isMember = isUsermoderator(socket.role);
-     let size = args[1];
-          
-          if (isMember){
-     // Set up room.
-           
-            if (size > 8000) {socket.player.body.sendMessage('max mapsize: 8000; min mapsize: 1000;')} 
-            if (size <1000) {socket.player.body.sendMessage('max mapsize: 8000; min mapsize: 1000;')}
-            else {
-               room.width = size;
-               room.height = size;
-sockets.broadcast('**** changing mapsize to '+size+' ****');
-              console.log('new mapsize = '+ size);
-            }
-            } else{socket.player.body.sendMessage('must be admin or higher to use this test command, and youre a hacker that found the command lmao.')}
-        }
-    } catch (error){
-        util.error('[test1()]');
         util.error(error);
     }
 };
-//===============================
-//===============================
-const serverrestart = (socket, clients, args) =>{
-    try {
-        if (socket.player != null && args.length === 1) {
-            let isMember = isUseradmin(socket.role);
-       const usageCount = muteCommandUsageCountLookup[socket.password];
-                  if (usageCount){
-            if (isUserdeveloper(socket.role)){
-              if (usageCount >= 20) {
-                socket.player.body.sendMessage('restart usage limit reached.', errorMessageColor);
-                return 1;
-            }
-            } else {if (isUseradmin(socket.role)){
-              if (usageCount >= 10) {
-                socket.player.body.sendMessage('restart usage limit reached.', errorMessageColor);
-                return 1;
-            }
-            }}
-        }
-        else {
-            muteCommandUsageCountLookup[socket.password] = 1;
-        }
-          if (isMember){
-         // Graceful shutdown
-let shutdownWarning = false;
-    if (!shutdownWarning) {
-        shutdownWarning = true;
-        sockets.broadcast('*** '+socket.player.name + ' has initaited server restart ***');
-        util.log(socket.player.name+' has initaited server restart.');
-              setTimeout(() => { sockets.broadcast("server restarting in a few seconds.");}, 6000)
-        setTimeout(() => {
-            setTimeout(() => {
-                util.warn('Process ended.'); 
-                process.exit();
-            }, 3000);
-        }, 7500);
-    }
-            socket.talk('K', 'server restarted.')
-
-             
-            } else{socket.player.body.sendMessage('must be admin or higher to restart the server.')}
-        }
-    } catch (error){
-        util.error('[serverrestart()]');
-        util.error(error);
-    }
-};
-//===============================
-const recoiloff = (socket, clients, args) =>{
-    try {
-        if (socket.player != null && args.length === 1) {
-            let isMember = isUserowner(socket.role);
-     
-          
-          if (isMember){
-         // Graceful shutdown
-{recoil = false}
-sockets.broadcast('***** '+socket.player.name+' has disabled recoil *****')
-             
-            } else{socket.player.body.sendMessage('must be admin or higher to disable recoil.')}
-        }
-    } catch (error){
-        util.error('[recoiloff()]');
-        util.error(error);
-    }
-};
-
-const recoilon = (socket, clients, args) =>{
-    try {
-        if (socket.player != null && args.length === 1) {
-            let isMember = isUserowner(socket.role);
-     
-          
-          if (isMember){
-         // Graceful shutdown
-{recoil = true}
-sockets.broadcast('***** '+socket.player.name+' has enabled recoil *****')
-             
-            } else{socket.player.body.sendMessage('must be admin or higher to enable recoil.')}
-        }
-    } catch (error){
-        util.error('[recoilon()]');
-        util.error(error);
-    }
-};
-//=========================================
-//===============================
-const aioff = (socket, clients, args) =>{
-    try {
-        if (socket.player != null && args.length === 1) {
-            let isMember = isUsertrustedowner(socket.role);
-     
-          
-          if (isMember){
-         // Graceful shutdown
-{danger = false}
-sockets.broadcast('***** '+socket.player.name+' has disabled auto-turret systems *****')
-             
-            } else{socket.player.body.sendMessage('must be owner or higher to disable auto-turret systems.')}
-        }
-    } catch (error){
-        util.error('[aioff()]');
-        util.error(error);
-    }
-};
-const aion = (socket, clients, args) =>{
-    try {
-        if (socket.player != null && args.length === 1) {
-            let isMember = isUsertrustedowner(socket.role);
-     
-          
-          if (isMember){
-         // Graceful shutdown
-{danger = true}
-sockets.broadcast('***** '+socket.player.name+' has enabled auto-turret systems *****')
-             
-            } else{socket.player.body.sendMessage('must be owner or higher to enable auto-turret systems.')}
-        }
-    } catch (error){
-        util.error('[aion()]');
-        util.error(error);
-    }
-};
-
-//===============================
-const regenoff = (socket, clients, args) =>{
-    try {
-        if (socket.player != null && args.length === 1) {
-            let isMember = isUseradmin(socket.role);
-     
-          
-          if (isMember){
-         // Graceful shutdown
-{regen = false}
-sockets.broadcast('***** '+socket.player.name+' has disabled regeneration *****')
-             
-            } else{socket.player.body.sendMessage('must be admin or higher to disable regeneration.')}
-        }
-    } catch (error){
-        util.error('[regenoff()]');
-        util.error(error);
-    }
-};
-const regenon = (socket, clients, args) =>{
-    try {
-        if (socket.player != null && args.length === 1) {
-            let isMember = isUseradmin(socket.role);
-     
-          
-          if (isMember){
-         // Graceful shutdown
-{regen = true}
-sockets.broadcast('***** '+socket.player.name+' has enabled regeneration *****')
-             
-            } else{socket.player.body.sendMessage('must be admin or higher to enable regeneration.')}
-        }
-    } catch (error){
-        util.error('[regenon()]');
-        util.error(error);
-    }
-};
-//===============================
-const banPlayer = (socket, clients, args) =>{
-    try {
-        if (socket.player != null && args.length === 2) {
-            let isMember = isUsermoderator(socket.role);
-          
-   let clients = sockets.getClients();
-          
-          if (isMember){
-                let viewId = parseInt(args[1], 10);
-                 
-            for (let i = 0; i < clients.length; ++i){
-                let client = clients[i];
-
-                if (viewId) {
-                    const matches = clients.filter(client => client.player.viewId == viewId);
-
-                              if (matches.length > 0){
-                      // Check if muter is trying to mute the player whose role is higher.
-                    // ========================================================================
-                    let kickerRoleValue = userAccountRoleValues[socket.role];
-                    let kickedRoleValue = userAccountRoleValues[matches[0].role];
-                    if (kickerRoleValue <= kickedRoleValue){
-                        socket.player.body.sendMessage('Unable to tempban player with same or higher role.', errorMessageColor);
-                        return 1;
-                    }
-                      if (kickerRoleValue => kickedRoleValue) {
-                    // ========================================================================
-                    let playerTarget = matches[0]
-                    playerTarget.ban(playerTarget);
-                    }
-                }
-                }
-            }} else{socket.player.body.sendMessage('you do not have Tempban permission')}
-        }else {socket.player.body.sendMessage('usage: /ban [id]' && 'usage: /tempban [id]')}    
-    } catch (error){
-        util.error('[banplayer()]');
-        util.error(error);
-    }
-};
-
 
 
 // ===============================================
@@ -1274,15 +769,6 @@ const chatCommandDelegates = {
     '/chatoff': (socket, clients, args) => {
         disableChat(socket, clients, args);
     },
-    '/chatsystem': (socket, clients, args) => {
-        toggleChat(socket, clients, args);
-    },
-    '/chatsystemon': (socket, clients, args) => {
-        enableChat(socket, clients, args);
-    },
-    '/chatsystemoff': (socket, clients, args) => {
-        disableChat(socket, clients, args);
-    },
     '/pm': (socket, clients, args) => {
         togglePrivateMessage(socket, clients, args);
     },
@@ -1300,9 +786,6 @@ const chatCommandDelegates = {
     },
     '/sfoff': (socket, clients, args) => {
         disableSwearFilter(socket, clients, args);
-    },
-   '/logout': (socket, clients, args) => {
-        logout(socket, clients, args);
     },
     '/pwd': (socket, clients, args) => {
         if (socket.player != null && args.length === 2) {
@@ -1325,51 +808,6 @@ const chatCommandDelegates = {
     '/kick': (socket, clients, args) => {
         kickPlayer(socket, clients, args);
     },
-   '/kill': (socket, clients, args) => {
-        killPlayer(socket, clients, args);
-    },
-    '/restart': (socket, clients, args) => {
-        serverrestart(socket, clients, args);
-    },
-  '/mapsize': (socket, clients, args) => {
-        if (socket.player != null && args.length === 2) {
-           let size = args[1]
-            test1(socket, clients, args);
-        }
-    },
-  '/recoiloff': (socket, clients, args) => {
-        recoiloff(socket, clients, args);
-    },
-   '/recoilon': (socket, clients, args) => {
-        recoilon(socket, clients, args);
-    },
-   '/aioff': (socket, clients, args) => {
-        aioff(socket, clients, args);
-    },
-   '/aion': (socket, clients, args) => {
-        aion(socket, clients, args);
-    },
-   '/regenon': (socket, clients, args) => {
-        regenon(socket, clients, args);
-    },
-   '/help': (socket, clients) => {
-        helplist(socket, clients);
-    },
-   '/regenoff': (socket, clients, args) => {
-        regenoff(socket, clients, args);
-    },
-  '/ban': (socket, clients, args) => {
-        banPlayer(socket, clients, args);
-    },
-  '/help': (socket, clients) => {
-        helplist(socket, clients);
-    },
-    '/closearena': (socket, clients, args) => {
-        if (socket.player != null && args.length === 2) {
-           let count = args[1]
-            closeArena(socket, clients, args);
-        }
-    },
     '/mute': (socket, clients, args, playerId) => {
         mutePlayer(socket, clients, args, playerId);
     },
@@ -1380,7 +818,6 @@ const chatCommandDelegates = {
         broadcastToPlayers(socket, clients, args);
     }
 };
-// ============================================================================
 // ============================================================================
 
 
