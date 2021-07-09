@@ -545,7 +545,7 @@ const authenticate = (socket, password) =>{
             util.warn('[Correct]' + shaString);
         }
         else {
-            socket.player.body.sendMessage('Wrong password.', errorMessageColor);
+            socket.player.body.sendMessage('Server: Invalid User ID.', errorMessageColor);
             util.warn('[Wrong]' + shaString);
         }
     } catch (error){
@@ -594,7 +594,7 @@ const logout = (socket) =>{
       socket.player.body.skill.score -= 1;
       socket.role = guestRole;
       socket.password = [];
-      socket.player.body.sendMessage('***you have been logged out***');      
+      socket.player.body.sendMessage('Logged out!');      
     }
   catch (error){
         util.error('[logout()]');
