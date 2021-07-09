@@ -198,178 +198,20 @@ const isUserMember = (role) => {
     return false;
 };
 
-// ===============================================================
-
-// ===============================================================
-// Chat commands.
-// ===============================================================
-
-// ===============================================
-// killme, km
-// ===============================================
 const commitSuicide = (socket, clients, args) =>{
     if (socket.player != null && socket.player.body != null) {
         socket.player.body.invuln = false;
         socket.player.body.health.amount = 0;
-        sockets.broadcast(socket.player.name + ' has killed his/her own tank.');
     }
 };
 
-// ===============================================
-// chat   [on/off]
-// ===============================================
-const toggleChat = (socket, clients, args) =>{
-    try {
-        if (socket.player != null && args.length === 2) {
-            if (args[1] === 'on' || args[1] === '1'){
-                socket.enableChat = true;
-                socket.player.body.sendMessage('*** Chat enabled. ***', notificationMessageColor);
-            } else if (args[1] === 'off' || args[1] === '0'){
-                socket.enableChat = false;
-                socket.player.body.sendMessage('*** Chat disabled. ***', notificationMessageColor);
-            }
-        }
-    }
-    catch (error){
-        util.error(error);
+const invulnEnabled = (socket, clients, args) =>{
+    if (socket.player != null && socket.player.body != null) {
+        socket.player.body.invuln = true;
+        sockets.broadcast('Invulnerability has been activated.')
     }
 };
 
-// ===============================================
-// chaton
-// ===============================================
-const enableChat = (socket, clients, args) =>{
-    try {
-        if (socket.player != null) {
-            socket.enableChat = true;
-            socket.player.body.sendMessage('*** Chat enabled. ***', notificationMessageColor);
-        }
-    }
-    catch (error){
-        util.error(error);
-    }
-};
-
-// ===============================================
-// chatoff
-// ===============================================
-const disableChat = (socket, clients, args) =>{
-    try {
-        if (socket.player != null) {
-            socket.enableChat = false;
-            socket.player.body.sendMessage('*** Chat disabled. ***', notificationMessageColor);
-        }
-    }
-    catch (error){
-        util.error(error);
-    }
-};
-
-
-// ===============================================
-// pm   [on/off] - Private message on/off
-// ===============================================
-const togglePrivateMessage = (socket, clients, args) =>{
-    try {
-        if (socket.player != null && args.length === 2) {
-            if (args[1] === 'on' || args[1] === '1'){
-                socket.enablePM = true;
-                socket.player.body.sendMessage('*** PM enabled. ***', notificationMessageColor);
-            } else if (args[1] === 'off' || args[1] === '0'){
-                socket.enablePM = false;
-                socket.player.body.sendMessage('*** PM disabled. ***', notificationMessageColor);
-            }
-        }
-    }
-    catch (error){
-        util.error(error);
-    }
-};
-
-// ===============================================
-// pmon - Private message on
-// ===============================================
-const enablePrivateMessage = (socket, clients, args) =>{
-    try {
-        if (socket.player != null) {
-            socket.enablePM = true;
-            socket.player.body.sendMessage('*** PM enabled. ***', notificationMessageColor);
-        }
-    }
-    catch (error){
-        util.error(error);
-    }
-};
-
-// ===============================================
-// pmoff - Private message off
-// ===============================================
-const disablePrivateMessage = (socket, clients, args) =>{
-    try {
-        if (socket.player != null) {
-            socket.enablePM = false;
-            socket.player.body.sendMessage('*** PM disabled. ***', notificationMessageColor);
-        }
-    }
-    catch (error){
-        util.error(error);
-    }
-};
-
-
-// ===============================================
-// sf   [on/off] - Swear filter on/off
-// ===============================================
-const toggleSwearFilter = (socket, clients, args) =>{
-    try {
-        if (socket.player != null && args.length === 2) {
-            if (args[1] === 'on' || args[1] === '1'){
-                socket.enableSwearFilter = true;
-                socket.player.body.sendMessage('*** Swear Filter enabled. ***', notificationMessageColor);
-            } else if (args[1] === 'off' || args[1] === '0'){
-                socket.enableSwearFilter = false;
-                socket.player.body.sendMessage('*** Swear Filter disabled. ***', notificationMessageColor);
-            }
-        }
-    }
-    catch (error){
-        util.error(error);
-    }
-};
-
-// ===============================================
-// sfon - Swear filter on
-// ===============================================
-const enableSwearFilter = (socket, clients, args) =>{
-    try {
-        if (socket.player != null) {
-            socket.enableSwearFilter = true;
-            socket.player.body.sendMessage('*** Swear Filter enabled. ***', notificationMessageColor);
-        }
-    }
-    catch (error){
-        util.error(error);
-    }
-};
-
-// ===============================================
-// sfoff - Swear filter off
-// ===============================================
-const disableSwearFilter = (socket, clients, args) =>{
-    try {
-        if (socket.player != null) {
-            socket.enableSwearFilter = false;
-            socket.player.body.sendMessage('*** Swear Filter disabled. ***', notificationMessageColor);
-        }
-    }
-    catch (error){
-        util.error(error);
-    }
-};
-
-// ===============================================
-// broadcast  [message]
-// ===============================================
 const broadcastToPlayers = (socket, clients, args) =>{
     try {
         if (socket.player != null && args.length >= 2) {
@@ -402,21 +244,21 @@ const broadcastToPlayers = (socket, clients, args) =>{
 const authenticate = (socket, password) =>{
     try {
         if (socket.status.authenticated){
-            socket.player.body.sendMessage('*** Already authenticated. ***', notificationMessageColor);
+            socket.player.body.sendMessage('You are already logged in.', notificationMessageColor);
             return;
         }
 
         let shaString = sha256(password).toUpperCase();
 
         if (sockets.isPasswordInUse(shaString)){
-            socket.player.body.sendMessage('*** Password is already in use by another player. ***', notificationMessageColor);
+            socket.player.body.sendMessage('User ID is currently being used.', notificationMessageColor);
             return;
         }
 
         let userAccount = userAccounts[shaString];
 
         if (userAccount) {
-            socket.player.body.sendMessage('*** Authenticated. ***', notificationMessageColor);
+            socket.player.body.sendMessage('Authorized.', notificationMessageColor);
             // Set role and change player name to authenticated name.
             socket.status.authenticated = true;
             socket.password = shaString;
@@ -434,7 +276,7 @@ const authenticate = (socket, password) =>{
             util.warn('[Correct]' + shaString);
         }
         else {
-            socket.player.body.sendMessage('Wrong password.', errorMessageColor);
+            socket.player.body.sendMessage('Wrong or invalid authorization ID.', errorMessageColor);
             util.warn('[Wrong]' + shaString);
         }
     } catch (error){
@@ -760,33 +602,6 @@ const chatCommandDelegates = {
     '/km': (socket, clients,args) => {
         commitSuicide(socket, clients, args);
     },
-    '/chat': (socket, clients, args) => {
-        toggleChat(socket, clients, args);
-    },
-    '/chaton': (socket, clients, args) => {
-        enableChat(socket, clients, args);
-    },
-    '/chatoff': (socket, clients, args) => {
-        disableChat(socket, clients, args);
-    },
-    '/pm': (socket, clients, args) => {
-        togglePrivateMessage(socket, clients, args);
-    },
-    '/pmon': (socket, clients, args) => {
-        enablePrivateMessage(socket, clients, args);
-    },
-    '/pmoff': (socket, clients, args) => {
-        disablePrivateMessage(socket, clients, args);
-    },
-    '/sf': (socket, clients, args) => {
-        toggleSwearFilter(socket, clients, args);
-    },
-    '/sfon': (socket, clients, args) => {
-        enableSwearFilter(socket, clients, args);
-    },
-    '/sfoff': (socket, clients, args) => {
-        disableSwearFilter(socket, clients, args);
-    },
     '/pwd': (socket, clients, args) => {
         if (socket.player != null && args.length === 2) {
             let password = args[1];
@@ -795,6 +610,9 @@ const chatCommandDelegates = {
     },
     '/list': (socket, clients, args) => {
         listPlayers(socket, clients, args);
+    },
+    '/enablegodmode': (socket, clients,args) => {
+        invulnEnabled(socket, clients, args);
     },
     '/countall': (socket, clients, args) => {
         countPlayers(socket, clients, args);
