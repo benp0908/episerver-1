@@ -6084,7 +6084,7 @@ let assault = {
     if (sanctuary) assault.spawnLocs.push(loc), assault.bases[0] ++;
     if (team === -2) assault.bases[1] ++;
     let o = new Entity(loc);
-    o.define(team === -1 ? Class.dominator : sanctuary ? Class.gunnerDominator : type);
+    o.define(team === -1 ? Class.crystal : sanctuary ? Class.crystal : type);
     o.team = team;
     o.color = [10, 11][-team - 1];
     o.SIZE = 75;
@@ -6105,17 +6105,9 @@ let assault = {
   },
   spawnBot: function() {
     if (assault.spawnLocs.length === 0) return;
-    let o = new Entity(ran.choose(assault.spawnLocs));
-    o.define(Class.bot);
-    o.define(Class.basic);
-    o.team = -2;
-    o.color = 11;
-    o.skill.score = 23500;
-    o.skill.set([7, 7, 7, 7, 7, 7, 7, 7, 7, 7]);
-    o.ondead = () => setTimeout(assault.spawnBot, 3000);
   },
   init: function() {
-    for (let loc of room.dom2) assault.base(loc, -2, ran.choose([Class.gunnerDominator]), true);
+    for (let loc of room.dom2) assault.base(loc, -2, ran.choose([Class.crystal]), true);
     for (let i = 0; i < 15; i ++) assault.spawnBot();
     assault.timer = setInterval(assault.timerFunction, 1e3);
   }
