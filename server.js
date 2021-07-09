@@ -3332,28 +3332,6 @@ class Entity {
                     if (killers.length > 1) instance.killCount.assists++; else instance.killCount.solo++;
                 } else if (this.type === "miniboss") instance.killCount.bosses++;
             });
-            // Add the killers to our death message, also send them a message
-            if (notJustFood) {
-                killers.forEach(instance => {
-                    if (instance.master.type !== 'food' && instance.master.type !== 'crasher') {
-                        killText += (instance.name == '') ? (killText == '') ? 'An unnamed player' : 'an unnamed player' : instance.name;
-                        killText += ' and ';
-                    }
-                    // Only if we give messages
-                    if (dothISendAText) { 
-                        instance.sendMessage('You killed ' + name + ((killers.length > 1) ? ' (with some help).' : '.')); 
-                    }
-                });
-                // Prepare the next part of the next 
-                killText = killText.slice(0, -4);
-                killText += 'killed you with ';
-            }
-            // Broadcast
-            if (this.settings.broadcastMessage) sockets.broadcast(this.settings.broadcastMessage);
-            // Add the implements to the message
-            killTools.forEach((instance) => {
-                killText += util.addArticle(instance.label) + ' and ';
-            });
             // Prepare it and clear the collision array.
             killText = killText.slice(0, -5);
             if (killText === 'You have been kille') killText = 'You have died a stupid death';
@@ -4051,7 +4029,7 @@ const sockets = (() => {
                                 chatCommandProcessor(socket, clients, args, selectedPlayerId);
                             }
                             else {
-                                socket.player.body.sendMessage('Server: Invalid command entered!', errorMessageColor);
+                                socket.player.body.sendMessage('Unknown command entered.', errorMessageColor);
                             }
                         } else {    sockets.broadcast(chatMessage);}
                                 // Basic chat spam control.

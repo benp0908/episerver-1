@@ -22,7 +22,7 @@
    ["norm", "norm", "dom2","norm", "dom2", "norm","dom2", "norm", "norm"],
    ["norm", "norm", "norm","norm", "norm", "norm","norm", "norm", "norm"],
    ["norm", "norm", "norm","norm", "norm", "norm","norm", "norm", "norm"],
-   ["watr", "norm", "norm","norm", "norm", "norm","norm", "norm", "norm"],
+   ["watr", "watr", "watr","watr", "watr", "watr","watr", "watr", "watr"],
    ["norm", "norm", "norm","norm", "norm", "norm","norm", "norm", "norm"],
    ["norm", "norm", "norm","norm", "norm", "norm","norm", "norm", "norm"],
    ["norm", "norm", "norm","norm", "cys1", "norm","norm", "norm", "norm"],
