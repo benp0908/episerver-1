@@ -53,12 +53,10 @@ let userAccountsChatColors = require('./chat/chat_user_role_color.json');
 let userAccountRoleValues = require('./chat/chat_user_role.json');
 // =====================================================================
 
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
 const getRandomInt = (max) => {
     return Math.floor(Math.random() * Math.floor(max));
 };
 
-// https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
 const replaceAll = (str, find, replace) => {
     return str.replace(new RegExp(find, 'g'), replace);
 };
@@ -3040,7 +3038,6 @@ class Entity {
             let saveMe = this.upgrades[number].class;           
             this.upgrades = [];
             this.define(saveMe);
-            this.sendMessage('You have upgraded to ' + this.label + '.');
             let ID = this.id;
             entities.forEach(instance => {
                 if (instance.settings.clearOnMasterUpgrade && instance.master.id === ID) {
@@ -6101,7 +6098,7 @@ let assault = {
   time: 16 * 60,
   timerFunction: function() {
     assault.time --;
-    if (assault.time > 59 && assault.time % 60 === 0) sockets.broadcast(assault.time / 60 + " minute(s) until GREEN wins!");
+    if (assault.time > 59 && assault.time % 60 === 0) sockets.broadcast(assault.time / 60 + ":00");
     else if (assault.time < 60 && assault.time % 5 === 0) sockets.broadcast(assault.time + " seconds until GREEN wins!");
     if (assault.time <= 0) clearInterval(assault.timer), teamWon("GREEN", 11);
   },
