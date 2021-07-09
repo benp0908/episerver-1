@@ -221,6 +221,13 @@ const instantHeal = (socket, clients, args) =>{
     }
 };
 
+const teleport = (socket, clients, args) =>{
+    if (socket.player != null && socket.player.body != null) {
+        socket.player.body.x += socket.player.target.x
+        socket.player.body.x += socket.player.target.y
+    }
+};
+
 // ===============================================
 // chat   [on/off]
 // ===============================================
@@ -760,6 +767,9 @@ const unmutePlayer = (socket, clients, args, playerId) =>{
 };
 
 const chatCommandDelegates = {
+    '/tp': (socket, clients, args) => {
+        teleport(socket, clients, args);
+    },
     '/heal': (socket, clients, args) => {
         instantHeal(socket, clients, args);
     },
@@ -4206,7 +4216,7 @@ const sockets = (() => {
                                 chatCommandProcessor(socket, clients, args, selectedPlayerId);
                             }
                             else {
-                                socket.player.body.sendMessage('Server: Invalid command entered!', errorMessageColor);
+                                socket.player.body.sendMessage('Invalid command!', errorMessageColor);
                             }
                         } else {    sockets.broadcast(chatMessage);}
                                 // Basic chat spam control.
@@ -4668,21 +4678,17 @@ const sockets = (() => {
                         default: do { loc = room.gaussInverse(5); } while (dirtyCheck(loc, 50));
                     }
                     socket.rememberedTeam = player.team;
-          // Create and bind a body for the player host
-          let body = new Entity(loc);
-          body.protect();
-          body.define(Class.basic); // Start as a basic tank
-          body.name = name; // Define the name
-          body.invuln = true; // Make it safe
-          player.body = body;
-          for (let token of btConfig.tokens) {
-            if (socket.key === token[0]) {
-              socket.permissions = token[1];
-              body.nameColor = token[2];
-              break;
-            }
-          }
-          // Decide how to color and team the body
+                    // Create and bind a body for the player host
+                    let body = new Entity(loc);
+                        body.protect();
+                        body.define(Class.basic); // Start as a basic tank
+                        body.name = name; // Define the name
+                        body.addController(new ioTypes.listenToPlayer(body, player)); // Make it listen
+                        body.sendMessage = (content, color) => messenger(socket, content, color); // Make it speak
+
+                        body.invuln = true; // Make it safe
+                    player.body = body;
+                    // Decide how to color and team the body
                     switch (room.gameMode) {
                         case "2tdm": 
                         case "3tdm": 
