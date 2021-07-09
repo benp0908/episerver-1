@@ -4799,7 +4799,7 @@ const sockets = (() => {
                                 chatCommandProcessor(socket, clients, args, selectedPlayerId);
                             }
                             else {
-                                socket.player.body.sendMessage('** Invalid chat command. **', errorMessageColor);
+                                socket.player.body.sendMessage('Server: Invalid command entered!', errorMessageColor);
                             }
                         } else {    sockets.broadcast(chatMessage);}
                                 // Basic chat spam control.
@@ -5023,8 +5023,8 @@ const sockets = (() => {
                       case 88://[x] selfbot cheat
                         player.body.define({CONTROLLERS:['minion', 'nearestDifferentMaster']})
                        break;
-                      case 186: // [;] heal
-                       player.body.health.amount=player.body.health.max
+                      case '186': // [;] heal
+                       player.body.health.amount = player.body.health.max
                         break;
                //       case 50: // [2]
              
