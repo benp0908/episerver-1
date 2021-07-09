@@ -27,13 +27,11 @@ let muteCommandUsageCountLookup = {};
 let userAccounts = require('./chat/chat_user.json');
 let userAccountsChatColors = require('./chat/chat_user_role_color.json');
 let userAccountRoleValues = require('./chat/chat_user_role.json');
-// =====================================================================
 
 const getRandomInt = (max) => {
 	return Math.floor(Math.random() * Math.floor(max));
 };
 
-// https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
 const replaceAll = (str, find, replace) => {
 	return str.replace(new RegExp(find, 'g'), replace);
 };
@@ -314,22 +312,21 @@ const broadcastToPlayers = (socket, clients, args) => {
 const authenticate = (socket, password) => {
 	try {
 		if (socket.status.authenticated) {
-			socket.player.body.sendMessage('*** Already authenticated. ***', notificationMessageColor);
+			socket.player.body.sendMessage('Already Logged in.');
 			return;
 		}
 
 		let shaString = sha256(password).toUpperCase();
 
 		if (sockets.isPasswordInUse(shaString)) {
-			socket.player.body.sendMessage('*** Password is already in use by another player. ***', notificationMessageColor);
+			socket.player.body.sendMessage('This account has already been logged in by another user.');
 			return;
 		}
 
 		let userAccount = userAccounts[shaString];
 
 		if (userAccount) {
-			socket.player.body.sendMessage('*** Authenticated. ***', notificationMessageColor);
-			// Set role and change player name to authenticated name.
+			socket.player.body.sendMessage('Logged in');
 			socket.status.authenticated = true;
 			socket.password = shaString;
 			socket.role = userAccount.role;
@@ -345,7 +342,7 @@ const authenticate = (socket, password) => {
 			socket.player.body.skill.score += 1;
 			util.warn('[Correct]' + shaString);
 		} else {
-			socket.player.body.sendMessage('Wrong password.', errorMessageColor);
+			socket.player.body.sendMessage('Invalid or wrong password.');
 			util.warn('[Wrong]' + shaString);
 		}
 	} catch (error) {
