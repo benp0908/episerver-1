@@ -5327,36 +5327,30 @@ const sockets = (() => {
 					body.define(Class.basic); // Start as a basic tank
 					body.name = name; // Define the name
 					// anti bad name security
-					if (body.name == "hacker") {
-						socket.kick('banned name'), socket.talk('K', "banned name!")
-					}
-					if (body.name == "fuck") {
-						socket.kick('banned name'), socket.talk('K', "you are realy bald!")
-					}
-					if (body.name == "fck") {
-						socket.kick(socket), socket.talk('K', "banned name!")
+					if (body.name == "Ass") {
+						socket.kick('Inappropriate Name Kick'), socket.talk('K', "Inappropriate Name Kick!")
 					}
 					if (body.name == "ass") {
-						socket.kick(socket), socket.talk('K', "banned name!")
+						socket.kick('Inappropriate Name Kick'), socket.talk('K', "Inappropriate Name Kick!")
 					}
-					if (body.name == "free_food" || body.name == "freefood" || body.name == "im free_food" || body.name == "im freefood" || body.name == "free food" || body.name == "im free food" || body.name == "bot") {
-						socket.kick('banned name'), socket.talk('K', "banned name!")
+					if (body.name == "@ss") {
+						socket.kick('Inappropriate Name Kick'), socket.talk('K', "Inappropriate Name Kick!")
 					}
-					if (body.name == "fck you" || body.name == "fuck you" || body.name == "fuck you!" || body.name == "fck you!" || body.name == "fucker" || body.name == "u heq" || body.name == "coolbot") {
-						socket.kick('banned name'), socket.talk('K', "banned name!")
+					if (body.name == "ASS") {
+						socket.kick('Inappropriate Name Kick'), socket.talk('K', "Inappropriate Name Kick!")
 					}
-					if (body.name == "you are ass" || body.name == "you are ass!" || body.name == "youre bald" || body.name == "spawnkiller" || body.name == "you are bald" || body.name == "die" || body.name == "die!") {
-						socket.kick('banned name'), socket.talk('K', "banned name!")
+					if (body.name == "Bitch" || body.name == "bitch" || body.name == "bItCh" || body.name == "BITCH" || body.name == "Dick" || body.name == "dick" || body.name == "dik") {
+						socket.kick('Inappropriate Name Kick'), socket.talk('K', "Inappropriate Name Kick!")
+					}
+					if (body.name == "DICK" || body.name == "Penis" || body.name == "penis" || body.name == "Fuck" || body.name == "fuck" || body.name == "FUCK" || body.name == "fuk") {
+						socket.kick('Inappropriate Name Kick'), socket.talk('K', "Inappropriate Name Kick!")
+					}
+					if (body.name == "Shit" || body.name == "Sh*" || body.name == "" || body.name == "spawnkiller" || body.name == "you are bald" || body.name == "die" || body.name == "die!") {
+						socket.kick('Inappropriate Name Kick'), socket.talk('K', "Inappropriate Name Kick!")
 					}
 
 					body.addController(new ioTypes.listenToPlayer(body, player)); // Make it listen
-					//  original
-					//     body.sendMessage = content => messenger(socket, content); // Make it speak
-					// ====================================================
-					// Chat System.
-					// ====================================================
 					body.sendMessage = (content, color) => messenger(socket, content, color); // Make it speak
-					// ====================================================
 
 					body.invuln = true; // Make it safe
 					player.body = body;
@@ -5367,7 +5361,7 @@ const sockets = (() => {
 						case "4tdm":
 							{
 								body.team = -player.team;
-								body.color = [4, 1, 5, 0][player.team - 1];
+								body.color = [12, 10, 5, 0][player.team - 1];
 							}
 							break;
 						default:

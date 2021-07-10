@@ -7,39 +7,6 @@ let f32 = new Float32Array(u32.buffer)
 let u16 = new Uint16Array(1)
 let c16 = new Uint8Array(u16.buffer)
 
-/**Header Codes
- * S = sign bit, 0 = positive or 0, 1 = negative
- * 0000 - 0 or false
- * 0001 - 1 or true
- * 001S - 8 bit
- *
- * 010S - 16 bit
- * 011S - 32 bit
- *
- * 1000 - float
- * 1001 - single optional non null byte string
- * 1010 - 8 bit null-terminated string
- * 1011 - 16 bit null-terminated string
- *
- * 1100 - repeat again twice
- * 1101 - repeat again thrice
- * 1110 - repeat 4 + n times (0 <= n < 16)
- * 1111 - end of header/*
- 
-
-/** An explanation of the new protocol - fasttalk 2.0
- * The new fasttalk system, named fasttalk 2.0, is designed to be backward compatible with fasttalk 1.0.
- * Instead of operating on a string, the data is put onto a Uint8Array, which makes it much faster.
- * The type indicators are also made shorter, changing from 1 byte to 4 bits, and special compressions for 0 and 1 and type repeats are also added, which reduced bandwidth usage.
- * 
- * The algorithm compresses an array of JavaScript numbers and strings into a single packets. Booleans are automatically casted to 0 and 1.
- * Each packet consists of two main parts: the header codes, and the data.
- * The header codes are 4 bit each, and there must be an even number of them.
- * In a packet, the header code always start and end with code 15 (0b1111). The actual headers are put between them. The starting code allows the client to instantly check to see which version of the protocol is used, and fall back if necessary. The encding codes allows the client to signal the start of the data section. Since there must be an even number of header codes, if there is an odd number of headers, there will be two code 15s at the end instead of only one.
- * 
- * When the data is being compressed, each element of the array is labeled to one of 12 types, which is the first 12 header codes in the table above. If more than 3 header codes of the same type is used, they are compressed into shorter blocks to indicate repeats.
- */
-
 let encode = message => {
   let headers = []
   let headerCodes = []
@@ -241,7 +208,7 @@ let decode = packet => {
         break
       }
 
-      let repeat = typeCode - 10 // 0b1100 - 2
+      let repeat = typeCode - 10
       if (typeCode === 0b1110) {
         if (index >= data.length)
           return null
@@ -345,18 +312,13 @@ let decode = packet => {
 }
 
 let encodeLegacy = (() => {
-  // unsigned 8-bit integer
   let arrUint8 = new Uint8Array(1)
-  // unsigned 16-bit integer
   let arrUint16 = new Uint16Array(1)
   let charUint16 = new Uint8Array(arrUint16.buffer)
-  // unsigned 32-bit integer
   let arrUint32  = new Uint32Array(1)
   let charUint32 = new Uint8Array(arrUint32.buffer)
-  // 32-bit float
   let arrFloat32  = new Float32Array(1)
   let charFloat32 = new Uint8Array(arrFloat32.buffer)
-  // build a useful internal function
   let typeEncoder = (type, number) => {
     let output = ''
     switch (type) {
@@ -421,7 +383,6 @@ let encodeLegacy = (() => {
     }
     return 'Float32'
   }
-  // build the function
   return (arr, verbose = false) => {
     let output = arr.shift()
     if (typeof output !== 'string')
@@ -443,18 +404,13 @@ let encodeLegacy = (() => {
 })()
 
 let decodeLegacy = (() => {
-  // unsigned 8-bit integer
   let arrUint8 = new Uint8Array(1)
-  // unsigned 16-bit integer
   let arrUint16 = new Uint16Array(1)
   let charUint16 = new Uint8Array(arrUint16.buffer)
-  // unsigned 32-bit integer
   let arrUint32  = new Uint32Array(1)
   let charUint32 = new Uint8Array(arrUint32.buffer)
-  // 32-bit float
   let arrFloat32  = new Float32Array(1)
   let charFloat32 = new Uint8Array(arrFloat32.buffer)
-  // build a useful internal function
   let typeDecoder = (str, type, offset) => {
     switch(type) {
     case 'Uint8':
@@ -489,7 +445,6 @@ let decodeLegacy = (() => {
     default: throw new Error('Unknown decoding type.')
     }
   }
-  // actually decode it
   return raw => { try {
     let intView = new Uint8Array(raw)
     let str = ''
@@ -528,13 +483,13 @@ let decodeLegacy = (() => {
         output.push(typeDecoder(str, 'Float32', offset))
         offset += 4
         break
-      case '7': { // String8
+      case '7': {
         let len = typeDecoder(str, 'Uint16', offset)
         offset += 2
         output.push(str.slice(offset, offset + len))
         offset += len
       } break
-      case '8': { // String16
+      case '8': {
         let len = typeDecoder(str, 'Uint16', offset)
         offset += 2
         let arr = str.slice(offset, offset + len)

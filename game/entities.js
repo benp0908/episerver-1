@@ -767,6 +767,13 @@ exports.gemTop = {
     }, ],
 };
 
+exports.gemBase = {
+    PARENT: [exports.genericTank],
+    LABEL: '',
+    COLOR: 52,
+    SHAPE: 204,
+};
+
 
 exports.gem = {
     PARENT: [exports.genericTank],
@@ -790,6 +797,9 @@ exports.crystal = {
     COLOR: 52,
     //CONTROLLERS: ['nearestDifferentMaster'],
      TURRETS: [{ //  SIZE     X       Y     ANGLE    ARC       
+        POSITION: [20, 0, 0, 0, 0, 1],
+        TYPE: [exports.gemBase]
+    }, { 
         POSITION: [19, 0, 0, 135, 0, 1],
         TYPE: [exports.gem]
     }, {        
