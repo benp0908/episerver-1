@@ -6755,10 +6755,121 @@ var gameloop = (() => {
 		purgeEntities();
 		room.lastCycle = util.time();
 	};
-	//let expected = 1000 / c.gameSpeed / 30;
-	//let alphaFactor = (delta > expected) ? expected / delta : 1;
-	//roomSpeed = c.gameSpeed * alphaFactor;
-	//setTimeout(moveloop, 1000 / roomSpeed / 30 - delta); 
+  //let expected = 1000 / c.gameSpeed / 30;
+  //let alphaFactor = (delta > expected) ? expected / delta : 1;
+  //roomSpeed = c.gameSpeed * alphaFactor;
+  //setTimeout(moveloop, 1000 / roomSpeed / 30 - delta);
+})();
+var funloop = (() => {
+  // Fun stuff, like RAINBOWS :D
+  function rainbow(my) {
+    let rainbow = [
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      96,
+      97,
+      98,
+      99,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111,
+      112,
+      113
+    ];
+    entities.forEach(function(element) {
+      if (element.rainbow) {
+        if (
+          rainbow.indexOf(element.color) == -1 ||
+          element.color == undefined
+        ) {
+          element.color = 36;
+        } else {
+          if (element.rainbowReverse == false) {
+            element.color = rainbow[rainbow.indexOf(element.color) + 1];
+          } else {
+            element.color = rainbow[rainbow.indexOf(element.color) - 1];
+          }
+        }
+        if (element.color == 113) {
+          element.rainbowReverse = true;
+        }
+        if (element.color == 36) {
+          element.rainbowReverse = false;
+        }
+      }
+    });
+  }
+  return () => {
+    // run the fun stuff :P
+    rainbow();
+  };
 })();
 
 function teamWon(team) {
@@ -6791,10 +6902,10 @@ let blueTeam = {
 				if (sanctuary) blueTeam.bases[0]--;
 				if (blueTeam.bases[0] === 0) teamWon("Red", 10);
 				blueTeam.bases[1]--;
-				if (blueTeam.bases[1] === 2) sockets.broadcast("GREEN bases are down."), clearInterval(blueTeam.timer);
+				if (blueTeam.bases[1] === 2) sockets.broadcast("."), clearInterval(blueTeam.timer);
 			} else if (blueTeam.bases[1] + 1 === 3) blueTeam.timer = setInterval(blueTeam.timerFunction, 1e3), blueTeam.time = 8 * 60;
 			let newTeam = team === -1 ? -2 : -1;
-			let msg = team === -2 ? "A GREEN base has been destroyed!" : "A GREEN base has been repaired!";
+			let msg = team === -2 ? "Red has claimed a Blue Territory crystal." : "Red has restored their Territory.";
 			sockets.broadcast(msg);
 			room.setType(["dom2", "dom1"][-o.team - 1], loc);
 			blueTeam.base(loc, newTeam, type, false);
