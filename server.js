@@ -6892,7 +6892,7 @@ let blueTeam = {
 		if (sanctuary) blueTeam.spawnLocs.push(loc), blueTeam.bases[0]++;
 		if (team === -2) blueTeam.bases[1]++;
 		let o = new Entity(loc);
-		o.define(team === -1 ? Class.crystal : sanctuary ? Class.crystal : type);
+		o.define(team === -1 ? Class.redcrystal : sanctuary ? Class.crystal : type);
 		o.team = team;
 		o.color = [10, 12][-team - 1];
 		o.SIZE = 75;

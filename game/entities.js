@@ -821,29 +821,74 @@ exports.crystal = {
     }, ],
 };
 
-exports.destroyedCrystal = {
+exports.redgemTop = {
+    PARENT: [exports.genericTank],
+    LABEL: '',
+    COLOR: 10,
+    SHAPE: 4,
+    //CONTROLLERS: ['nearestDifferentMaster'],
+    GUNS: [{
+        /*** LENGTH  WIDTH   ASPECT    X       Y     ANGLE   DELAY */
+        POSITION: [24, 0, 1, 0, 0, 45, 0.5, ],
+    }, {
+        POSITION: [24, 0, 1, 0, 0, 135, 0.5, ],
+    }, {
+        POSITION: [24, 0, 1, 0, 0, 225, 0.5, ],
+    }, {
+        POSITION: [24, 0, 1, 0, 0, 315, 0.5, ],
+    }, ],
+};
+
+exports.redgemBase = {
+    PARENT: [exports.genericTank],
+    LABEL: '',
+    COLOR: 52,
+    SHAPE: 204,
+};
+
+
+exports.redgem = {
+    PARENT: [exports.genericTank],
+    LABEL: '',
+    COLOR: 10,
+    SHAPE: 4,
+    //CONTROLLERS: ['nearestDifferentMaster'],
+    GUNS: [{
+      /*** LENGTH  WIDTH   ASPECT    X       Y     ANGLE   DELAY */
+      POSITION: [12, 15, 1, -6, 0, 0, 0, ],
+      PROPERTIES: {
+          COLOR: 100
+      },
+    }, ]
+};
+
+exports.redcrystal = {
     PARENT: [exports.obstacle],
     LABEL: '',
     SHAPE: 204,
+    COLOR: 52,
     //CONTROLLERS: ['nearestDifferentMaster'],
      TURRETS: [{ //  SIZE     X       Y     ANGLE    ARC       
+        POSITION: [20, 0, 0, 0, 0, 1],
+        TYPE: [exports.redgemBase]
+    }, { 
         POSITION: [19, 0, 0, 135, 0, 1],
-        TYPE: [exports.gem]
+        TYPE: [exports.redgem]
     }, {        
         POSITION: [18.5, 0, 0, 135, 0, 1],
-        TYPE: [exports.gem]
+        TYPE: [exports.redgem]
     }, {        
         POSITION: [10, 0, 0, 135, 0, 1],
-        TYPE: [exports.gemTop]
+        TYPE: [exports.redgemTop]
     }, {        
         POSITION: [9.5, 0, 0, 135, 0, 1],
-        TYPE: [exports.gemTop]
+        TYPE: [exports.redgemTop]
     }, {        
         POSITION: [9, 0, 0, 135, 0, 1],
-        TYPE: [exports.gemTop]
+        TYPE: [exports.redgemTop]
     }, {        
         POSITION: [8.5, 0, 0, 135, 0, 1],
-        TYPE: [exports.gemTop]
+        TYPE: [exports.redgemTop]
     }, ],
 };
 
