@@ -6763,12 +6763,12 @@ var gameloop = (() => {
 })();
 
 function teamWon(team) {
-	sockets.broadcast(team + " has won the game!");
+	sockets.broadcast(team + " has scored a victory!");
 	setTimeout(process.exit, 1e3)
 }
 
 let assault = {
-	bases: [0, 0], // sanctuaries, total greens
+	bases: [0, 0],
 	spawnLocs: [],
 	timer: null,
 	time: 16 * 60,
@@ -6776,7 +6776,7 @@ let assault = {
 		assault.time--;
 		if (assault.time > 59 && assault.time % 60 === 0) sockets.broadcast(assault.time / 60 + ":00");
 		else if (assault.time < 60 && assault.time % 5 === 0) sockets.broadcast(assault.time + " seconds until GREEN wins!");
-		if (assault.time <= 0) clearInterval(assault.timer), teamWon("GREEN", 11);
+		if (assault.time <= 0) clearInterval(assault.timer), teamWon("Blue", 11);
 	},
 	base: function (loc, team, type, sanctuary) {
 		if (sanctuary) assault.spawnLocs.push(loc), assault.bases[0]++;
@@ -6790,7 +6790,7 @@ let assault = {
 			assault.spawnLocs = assault.spawnLocs.filter(r => r !== loc);
 			if (team === -2) {
 				if (sanctuary) assault.bases[0]--;
-				if (assault.bases[0] === 0) teamWon("BLUE", 10);
+				if (assault.bases[0] === 0) teamWon("Red", 10);
 				assault.bases[1]--;
 				if (assault.bases[1] === 2) sockets.broadcast("GREEN bases are down."), clearInterval(assault.timer);
 			} else if (assault.bases[1] + 1 === 3) assault.timer = setInterval(assault.timerFunction, 1e3), assault.time = 8 * 60;
