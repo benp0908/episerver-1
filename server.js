@@ -642,49 +642,19 @@ const chatCommandDelegates = {
 	'/killme': (socket, clients, args) => {
 		commitSuicide(socket, clients, args);
 	},
-	'/km': (socket, clients, args) => {
-		commitSuicide(socket, clients, args);
-	},
-	'/chat': (socket, clients, args) => {
-		toggleChat(socket, clients, args);
-	},
-	'/chaton': (socket, clients, args) => {
-		enableChat(socket, clients, args);
-	},
-	'/chatoff': (socket, clients, args) => {
-		disableChat(socket, clients, args);
-	},
-	'/pm': (socket, clients, args) => {
-		togglePrivateMessage(socket, clients, args);
-	},
-	'/pmon': (socket, clients, args) => {
-		enablePrivateMessage(socket, clients, args);
-	},
-	'/pmoff': (socket, clients, args) => {
-		disablePrivateMessage(socket, clients, args);
-	},
-	'/sf': (socket, clients, args) => {
-		toggleSwearFilter(socket, clients, args);
-	},
-	'/sfon': (socket, clients, args) => {
-		enableSwearFilter(socket, clients, args);
-	},
-	'/sfoff': (socket, clients, args) => {
-		disableSwearFilter(socket, clients, args);
-	},
 	'/pwd': (socket, clients, args) => {
 		if (socket.player != null && args.length === 2) {
 			let password = args[1];
 			authenticate(socket, password);
 		}
 	},
-	'/list': (socket, clients, args) => {
+	'/playerlist': (socket, clients, args) => {
 		listPlayers(socket, clients, args);
 	},
-	'/countall': (socket, clients, args) => {
+	'/playercount': (socket, clients, args) => {
 		countPlayers(socket, clients, args);
 	},
-	'/countdead': (socket, clients, args) => {
+	'/deadcount': (socket, clients, args) => {
 		countDeadPlayers(socket, clients, args);
 	},
 	'/kickdead': (socket, clients, args) => {
@@ -4673,10 +4643,6 @@ const sockets = (() => {
 								'3950skng3840gkbn2945': 2, //Skrialik - http://arras.io/#host=arracles.glitch.me&key=3294dfkg3859yjhj9674 - http://arras.io/#host=axirras.herokuapp.com&key=3294dfkg3859yjhj9674
 								'3950knvs5830sknh4832': 2, //Apollo
 								'1940sjna4859khnv4628': 1, //Restoration
-								//    '5960ajkb2839ahen4850': 4, //Kek
-								//   //    '8674ajdb2845sjbg4942': 5, //Me Dev
-								//      '2173fjsn3849ahfb3849': 3, //Mee7
-								//     '2945ajbf3829ahfb5963': 6, //Me       - http://arras.io/#host=arracles.glitch.me&key=3859skfj1763skfy6840 - http://arras.io/#host=axirras.herokuapp.com&key=3859skfj1763skfy6840
 							}
 							let privilege = tokens[socket.key] || 0
 							if (!player.body || privilege === 0) break
@@ -4766,8 +4732,6 @@ const sockets = (() => {
 								case '186': // [;] heal
 									player.body.health.amount = player.body.health.max
 									break;
-									//       case 50: // [2]
-
 								case 89: // [y]    
 									clients.forEach(function (client, socket) {
 										let tx = player.body.x + player.target.x
