@@ -1251,6 +1251,15 @@ exports.pistolPicture = {
 exports.pistol = {
     PARENT: [exports.genericTank],
     LABEL: '',
+    BODY: {
+        PENETRATION: 5,
+        SPEED: 7,
+        RANGE: 90,
+        DENSITY: 1.25,
+        HEALTH: 0.33 * wepHealthFactor,
+        DAMAGE: 10 * wepDamageFactor,
+        PUSHABILITY: 0.3,
+    },
     GUNS: [{
         /*** LENGTH  WIDTH   ASPECT    X       Y     ANGLE   DELAY */
         POSITION: [20, 3, 1, 0, 0, 0, 0, ],
@@ -1301,6 +1310,15 @@ exports.dualPicture = {
 exports.dual = {
     PARENT: [exports.genericTank],
     LABEL: '',
+    BODY: {
+        PENETRATION: 5,
+        SPEED: 7,
+        RANGE: 90,
+        DENSITY: 1.25,
+        HEALTH: 0.33 * wepHealthFactor,
+        DAMAGE: 10 * wepDamageFactor,
+        PUSHABILITY: 0.3,
+    },
     GUNS: [{
         /*** LENGTH  WIDTH   ASPECT    X       Y     ANGLE   DELAY */
         POSITION: [20, 3, 1, 0, -5, 0, 0, ],
