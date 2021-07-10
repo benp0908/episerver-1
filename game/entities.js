@@ -1351,6 +1351,128 @@ exports.dual = {
         }],
     }, ]
 };
+exports.riflePicture = {
+    PARENT: [exports.genericTank],
+    LABEL: 'Rifle Picture',
+    SHAPE: [
+        [1000000000000000, 229400000000000000]
+    ],
+    GUNS: [{
+        /*** LENGTH  WIDTH   ASPECT    X       Y     ANGLE   DELAY */
+        POSITION: [  20,    10,    1,      0,      0,      0,      0,   ], 
+        }, {
+        POSITION: [  24,     5,      1,      0,      0,      0,      0,   ], 
+        PROPERTIES: {
+            SHOOT_SETTINGS: combineStats([g.basic, g.sniper, g.rifle]),
+            TYPE: exports.bullet,
+      },
+    }, ],
+};
+exports.rifle = {
+    PARENT: [exports.genericTank],
+    LABEL: '',
+    BODY: {
+        PENETRATION: 5,
+        SPEED: 7,
+        RANGE: 90,
+        DENSITY: 1.25,
+        HEALTH: 0.33 * wepHealthFactor,
+        DAMAGE: 10 * wepDamageFactor,
+        PUSHABILITY: 0.3,
+    },
+    GUNS: [{
+        /*** LENGTH  WIDTH   ASPECT    X       Y     ANGLE   DELAY */
+        POSITION: [20, 3, 1, 0, -5, 0, 0, ],
+        PROPERTIES: {
+            SHOOT_SETTINGS: combineStats([g.basic, g.twin]),
+            TYPE: exports.bullet,
+        },
+    }, {
+        POSITION: [20, 3, 1, 0, 5, 0, 0.5, ],
+        PROPERTIES: {
+            SHOOT_SETTINGS: combineStats([g.basic, g.twin]),
+            TYPE: exports.bullet,
+        },
+    }, {
+      POSITION: [12, 15, 1, -6, 0, 0, 0, ],
+      PROPERTIES: {
+          COLOR: 100
+      },
+    }, ],
+    TURRETS: [{
+        /*  SIZE     X       Y     ANGLE    ARC */
+        POSITION: [9, 10, 0, 320, 360, 0],
+        TYPE: [exports.arm, {
+            COLOR: 38,
+        }],
+    }, {
+        POSITION: [9, 10, 0, 40, 360, 0],
+        TYPE: [exports.arm, {
+            COLOR: 38,
+        }],
+    }, ]
+};
+exports.shotgunPicture = {
+    PARENT: [exports.genericTank],
+    LABEL: 'Shotgun Picture',
+    SHAPE: [
+        [1000000000000000, 229400000000000000]
+    ],
+    GUNS: [{
+        /*** LENGTH  WIDTH   ASPECT    X       Y     ANGLE   DELAY */
+        POSITION: [  15,    10,    1,      0,      0,      0,      0,   ], 
+        }, {
+        POSITION: [  24,     5,      1,      0,      0,      0,      0,   ], 
+        PROPERTIES: {
+            SHOOT_SETTINGS: combineStats([g.basic, g.sniper, g.rifle]),
+            TYPE: exports.bullet,
+      },
+    }, ],
+};
+exports.shotgun = {
+    PARENT: [exports.genericTank],
+    LABEL: '',
+    BODY: {
+        PENETRATION: 5,
+        SPEED: 7,
+        RANGE: 90,
+        DENSITY: 1.25,
+        HEALTH: 0.33 * wepHealthFactor,
+        DAMAGE: 10 * wepDamageFactor,
+        PUSHABILITY: 0.3,
+    },
+    GUNS: [{
+        /*** LENGTH  WIDTH   ASPECT    X       Y     ANGLE   DELAY */
+        POSITION: [20, 3, 1, 0, -5, 0, 0, ],
+        PROPERTIES: {
+            SHOOT_SETTINGS: combineStats([g.basic, g.twin]),
+            TYPE: exports.bullet,
+        },
+    }, {
+        POSITION: [20, 3, 1, 0, 5, 0, 0.5, ],
+        PROPERTIES: {
+            SHOOT_SETTINGS: combineStats([g.basic, g.twin]),
+            TYPE: exports.bullet,
+        },
+    }, {
+      POSITION: [12, 15, 1, -6, 0, 0, 0, ],
+      PROPERTIES: {
+          COLOR: 100
+      },
+    }, ],
+    TURRETS: [{
+        /*  SIZE     X       Y     ANGLE    ARC */
+        POSITION: [9, 10, 0, 320, 360, 0],
+        TYPE: [exports.arm, {
+            COLOR: 38,
+        }],
+    }, {
+        POSITION: [9, 10, 0, 40, 360, 0],
+        TYPE: [exports.arm, {
+            COLOR: 38,
+        }],
+    }, ]
+};
 exports.sniperPicture = {
     PARENT: [exports.genericTank],
     LABEL: 'Sniper Picture',
@@ -1397,9 +1519,10 @@ exports.stone = {
 };
 
 // UPGRADE PATHS
-exports.basic.UPGRADES_TIER_1 = [exports.pistolPicture, exports.dualPicture, exports.pistolPicture, exports.pistolPicture, exports.pistolPicture];
+exports.basic.UPGRADES_TIER_1 = [exports.pistolPicture, exports.dualPicture, exports.riflePicture, exports.shotgunPicture, exports.pistolPicture];
 
-exports.pistol.UPGRADES_TIER_2 = [];
+exports.pistol.UPGRADES_TIER_1 = [exports.pistolPicture, exports.dualPicture, exports.pistolPicture, exports.pistolPicture, exports.pistolPicture];
+exports.dualPicture.UPGRADES_TIER_1 = [];
 
 exports.bot = {
     AUTO_UPGRADE: 'random',

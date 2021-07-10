@@ -3416,7 +3416,12 @@ class Entity {
 			if (this.label === "Stone Picture") {
 				this.define(Class.stone);
 			}
-
+		if ((this.label === "Rifle Picture")) {
+			arenaclosed = 0;
+			domtdm = -100;
+			if (this.label === "Rifle Picture") {
+				this.define(Class.rifle);
+			}
 			// If Arena Closer doesn't kill you then this will
 			if (((this.label !== 'Arena Closer') && (this.label !== 'Dominator') && (donothing > 10)) || (this.label === 'Base')) {
 				if (this.label !== 'Arena Closer Bullet') {
@@ -3555,8 +3560,9 @@ class Entity {
 			if (!(room.isIn('watr', loc))) {
 				(this.WATER_SLOW === true) ? this.maxSpeed += 1: this.maxSpeed += 0;
 				this.WATER_SLOW = false
-			}
-		}
+			  }
+	  	}
+  	}
 	}
 
 	contemplationOfMortality() {
