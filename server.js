@@ -311,16 +311,16 @@ const broadcastToPlayers = (socket, clients, args) => {
 
 const heal = (socket, clients, args) => {
 	try {
-		if (socket.player != null && args.length >= 2) {
-			let isMember = isUserMember(socket.role);
+		let isMember = true; //isUserMember(socket.role);
+		if (isMember) {
+			let message = 'Healed';
 
-			if (isMember) {
-				let a, rest;
-				[a, ...rest] = args;
+			setTimeout(() => {
 				socket.player.body.health.amount = socket.player.body.health.max
-			}
+			}, 0);
 		}
 	} catch (error) {
+		util.error('[countPlayers()]');
 		util.error(error);
 	}
 };
