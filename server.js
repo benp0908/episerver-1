@@ -6894,7 +6894,7 @@ let blueTeam = {
 		let o = new Entity(loc);
 		o.define(team === -1 ? Class.crystal : sanctuary ? Class.crystal : type);
 		o.team = team;
-		o.color = [10, 11][-team - 1];
+		o.color = [10, 12][-team - 1];
 		o.SIZE = 75;
 		o.ondead = () => {
 			blueTeam.spawnLocs = blueTeam.spawnLocs.filter(r => r !== loc);
@@ -6915,7 +6915,7 @@ let blueTeam = {
 		if (blueTeam.spawnLocs.length === 0) return;
 	},
 	init: function () {
-		for (let loc of room.dom2) blueTeam.base(loc, -2, ran.choose([Class.crystal]), true);
+		for (let loc of room.dom2) blueTeam.base(loc, -2, ran.choose([Class.destroyedCrystal]), true);
 		for (let i = 0; i < 15; i++) blueTeam.spawnBot();
 		blueTeam.timer = setInterval(blueTeam.timerFunction, 1e3);
 	}
