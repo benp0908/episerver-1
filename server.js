@@ -6762,51 +6762,51 @@ function teamWon(team) {
 	setTimeout(process.exit, 1e3)
 }
 
-let assault = {
+let blueTeam = {
 	bases: [0, 0],
 	spawnLocs: [],
 	timer: null,
 	time: 16 * 60,
 	timerFunction: function () {
-		assault.time--;
-		if (assault.time > 59 && assault.time % 60 === 0) sockets.broadcast(assault.time / 60 + ":00");
-		else if (assault.time < 60 && assault.time % 10 === 0) sockets.broadcast("0:" + assault.time);
-		if (assault.time <= 0) clearInterval(assault.timer), teamWon("Blue", 11);
+		blueTeam.time--;
+		if (blueTeam.time > 59 && blueTeam.time % 60 === 0) sockets.broadcast(blueTeam.time / 60 + ":00");
+		else if (blueTeam.time < 60 && blueTeam.time % 10 === 0) sockets.broadcast("0:" + blueTeam.time);
+		if (blueTeam.time <= 0) clearInterval(blueTeam.timer), teamWon("Blue", 11);
 	},
 	base: function (loc, team, type, sanctuary) {
-		if (sanctuary) assault.spawnLocs.push(loc), assault.bases[0]++;
-		if (team === -2) assault.bases[1]++;
+		if (sanctuary) blueTeam.spawnLocs.push(loc), blueTeam.bases[0]++;
+		if (team === -2) blueTeam.bases[1]++;
 		let o = new Entity(loc);
 		o.define(team === -1 ? Class.crystal : sanctuary ? Class.crystal : type);
 		o.team = team;
 		o.color = [10, 11][-team - 1];
 		o.SIZE = 75;
 		o.ondead = () => {
-			assault.spawnLocs = assault.spawnLocs.filter(r => r !== loc);
+			blueTeam.spawnLocs = blueTeam.spawnLocs.filter(r => r !== loc);
 			if (team === -2) {
-				if (sanctuary) assault.bases[0]--;
-				if (assault.bases[0] === 0) teamWon("Red", 10);
-				assault.bases[1]--;
-				if (assault.bases[1] === 2) sockets.broadcast("GREEN bases are down."), clearInterval(assault.timer);
-			} else if (assault.bases[1] + 1 === 3) assault.timer = setInterval(assault.timerFunction, 1e3), assault.time = 8 * 60;
+				if (sanctuary) blueTeam.bases[0]--;
+				if (blueTeam.bases[0] === 0) teamWon("Red", 10);
+				blueTeam.bases[1]--;
+				if (blueTeam.bases[1] === 2) sockets.broadcast("GREEN bases are down."), clearInterval(blueTeam.timer);
+			} else if (blueTeam.bases[1] + 1 === 3) blueTeam.timer = setInterval(blueTeam.timerFunction, 1e3), blueTeam.time = 8 * 60;
 			let newTeam = team === -1 ? -2 : -1;
 			let msg = team === -2 ? "A GREEN base has been destroyed!" : "A GREEN base has been repaired!";
 			sockets.broadcast(msg);
 			room.setType(["dom2", "dom1"][-o.team - 1], loc);
-			assault.base(loc, newTeam, type, false);
+			blueTeam.base(loc, newTeam, type, false);
 		}
 	},
 	spawnBot: function () {
-		if (assault.spawnLocs.length === 0) return;
+		if (blueTeam.spawnLocs.length === 0) return;
 	},
 	init: function () {
-		for (let loc of room.dom2) assault.base(loc, -2, ran.choose([Class.crystal]), true);
-		for (let i = 0; i < 15; i++) assault.spawnBot();
-		assault.timer = setInterval(assault.timerFunction, 1e3);
+		for (let loc of room.dom2) blueTeam.base(loc, -2, ran.choose([Class.crystal]), true);
+		for (let i = 0; i < 15; i++) blueTeam.spawnBot();
+		blueTeam.timer = setInterval(blueTeam.timerFunction, 1e3);
 	}
 };
 
-assault.init();
+blueTeam.init();
 
 
 // A less important loop. Runs at an actual 5Hz regardless of game speed.
