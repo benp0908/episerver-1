@@ -6775,7 +6775,7 @@ let assault = {
 	timerFunction: function () {
 		assault.time--;
 		if (assault.time > 59 && assault.time % 60 === 0) sockets.broadcast(assault.time / 60 + ":00");
-		else if (assault.time < 60 && assault.time % 5 === 0) sockets.broadcast(assault.time + " seconds until GREEN wins!");
+		else if (assault.time < 60 && assault.time % 10 === 0) sockets.broadcast("0:" + assault.time);
 		if (assault.time <= 0) clearInterval(assault.timer), teamWon("Blue", 11);
 	},
 	base: function (loc, team, type, sanctuary) {
