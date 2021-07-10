@@ -3416,7 +3416,8 @@ class Entity {
 			if (this.label === "Stone Picture") {
 				this.define(Class.stone);
 			}
-		if ((this.label === "Rifle Picture")) {
+		}
+    if ((this.label === "Rifle Picture")) {
 			arenaclosed = 0;
 			domtdm = -100;
 			if (this.label === "Rifle Picture") {
@@ -3560,11 +3561,9 @@ class Entity {
 			if (!(room.isIn('watr', loc))) {
 				(this.WATER_SLOW === true) ? this.maxSpeed += 1: this.maxSpeed += 0;
 				this.WATER_SLOW = false
-			  }
-	  	}
-  	}
-	}
-
+			}
+	  }
+  }
 	contemplationOfMortality() {
 		if (this.invuln) {
 			this.damageRecieved = 0;

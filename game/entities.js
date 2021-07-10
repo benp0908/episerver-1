@@ -1382,15 +1382,11 @@ exports.rifle = {
     },
     GUNS: [{
         /*** LENGTH  WIDTH   ASPECT    X       Y     ANGLE   DELAY */
-        POSITION: [20, 3, 1, 0, -5, 0, 0, ],
+        POSITION: [  20,    10,    1,      0,      0,      0,      0,   ], 
+        }, {
+        POSITION: [  24,     5,      1,      0,      0,      0,      0,   ], 
         PROPERTIES: {
-            SHOOT_SETTINGS: combineStats([g.basic, g.twin]),
-            TYPE: exports.bullet,
-        },
-    }, {
-        POSITION: [20, 3, 1, 0, 5, 0, 0.5, ],
-        PROPERTIES: {
-            SHOOT_SETTINGS: combineStats([g.basic, g.twin]),
+            SHOOT_SETTINGS: combineStats([g.basic, g.sniper, g.rifle]),
             TYPE: exports.bullet,
         },
     }, {
@@ -1401,12 +1397,12 @@ exports.rifle = {
     }, ],
     TURRETS: [{
         /*  SIZE     X       Y     ANGLE    ARC */
-        POSITION: [9, 10, 0, 320, 360, 0],
+        POSITION: [9, 10, 2, 320, 360, 0],
         TYPE: [exports.arm, {
             COLOR: 38,
         }],
     }, {
-        POSITION: [9, 10, 0, 40, 360, 0],
+        POSITION: [9, 11, 0, 16, 360, 0],
         TYPE: [exports.arm, {
             COLOR: 38,
         }],
