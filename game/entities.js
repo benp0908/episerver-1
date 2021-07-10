@@ -787,6 +787,7 @@ exports.crystal = {
     PARENT: [exports.obstacle],
     LABEL: '',
     SHAPE: 204,
+    COLOR: 52,
     //CONTROLLERS: ['nearestDifferentMaster'],
      TURRETS: [{ //  SIZE     X       Y     ANGLE    ARC       
         POSITION: [19, 0, 0, 135, 0, 1],
