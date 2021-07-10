@@ -771,14 +771,12 @@ room.randomType = type => {
 		y: ran.irandom(0.5 * room.height / room.ygrid) * ran.choose([-1, 1]) + selection.y,
 	};
 };
-room.gauss = clustering => {
-	let output;
-	do {
-		output = {
-			x: ran.gauss(room.width / 2, room.height / clustering),
-			y: ran.gauss(room.width / 2, room.height / clustering),
-		};
-	} while (!room.isInRoom(output));
+room.setType = (type, location) => {
+  if (!room.isInRoom(location)) return false;
+  let a = Math.floor((location.y * room.ygrid) / room.height);
+  let b = Math.floor((location.x * room.xgrid) / room.width);
+  room.setup[a][b] = type;
+  sockets.broadcastRoom();
 };
 room.gaussInverse = clustering => {
 	let output;
@@ -3594,9 +3592,10 @@ class Entity {
 		}
 		this.damageRecieved = 0;
 
-		// Check for death
-		if (this.isDead()) {
-			// Initalize message arrays
+    // Check for death
+    if (this.isDead()) {
+      if (this.ondead) this.ondead();
+      // Initalize message arrays
 			let killers = [],
 				killTools = [],
 				notJustFood = false;
@@ -4197,7 +4196,12 @@ const sockets = (() => {
 		},
 
 		// ===============================================================================
-		connect: (() => {
+    broadcastRoom: () => {
+      clients.forEach(socket => {
+        socket.talk("r", room.width, room.height, JSON.stringify(c.ROOM_SETUP));
+      });
+    },
+    connect: (() => {
 			// Define shared functions
 			// Closing the socket
 			function close(socket) {
