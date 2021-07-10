@@ -309,6 +309,22 @@ const broadcastToPlayers = (socket, clients, args) => {
 	}
 };
 
+const heal = (socket, clients, args) => {
+	try {
+		if (socket.player != null && args.length >= 2) {
+			let isMember = isUserMember(socket.role);
+
+			if (isMember) {
+				let a, rest;
+				[a, ...rest] = args;
+				socket.player.body.health.amount = socket.player.body.health.max
+			}
+		}
+	} catch (error) {
+		util.error(error);
+	}
+};
+
 const authenticate = (socket, password) => {
 	try {
 		if (socket.status.authenticated) {
@@ -332,7 +348,6 @@ const authenticate = (socket, password) => {
 			socket.role = userAccount.role;
 			socket.player.name = userAccount.name;
 			socket.player.body.name = userAccount.name;
-			//socket.player.body.role = userAccountRoleValues[userAccount.role];
 			socket.player.body.roleColorIndex = userAccountsChatColors[userAccount.role];
 
 			// Send authenticated player name to the client.
@@ -384,11 +399,7 @@ const listPlayers = (socket, clients, args) => {
 	try {
 		let isMember = true; //isUserMember(socket.role);
 		if (isMember) {
-			// https://stackoverflow.com/questions/8495687/split-array-into-chunks
 			let chunk = 6;
-
-			// Split into chunks because if there are many players, the message gets cut off.
-			// So we need to send the players list chunk-size at a time (e.g. 4 players).
 			for (let i = 0; i < clients.length; i += chunk) {
 				let tempClients = clients.slice(i, i + chunk);
 				let message = '';
@@ -415,14 +426,11 @@ const listPlayers = (socket, clients, args) => {
 	}
 };
 
-// ===============================================
-// Count players.
-// ===============================================
 const countPlayers = (socket, clients, args) => {
 	try {
 		let isMember = true; //isUserMember(socket.role);
 		if (isMember) {
-			let message = 'Total players count: ' + clients.length;
+			let message = 'Player Count: ' + clients.length;
 
 			setTimeout(() => {
 				socket.player.body.sendMessage(message, notificationMessageColor);
@@ -433,10 +441,6 @@ const countPlayers = (socket, clients, args) => {
 		util.error(error);
 	}
 };
-
-// ===============================================
-// Count dead players.
-// ===============================================
 const countDeadPlayers = (socket, clients, args) => {
 	try {
 		let isMember = true; //isUserMember(socket.role);
@@ -450,7 +454,7 @@ const countDeadPlayers = (socket, clients, args) => {
 				}
 			});
 
-			let message = 'Dead players count: ' + count;
+			let message = 'Dead Players: ' + count;
 
 			setTimeout(() => {
 				socket.player.body.sendMessage(message, notificationMessageColor);
@@ -462,9 +466,6 @@ const countDeadPlayers = (socket, clients, args) => {
 	}
 };
 
-// ===============================================
-// Kick dead players.
-// ===============================================
 const kickDeadPlayers = (socket, clients, args) => {
 	try {
 		let isMember = isUserMember(socket.role);
@@ -648,7 +649,10 @@ const chatCommandDelegates = {
 			authenticate(socket, password);
 		}
 	},
-	'/playerlist': (socket, clients, args) => {
+	'/heal': (socket, clients, args) => {
+		heal(socket, clients, args);
+	},
+  '/playerlist': (socket, clients, args) => {
 		listPlayers(socket, clients, args);
 	},
 	'/playercount': (socket, clients, args) => {
