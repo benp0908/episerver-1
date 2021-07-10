@@ -1371,7 +1371,7 @@ exports.stone = {
 };
 
 // UPGRADE PATHS
-exports.basic.UPGRADES_TIER_1 = [exports.pistolPicture, exports.dualPicture];
+exports.basic.UPGRADES_TIER_1 = [exports.pistolPicture, exports.dualPicture, exports.pistolPicture, exports.pistolPicture, exports.pistolPicture];
 
 exports.pistol.UPGRADES_TIER_2 = [];
 
