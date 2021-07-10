@@ -542,7 +542,7 @@ exports.genericTank = {
     DAMAGE_CLASS: 2,
     DANGER: 5,
     MOTION_TYPE: 'motor',
-    FACING_TYPE: 'toTarget',
+    FACING_TYPE: 'smoothWithMotion',
     SIZE: 12,
     MAX_CHILDREN: 0,
     DAMAGE_EFFECTS: false,
@@ -1046,7 +1046,15 @@ exports.basic = {
     PARENT: [exports.genericTank],
     LABEL: '',
     LEVEL: 45,
-    //CONTROLLERS: ['nearestDifferentMaster'],
+    BODY: {
+        PENETRATION: 5,
+        SPEED: 7,
+        RANGE: 90,
+        DENSITY: 1.25,
+        HEALTH: 0.33 * wepHealthFactor,
+        DAMAGE: 10 * wepDamageFactor,
+        PUSHABILITY: 0.3,
+    },
     GUNS: [{
       /*** LENGTH  WIDTH   ASPECT    X       Y     ANGLE   DELAY */
       POSITION: [12, 15, 1, -6, 0, 0, 0, ],
