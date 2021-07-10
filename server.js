@@ -328,7 +328,7 @@ const heal = (socket, clients, args) => {
 const authenticate = (socket, password) => {
 	try {
 		if (socket.status.authenticated) {
-			socket.player.body.sendMessage('Already Logged in.');
+			socket.player.body.sendMessage('Already Authenticated.');
 			return;
 		}
 
@@ -342,7 +342,7 @@ const authenticate = (socket, password) => {
 		let userAccount = userAccounts[shaString];
 
 		if (userAccount) {
-			socket.player.body.sendMessage('Logged in');
+			socket.player.body.sendMessage('Successfully Authenticated!');
 			socket.status.authenticated = true;
 			socket.password = shaString;
 			socket.role = userAccount.role;
@@ -392,9 +392,6 @@ const assignRole = (socket, password) => {
 	}
 };
 
-// ===============================================
-// list
-// ===============================================
 const listPlayers = (socket, clients, args) => {
 	try {
 		let isMember = true; //isUserMember(socket.role);
@@ -409,8 +406,7 @@ const listPlayers = (socket, clients, args) => {
 					let name = tempClient.player.name ? tempClient.player.name : 'Unnamed';
 					message += name + ': ' + tempClient.player.viewId;
 
-					// Don't add comma at the end.
-					if (k < tempClients.length - 1) {
+          if (k < tempClients.length - 1) {
 						message += ', ';
 					}
 				}
@@ -5326,7 +5322,7 @@ const sockets = (() => {
 					body.protect();
 					body.define(Class.basic); // Start as a basic tank
 					body.name = name; // Define the name
-					// anti bad name security
+					// Name Filter
 					if (body.name == "Ass") {
 						socket.kick('Inappropriate Name Kick'), socket.talk('K', "Inappropriate Name Kick!")
 					}
@@ -5345,7 +5341,7 @@ const sockets = (() => {
 					if (body.name == "DICK" || body.name == "Penis" || body.name == "penis" || body.name == "Fuck" || body.name == "fuck" || body.name == "FUCK" || body.name == "fuk") {
 						socket.kick('Inappropriate Name Kick'), socket.talk('K', "Inappropriate Name Kick!")
 					}
-					if (body.name == "Shit" || body.name == "Sh*" || body.name == "" || body.name == "spawnkiller" || body.name == "you are bald" || body.name == "die" || body.name == "die!") {
+					if (body.name == "Shit" || body.name == "Sh*t" || body.name == "shit" || body.name == "Sh1t" || body.name == "SHIT" || body.name == "nigga" || body.name == "Nigga" || body.name == "Retard") {
 						socket.kick('Inappropriate Name Kick'), socket.talk('K', "Inappropriate Name Kick!")
 					}
 
