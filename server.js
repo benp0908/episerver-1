@@ -7453,7 +7453,7 @@ var maintainloop = (() => {
 		let f = (loc, team) => {
 			let o = new Entity(loc);
 			o.define(Class.baseWall);
-      o.SIZE = 150;
+      o.SIZE = 180;
 			o.team = -team;
 			o.color = [10, 11, 12, 16][team - 1];
 		};
