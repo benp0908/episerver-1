@@ -29,7 +29,7 @@ const combineStats = function(arr) {
     }
 };
 const skillSet = (() => {
-    let config = require('../config.json');
+    let config = require('../map.json');
     let skcnv = {
         rld: 0,
         pen: 1,

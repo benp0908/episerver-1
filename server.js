@@ -10,7 +10,7 @@ goog.require('goog.structs.QuadTree');
 const security_node = require('eslint-plugin-security-node')
 
 // Import game settings.
-const c = require('./config.json');
+const c = require('./map.json');
 
 // Import utilities.
 const util = require('./game/collisions');
