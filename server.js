@@ -3560,93 +3560,128 @@ class Entity {
 			}
 	  }
   }
-	contemplationOfMortality() {
-		if (this.invuln) {
-			this.damageRecieved = 0;
-			return 0;
-		}
+    contemplationOfMortality() {
+        if (this.invuln) {
+            this.damageRecieved = 0;
+            return 0;
+        }
 
-		// Life-limiting effects
-		if (this.settings.diesAtRange) {
-			this.range -= 1 / roomSpeed;
-			if (this.range < 0) {
-				this.kill();
-			}
-		}
-		if (this.settings.diesAtLowSpeed) {
-			if (!this.collisionArray.length && this.velocity.length < this.topSpeed / 2) {
-				this.health.amount -= this.health.getDamage(1 / roomSpeed);
-			}
-		}
-		// Shield regen and damage
-		if (this.shield.max) {
-			if (this.damageRecieved !== 0) {
-				let shieldDamage = this.shield.getDamage(this.damageRecieved);
-				this.damageRecieved -= shieldDamage;
-				this.shield.amount -= shieldDamage;
-			}
-		}
-		// Health damage 
-		if (this.damageRecieved !== 0) {
-			let healthDamage = this.health.getDamage(this.damageRecieved);
-			this.blend.amount = 1;
-			this.health.amount -= healthDamage;
-		}
-		this.damageRecieved = 0;
+        // Life-limiting effects
+        if (this.settings.diesAtRange) {
+            this.range -= 1 / roomSpeed;
+            if (this.range < 0) {
+                this.kill();
+            }
+        }
+        if (this.settings.diesAtLowSpeed) {
+            if (!this.collisionArray.length && this.velocity.length < this.topSpeed / 2) {
+                this.health.amount -= this.health.getDamage(1 / roomSpeed);
+            }
+        }
+        // Shield regen and damage
+        if (this.shield.max) {
+            if (this.damageRecieved !== 0) {
+                let shieldDamage = this.shield.getDamage(this.damageRecieved);
+                this.damageRecieved -= shieldDamage;
+                this.shield.amount -= shieldDamage;
+            }
+        }
+        // Health damage 
+        if (this.damageRecieved !== 0) {
+            let healthDamage = this.health.getDamage(this.damageRecieved);
+            this.blend.amount = 1;
+            this.health.amount -= healthDamage;
+        }
+        this.damageRecieved = 0;
 
-    // Check for death
-    if (this.isDead()) {
-      if (this.ondead) this.ondead();
-      // Initalize message arrays
-			let killers = [],
-				killTools = [],
-				notJustFood = false;
-			// If I'm a tank, call me a nameless player
-			let name = (this.master.name == '') ?
-				(this.master.type === 'tank') ?
-				"a nameless player's " + this.label :
-				(this.master.type === 'miniboss') ?
-				"a visiting " + this.label :
-				util.addArticle(this.label) :
-				this.master.name + "'s " + this.label;
-			// Calculate the jackpot
-			let jackpot = Math.ceil(util.getJackpot(this.skill.score) / this.collisionArray.length);
-			// Now for each of the things that kill me...
-			this.collisionArray.forEach(instance => {
-				if (instance.type === 'wall') return 0;
-				if (instance.master.settings.acceptsScore) { // If it's not food, give its master the score
-					if (instance.master.type === 'tank' || instance.master.type === 'miniboss') notJustFood = true;
-					instance.master.skill.score += jackpot;
-					killers.push(instance.master); // And keep track of who killed me
-				} else if (instance.settings.acceptsScore) {
-					instance.skill.score += jackpot;
-				}
-				killTools.push(instance); // Keep track of what actually killed me
-			});
-			// Remove duplicates
-			killers = killers.filter((elem, index, self) => {
-				return index == self.indexOf(elem);
-			});
-			// If there's no valid killers (you were killed by food), change the message to be more passive
-			let killText = (notJustFood) ? '' : "You have been killed by ",
-				dothISendAText = this.settings.givesKillMessage;
-			killers.forEach(instance => {
-				this.killCount.killers.push(instance.index);
-				if (this.type === 'tank') {
-					if (killers.length > 1) instance.killCount.assists++;
-					else instance.killCount.solo++;
-				} else if (this.type === "miniboss") instance.killCount.bosses++;
-			});
-			// Prepare it and clear the collision array.
-			killText = killText.slice(0, -5);
-			this.sendMessage(killText + '.');
-			// If I'm the leader, broadcast it:
-			return 1;
-		}
-		return 0;
-	}
+        // Check for death
+        if (this.isDead()) {
+            // Initalize message arrays
+            let killers = [], killTools = [], notJustFood = false;
+            // If I'm a tank, call me a nameless player
+            let name = (this.master.name == '') ?
+                (this.master.type === 'tank') ?
+                    "a nameless player's " + this.label :
+                    (this.master.type === 'miniboss') ?
+                        "a visiting " + this.label :
+                        util.addArticle(this.label) 
+                :
+                this.master.name + "'s " + this.label;
+            // Calculate the jackpot
+            let jackpot = Math.ceil(util.getJackpot(this.skill.score) / this.collisionArray.length);
+            // Now for each of the things that kill me...
+            this.collisionArray.forEach(instance => {
+                if (instance.type === 'wall') return 0;
+                if (instance.master.settings.acceptsScore) { // If it's not food, give its master the score
+                    if (instance.master.type === 'tank' || instance.master.type === 'miniboss') notJustFood = true;
+                    instance.master.skill.score += jackpot;
+                    killers.push(instance.master); // And keep track of who killed me
+                } else if (instance.settings.acceptsScore) {
+                    instance.skill.score += jackpot;
+                }
+                killTools.push(instance); // Keep track of what actually killed me
+            });
+            // Remove duplicates
+            killers = killers.filter((elem, index, self) => { return index == self.indexOf(elem); });
+            // If there's no valid killers (you were killed by food), change the message to be more passive
+            let killText = (notJustFood) ? '' : "You have been killed by ",
+                dothISendAText = this.settings.givesKillMessage;
+            killers.forEach(instance => {
+                this.killCount.killers.push(instance.index);
+                if (this.type === 'tank') {
+                    if (killers.length > 1) instance.killCount.assists++; else instance.killCount.solo++;
+                } else if (this.type === "miniboss") instance.killCount.bosses++;
+            });
+            // Add the killers to our death message, also send them a message
+            if (notJustFood) {
+                killers.forEach(instance => {
+                    if (instance.master.type !== 'food' && instance.master.type !== 'crasher') {
+                        killText += (instance.name == '') ? (killText == '') ? 'An unnamed player' : 'an unnamed player' : instance.name;
+                        killText += ' and ';
+                    }
+                    // Only if we give messages
+                    if (dothISendAText) { 
+                        instance.sendMessage('You killed ' + name + ((killers.length > 1) ? ' (with some help).' : '.')); 
+                    }
+                });
+                // Prepare the next part of the next 
+                killText = killText.slice(0, -4);
+                killText += 'killed you with ';
+            }
+            // Broadcast
+            if (this.settings.broadcastMessage) sockets.broadcast(this.settings.broadcastMessage);
+            // Add the implements to the message
+            killTools.forEach((instance) => {
+                killText += util.addArticle(instance.label) + ' and ';
+            });
+            // Prepare it and clear the collision array.
+            killText = killText.slice(0, -5);
+            if (killText === 'You have been kille') killText = 'You have died a stupid death';
+            this.sendMessage(killText + '.');
+            // If I'm the leader, broadcast it:
+            if (this.id === room.topPlayerID) {
+                let usurptText = (this.name === '') ? 'The leader': this.name;
+                if (notJustFood) { 
+                    usurptText += ' has been usurped by';
+                    killers.forEach(instance => {
+                        usurptText += ' ';
+                        usurptText += (instance.name === '') ? 'an unnamed player' : instance.name;
+                        usurptText += ' and';
+                    });
+                    usurptText = usurptText.slice(0, -4);
+                    usurptText += '!';
+                } else {
+                    usurptText += ' fought a polygon... and the polygon won.';
+                }
+                sockets.broadcast(usurptText);
+            }
+            // Kill it
+            return 1;
+        } 
+        return 0;
+    }
 
-	protect() {
+    protect() { 
 		entitiesToAvoid.push(this);
 		this.isProtected = true;
 	}
