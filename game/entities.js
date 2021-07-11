@@ -824,7 +824,7 @@ exports.crystal = {
 exports.redgemTop = {
     PARENT: [exports.genericTank],
     LABEL: '',
-    COLOR: 10,
+    COLOR: 12,
     SHAPE: 4,
     //CONTROLLERS: ['nearestDifferentMaster'],
     GUNS: [{
@@ -850,7 +850,7 @@ exports.redgemBase = {
 exports.redgem = {
     PARENT: [exports.genericTank],
     LABEL: '',
-    COLOR: 10,
+    COLOR: 12,
     SHAPE: 4,
     //CONTROLLERS: ['nearestDifferentMaster'],
     GUNS: [{

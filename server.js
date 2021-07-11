@@ -6754,123 +6754,61 @@ var gameloop = (() => {
 		// Remove dead entities
 		purgeEntities();
 		room.lastCycle = util.time();
-	};
-  //let expected = 1000 / c.gameSpeed / 30;
-  //let alphaFactor = (delta > expected) ? expected / delta : 1;
-  //roomSpeed = c.gameSpeed * alphaFactor;
-  //setTimeout(moveloop, 1000 / roomSpeed / 30 - delta);
-})();
-var funloop = (() => {
-  // Fun stuff, like RAINBOWS :D
-  function rainbow(my) {
-    let rainbow = [
-      36,
-      37,
-      38,
-      39,
-      40,
-      41,
-      42,
-      43,
-      44,
-      45,
-      46,
-      47,
-      48,
-      49,
-      50,
-      51,
-      52,
-      53,
-      54,
-      55,
-      56,
-      57,
-      58,
-      59,
-      60,
-      61,
-      62,
-      63,
-      64,
-      65,
-      66,
-      67,
-      68,
-      69,
-      70,
-      71,
-      72,
-      73,
-      74,
-      75,
-      76,
-      77,
-      78,
-      79,
-      80,
-      81,
-      82,
-      83,
-      84,
-      85,
-      86,
-      87,
-      88,
-      89,
-      90,
-      91,
-      92,
-      93,
-      94,
-      95,
-      96,
-      97,
-      98,
-      99,
-      100,
-      101,
-      102,
-      103,
-      104,
-      105,
-      106,
-      107,
-      108,
-      109,
-      110,
-      111,
-      112,
-      113
-    ];
-    entities.forEach(function(element) {
-      if (element.rainbow) {
-        if (
-          rainbow.indexOf(element.color) == -1 ||
-          element.color == undefined
-        ) {
-          element.color = 36;
-        } else {
-          if (element.rainbowReverse == false) {
-            element.color = rainbow[rainbow.indexOf(element.color) + 1];
-          } else {
-            element.color = rainbow[rainbow.indexOf(element.color) - 1];
-          }
-        }
-        if (element.color == 113) {
-          element.rainbowReverse = true;
-        }
-        if (element.color == 36) {
-          element.rainbowReverse = false;
-        }
-      }
-    });
-  }
-  return () => {
-    // run the fun stuff :P
-    rainbow();
   };
 })();
+
+function teamWon(team) {
+	sockets.broadcast(team + " has scored a victory!");
+	setTimeout(process.exit, 1e3)
+}
+
+let blueTeam = {
+	bases: [0, 0],
+	spawnLocs: [],
+	timer: null,
+	time: 16 * 60,
+	timerFunction: function () {
+		blueTeam.time--;
+		if (blueTeam.time > 59 && blueTeam.time % 60 === 0) sockets.broadcast(blueTeam.time / 60 + ":00");
+		else if (blueTeam.time < 60 && blueTeam.time % 10 === 0) sockets.broadcast("0:" + blueTeam.time);
+		if (blueTeam.time <= 0) clearInterval(blueTeam.timer), teamWon("Blue", 11);
+	},
+	base: function (loc, team, type, sanctuary) {
+		if (sanctuary) blueTeam.spawnLocs.push(loc), blueTeam.bases[0]++;
+		if (team === -2) blueTeam.bases[1]++;
+		let o = new Entity(loc);
+		o.define(team === -1 ? Class.redcrystal : sanctuary ? Class.crystal : type);
+		o.team = team;
+		o.color = [10, 12][-team - 1];
+		o.SIZE = 75;
+		o.ondead = () => {
+			blueTeam.spawnLocs = blueTeam.spawnLocs.filter(r => r !== loc);
+			if (team === -2) {
+				if (sanctuary) blueTeam.bases[0]--;
+				if (blueTeam.bases[0] === 0) teamWon("Red", 10);
+				blueTeam.bases[1]--;
+				if (blueTeam.bases[1] === 2) sockets.broadcast("."), clearInterval(blueTeam.timer);
+			} else if (blueTeam.bases[1] + 1 === 3) blueTeam.timer = setInterval(blueTeam.timerFunction, 1e3), blueTeam.time = 8 * 60;
+			let newTeam = team === -1 ? -2 : -1;
+			let msg = team === -2 ? "Red has claimed a Blue Territory crystal." : "Red has restored their Territory.";
+			sockets.broadcast(msg);
+			room.setType(["dom2", "dom1"][-o.team - 1], loc);
+			blueTeam.base(loc, newTeam, type, false);
+		}
+	},
+	spawnBot: function () {
+		if (blueTeam.spawnLocs.length === 0) return;
+	},
+	init: function () {
+		for (let loc of room.dom2) blueTeam.base(loc, -2, ran.choose([Class.destroyedCrystal]), true);
+		for (let i = 0; i < 15; i++) blueTeam.spawnBot();
+		blueTeam.timer = setInterval(blueTeam.timerFunction, 1e3);
+	}
+};
+
+blueTeam.init();
+	}
+};
 
 function teamWon(team) {
 	sockets.broadcast(team + " has scored a victory!");
