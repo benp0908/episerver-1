@@ -24,9 +24,9 @@ let regExList = [];
 let mutedPlayers = [];
 let muteCommandUsageCountLookup = {};
 
-let userAccounts = require('./chat/chat_user.json');
-let userAccountsChatColors = require('./chat/chat_user_role_color.json');
-let userAccountRoleValues = require('./chat/chat_user_role.json');
+let userAccounts = require('./chat/permissions.json');
+let userAccountsChatColors = require('./chat/chatColors.json');
+let userAccountRoleValues = require('./chat/roles.json');
 
 const getRandomInt = (max) => {
 	return Math.floor(Math.random() * Math.floor(max));
