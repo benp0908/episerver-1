@@ -896,7 +896,7 @@ exports.baseWall = {
     PARENT: [exports.obstacle],
     LABEL: '',
     SHAPE: 4,
-    COLOR: 52,
+    TYPE: 'wall',
 };
 
 exports.mazeWall = {
