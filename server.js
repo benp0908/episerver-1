@@ -7936,7 +7936,7 @@ let server = http.createServer((req, res) => {
 	switch (pathname) {
 		case '/':
 			res.writeHead(200)
-			res.end(`<!DOCTYPE html><h3>Arras</h3><button onclick="location.href = 'http://arras.io/#host=' + location.host">Open</button>`)
+			res.end(`<!DOCTYPE html><h3>US East</h3><h3>Heroku Web Server</h3><button onclick="location.href = 'http://arras.io/#host=' + location.host">Launch</button>`)
 			break
 		case '/mockups.json':
 			res.setHeader('Access-Control-Allow-Origin', '*')
