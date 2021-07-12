@@ -7957,16 +7957,12 @@ let server = http.createServer((req, res) => {
 			break
 		default:
 			res.writeHead(404)
-			res.end()
-	}
+      res.end()
+  }
 })
-var express = require('express'),
-	app = express();
-var server2 = http.createServer(app);
-
 
 let websockets = (() => {
-	// Configure the websocketserver
+    // Configure the websocketserver
 	let config = {
 		server: server
 	}
